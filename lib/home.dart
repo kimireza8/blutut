@@ -8,15 +8,25 @@ class HomePage extends StatelessWidget {
   final List<Shipment> shipments = [
     Shipment(
       trackingNumber: '123456789',
-      sender: 'Sender',
-      receiver: 'Receiver',
-      weight: 10,
+      sender: 'Sender A',
+      receiver: 'Receiver A',
+      branchOffice: 'Jakarta',
+      totalColi: 10,
+      date: '2023-01-01',
+      relationName: 'Company A',
+      deliveryRoute: 'Jakarta - Surabaya',
+      shipmentNumber: 'SJ-001',
     ),
     Shipment(
       trackingNumber: '987654321',
-      sender: 'Sender',
-      receiver: 'Receiver',
-      weight: 20,
+      sender: 'Sender B',
+      receiver: 'Receiver B',
+      branchOffice: 'Surabaya',
+      totalColi: 20,
+      date: '2023-01-02',
+      relationName: 'Company B',
+      deliveryRoute: 'Surabaya - Bandung',
+      shipmentNumber: 'SJ-002',
     ),
   ];
 
@@ -24,7 +34,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Daftar Pengiriman'),
+        centerTitle: true,
       ),
       body: Column(
         children: [
@@ -33,25 +44,45 @@ class HomePage extends StatelessWidget {
               itemCount: shipments.length,
               itemBuilder: (context, index) {
                 final shipment = shipments[index];
-                return ListTile(
-                  title: Text(shipment.trackingNumber),
-                  subtitle: Text('${shipment.sender} -> ${shipment.receiver}'),
-                  trailing: Text('${shipment.weight} kg'),
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    title: Text(
+                      "No Resi: ${shipment.trackingNumber}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text("${shipment.sender} → ${shipment.receiver}"),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Cabang: ${shipment.branchOffice}"),
+                        Text("Total Coli: ${shipment.totalColi}"),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
           ),
           const Divider(),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              ),
+              onPressed: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Print(
-                            shipments: shipments,
-                          )));
-            },
-            child: const Text('print'),
+                    builder: (context) => Print(shipments: shipments),
+                  ),
+                );
+              },
+              child: const Text('Print QR Code'),
+            ),
           ),
         ],
       ),

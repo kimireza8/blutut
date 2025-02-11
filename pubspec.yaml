@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
   bluetooth_classic:
     path: pkgs/bluetooth_classic
+  qr_flutter: ^4.1.0
+  flutter_esc_pos_utils: ^1.0.1
+  image: ^4.5.2
 
 dev_dependencies:
   flutter_test:

@@ -179,16 +179,24 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
         call.argument<String>("serviceUUID")!!
       )
       "disconnect" -> disconnect(result)
-      "write" -> write(result, call.argument<String>("message")!!)
+      "write" -> {
+        val message = call.argument<ByteArray>("message")
+        if (message != null) {
+          write(result, message)
+        } else {
+          result.error("invalid_argument", "Message is null or invalid", null)
+        }
+      }
+
       else -> result.notImplemented()
     }
   }
 
-  private fun write(result: Result, message: String) {
+  private fun write(result: Result, message: ByteArray) {
     Log.i("write_handle", thread.toString())
     Log.i("write_handle", "inside write handle")
     if (thread != null) {
-      thread!!.write(message.toByteArray())
+      thread!!.write(message)
       result.success(true)
     } else {
       result.error("write_impossible", "could not send message to unconnected device", null)
