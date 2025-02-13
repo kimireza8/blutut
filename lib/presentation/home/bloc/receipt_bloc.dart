@@ -1,4 +1,4 @@
-import 'package:blutut_clasic/domain/usecase/receipt_fetch_usecase.dart';
+import 'package:blutut_clasic/domain/usecases/receipt_fetch_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

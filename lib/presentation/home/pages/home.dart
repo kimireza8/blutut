@@ -1,11 +1,7 @@
-import 'package:blutut_clasic/presentation/auth/bloc/auth_bloc_bloc.dart';
-import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
-import 'package:blutut_clasic/presentation/home/pages/page.dart';
 import 'package:flutter/material.dart';
 import 'package:blutut_clasic/presentation/home/pages/print.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../data/models/shipping_models.dart';
+import '../../../data/models/shipping_model.dart';
 
 class HomeCuy extends StatelessWidget {
   HomeCuy({super.key});

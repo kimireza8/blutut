@@ -5,13 +5,19 @@ class SharedPreferencesService {
 
   final SharedPreferences _sharedPreferences;
 
-  Future<void> setToken(String token) async {
-    await _sharedPreferences.setString('token', token);
+  Future<void> setCookie(String cookie) async {
+    await setString('cookie', cookie);
   }
 
-  String? getToken() => _sharedPreferences.getString('token');
+  String? getCookie() => getString('cookie');
 
-  Future<void> clearToken() async {
+  Future<void> clearCookie() async {
     await _sharedPreferences.clear();
   }
+
+  Future<void> setString(String key, String value) async {
+    await _sharedPreferences.setString(key, value);
+  }
+
+  String? getString(String key) => _sharedPreferences.getString(key);
 }

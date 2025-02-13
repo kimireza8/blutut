@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image/image.dart' as img;
 
-import '../../../data/models/shipping_models.dart';
+import '../../../data/models/shipping_model.dart';
 
 class Print extends StatefulWidget {
   final List<Shipment> shipments;

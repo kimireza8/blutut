@@ -1,12 +1,12 @@
-
-import 'package:blutut_clasic/presentation/auth/bloc/auth_bloc_bloc.dart';
-import 'package:blutut_clasic/presentation/auth/pages/login_page.dart';
 import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/router/app_router.dart';
 import 'injection.dart';
+import 'presentation/auth/cubit/auth_cubit.dart';
+import 'core/services/shared_preferences_service.dart';
+import 'domain/usecases/auth_usecases.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,16 +23,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => ReceiptBloc(receiptFetchUsecase: serviceLocator()),
+        BlocProvider<AuthCubit>(
+          create: (context) => AuthCubit(
+            serviceLocator<SharedPreferencesService>(),
+            serviceLocator<LoginUsecase>(),
+          ),
         ),
         BlocProvider(
-          create: (context) => AuthBloc(userLoginUsecase: serviceLocator(), userFetchdataUsecase: serviceLocator()),
+          create: (context) =>
+              ReceiptBloc(receiptFetchUsecase: serviceLocator()),
         ),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        routerConfig: _appRouter.config(),
       ),
     );
   }
