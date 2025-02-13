@@ -1,5 +1,5 @@
-import 'package:blutut_clasic/print.dart';
-import 'package:blutut_clasic/shipping_models.dart';
+import 'package:blutut_clasic/presentation/home/pages/print.dart';
+import 'package:blutut_clasic/presentation/home/pages/shipping_models.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {

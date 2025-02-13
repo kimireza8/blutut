@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bluetooth_classic/bluetooth_classic.dart';
 import 'package:bluetooth_classic/models/device.dart';
-import 'package:blutut_clasic/shipping_models.dart';
+import 'package:blutut_clasic/presentation/home/pages/shipping_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'dart:async';
