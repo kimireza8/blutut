@@ -1,5 +1,5 @@
 import 'package:blutut_clasic/data/models/login_request_model.dart';
-import 'package:blutut_clasic/domain/exceptions/auth_exceptions.dart';
+import 'package:blutut_clasic/core/utils/exceptions/auth_exceptions.dart';
 import 'package:dio/dio.dart';
 
 import '../../core/constants/constant.dart';
