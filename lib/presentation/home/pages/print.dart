@@ -1,13 +1,13 @@
-import 'dart:convert';
 import 'package:bluetooth_classic/bluetooth_classic.dart';
 import 'package:bluetooth_classic/models/device.dart';
-import 'package:blutut_clasic/presentation/home/pages/shipping_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image/image.dart' as img;
+
+import '../../../data/models/shipping_models.dart';
 
 class Print extends StatefulWidget {
   final List<Shipment> shipments;
@@ -59,7 +59,7 @@ class _PrintState extends State<Print> {
       if (mounted) setState(() => _scanning = false);
     } else {
       setState(() {
-        _discoveredDevices.clear(); // Bersihkan daftar sebelum scan baru
+        _discoveredDevices.clear();
       });
 
       await _bluetoothClassicPlugin.startScan();

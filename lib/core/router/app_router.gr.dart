@@ -16,46 +16,46 @@ import 'package:blutut_clasic/presentation/auth/pages/login_page.dart' as _i1;
 /// [_i1.ForgotPasswordPage]
 class ForgotPasswordRoute extends _i2.PageRouteInfo<void> {
   const ForgotPasswordRoute({List<_i2.PageRouteInfo>? children})
-    : super(ForgotPasswordRoute.name, initialChildren: children);
+      : super(ForgotPasswordRoute.name, initialChildren: children);
 
   static const String name = 'ForgotPasswordRoute';
 
-  static _i2.PageInfo page = _i2.PageInfo(
-    name,
-    builder: (data) {
-      return const _i1.ForgotPasswordPage();
-    },
-  );
+  // static _i2.PageInfo page = _i2.PageInfo(
+  //   name,
+  //   builder: (data) {
+  //     return const _i1.ForgotPasswordPage();
+  //   },
+  // );
 }
 
 /// generated route for
 /// [_i1.HomePage]
 class HomeRoute extends _i2.PageRouteInfo<void> {
   const HomeRoute({List<_i2.PageRouteInfo>? children})
-    : super(HomeRoute.name, initialChildren: children);
+      : super(HomeRoute.name, initialChildren: children);
 
   static const String name = 'HomeRoute';
 
-  static _i2.PageInfo page = _i2.PageInfo(
-    name,
-    builder: (data) {
-      return const _i1.HomePage();
-    },
-  );
+  // static _i2.PageInfo page = _i2.PageInfo(
+  //   name,
+  //   builder: (data) {
+  //     return const _i1.HomePage();
+  //   },
+  // );
 }
 
 /// generated route for
 /// [_i1.LoginPage]
 class LoginRoute extends _i2.PageRouteInfo<void> {
   const LoginRoute({List<_i2.PageRouteInfo>? children})
-    : super(LoginRoute.name, initialChildren: children);
+      : super(LoginRoute.name, initialChildren: children);
 
   static const String name = 'LoginRoute';
 
-  static _i2.PageInfo page = _i2.PageInfo(
-    name,
-    builder: (data) {
-      return const _i1.LoginPage();
-    },
-  );
+  // static _i2.PageInfo page = _i2.PageInfo(
+  //   name,
+  //   builder: (data) {
+  //     return const _i1.LoginPage();
+  //   },
+  // );
 }

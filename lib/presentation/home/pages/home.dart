@@ -1,21 +1,27 @@
-import 'package:blutut_clasic/presentation/home/pages/print.dart';
-import 'package:blutut_clasic/presentation/home/pages/shipping_models.dart';
+import 'package:blutut_clasic/presentation/auth/bloc/auth_bloc_bloc.dart';
+import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
+import 'package:blutut_clasic/presentation/home/pages/page.dart';
 import 'package:flutter/material.dart';
+import 'package:blutut_clasic/presentation/home/pages/print.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+import '../../../data/models/shipping_models.dart';
+
+class HomeCuy extends StatelessWidget {
+  HomeCuy({super.key});
 
   final List<Shipment> shipments = [
     Shipment(
       trackingNumber: '123456789',
       sender: 'Sender A',
       receiver: 'Receiver A',
-      branchOffice: 'Jakarta',
+      branchOffice: 'Bandung',
       totalColi: 10,
       date: '2023-01-01',
       relationName: 'Company A',
-      deliveryRoute: 'Jakarta - Surabaya',
+      deliveryRoute: 'Bandung - Surabaya',
       shipmentNumber: 'SJ-001',
+      weight: 10,
     ),
     Shipment(
       trackingNumber: '987654321',
@@ -27,6 +33,7 @@ class HomePage extends StatelessWidget {
       relationName: 'Company B',
       deliveryRoute: 'Surabaya - Bandung',
       shipmentNumber: 'SJ-002',
+      weight: 20,
     ),
   ];
 
@@ -34,30 +41,63 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daftar Pengiriman'),
+        title: const Text('Daftar Pengiriman',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        elevation: 4,
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.all(10),
               itemCount: shipments.length,
               itemBuilder: (context, index) {
                 final shipment = shipments[index];
                 return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: ListTile(
-                    title: Text(
-                      "No Resi: ${shipment.trackingNumber}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text("${shipment.sender} → ${shipment.receiver}"),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Cabang: ${shipment.branchOffice}"),
-                        Text("Total Coli: ${shipment.totalColi}"),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("No Resi: ${shipment.trackingNumber}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                            Chip(
+                              label: Text(shipment.branchOffice,
+                                  style: const TextStyle(color: Colors.white)),
+                              backgroundColor: Colors.blueAccent,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                            "Pengirim: ${shipment.sender} → ${shipment.receiver}",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black54)),
+                        const SizedBox(height: 4),
+                        Text("Rute: ${shipment.deliveryRoute}",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black54)),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Total Coli: ${shipment.totalColi}",
+                                style: const TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text("Tanggal: ${shipment.date}",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black54)),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -67,21 +107,25 @@ class HomePage extends StatelessWidget {
           ),
           const Divider(),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
+            padding: const EdgeInsets.all(12),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: Colors.blueAccent,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => Print(shipments: shipments),
-                  ),
-                );
-              },
-              child: const Text('Print QR Code'),
+                  ));
+                },
+                child: const Text('Print QR Code',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
             ),
           ),
         ],
