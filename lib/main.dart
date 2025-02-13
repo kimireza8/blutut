@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/router/app_router.dart';
-import 'injection.dart';
+import 'dependency_injections.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'core/services/shared_preferences_service.dart';
 import 'domain/usecases/auth_usecases.dart';

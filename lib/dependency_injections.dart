@@ -27,8 +27,6 @@ Future<void> initDependency() async {
     ..registerLazySingleton<RemoteReceiptProvider>(
       () => RemoteReceiptProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
-        remoteAuthProvider: serviceLocator<RemoteAuthProvider>()))
     ..registerLazySingleton(() => AuthCubit(
         serviceLocator<SharedPreferencesService>(),
         serviceLocator<LoginUsecase>()));

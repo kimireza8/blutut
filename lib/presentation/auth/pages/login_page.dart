@@ -5,6 +5,7 @@ import 'package:blutut_clasic/presentation/auth/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+@RoutePage()
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -38,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
                   rememberMe: _rememberMe ? 1 : 0),
             );
         if (context.mounted) {
-          context.router.push(const HomeRoute());
+          context.router.replace(HomeRoute());
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -200,40 +201,6 @@ class _LoginPageState extends State<LoginPage> {
       child: const Text(
         'Forgot Password',
         style: TextStyle(color: Colors.grey),
-      ),
-    );
-  }
-}
-
-@RoutePage()
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: const Center(
-        child: Text('Welcome to the Home Page!'),
-      ),
-    );
-  }
-}
-
-@RoutePage()
-class ForgotPasswordPage extends StatelessWidget {
-  const ForgotPasswordPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Forgot Password'),
-      ),
-      body: const Center(
-        child: Text('Forgot Password Page'),
       ),
     );
   }

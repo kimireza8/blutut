@@ -1,10 +1,12 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:blutut_clasic/presentation/home/pages/print.dart';
+import 'package:blutut_clasic/presentation/home/pages/print_page.dart';
 
 import '../../../data/models/shipping_model.dart';
 
-class HomeCuy extends StatelessWidget {
-  HomeCuy({super.key});
+@RoutePage()
+class HomePage extends StatelessWidget {
+  HomePage({super.key});
 
   final List<Shipment> shipments = [
     Shipment(

@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 
 import '../../core/services/shared_preferences_service.dart';
-import '../../injection.dart';
+import '../../dependency_injections.dart';
 
 class RemoteReceiptProvider {
   final Dio _dio;

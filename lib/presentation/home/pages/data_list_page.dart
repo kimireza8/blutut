@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/receipt_bloc.dart';
 
-class PageFetch extends StatelessWidget {
-  const PageFetch({super.key});
+class DataListPage extends StatelessWidget {
+  const DataListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
