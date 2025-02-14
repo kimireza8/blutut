@@ -1,13 +1,12 @@
-import 'package:blutut_clasic/data/models/login_request_model.dart';
-import 'package:blutut_clasic/core/utils/exceptions/auth_exceptions.dart';
 import 'package:dio/dio.dart';
 
 import '../../core/constants/constant.dart';
+import '../../core/services/shared_preferences_service.dart';
+import '../../core/utils/exceptions/auth_exceptions.dart';
+import '../models/login_request_model.dart';
 
 class RemoteAuthProvider {
   final Dio _dio;
-
-  static const String _sessionCookieName = 'siklonsession';
 
   static final _loginHeaders = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -17,7 +16,10 @@ class RemoteAuthProvider {
     "X-Requested-With": "XMLHttpRequest",
   };
 
-  const RemoteAuthProvider({required Dio dio}) : _dio = dio;
+  const RemoteAuthProvider({
+    required Dio dio,
+    required SharedPreferencesService sharedPreferencesService,
+  })  : _dio = dio;
 
   Future<String> login(LoginRequest loginRequest) async {
     try {
@@ -51,16 +53,15 @@ class RemoteAuthProvider {
 
   String _extractSessionToken(List<String> cookies) {
     String? lastCookie;
-    for (final cookie in cookies) {
-      final cookieParts = cookie.split(';');
-      final cookieNameValue = cookieParts[0].split('=');
-      final cookieName = cookieNameValue[0].trim();
-      final cookieValue = cookieNameValue[1].trim();
-      if (cookieName == _sessionCookieName) {
-        lastCookie = "$_sessionCookieName=$cookieValue";
-        break;
+    for (var cookie in cookies) {
+        var cookieParts = cookie.split(';');
+        var cookieName = cookieParts[0].split('=')[0].trim();
+        var cookieValue = cookieParts[0].split('=')[1].trim();
+        if (cookieName == 'siklonsession') {
+          lastCookie = cookieValue;
+        }
       }
-    }
+
     return lastCookie ?? '';
   }
 

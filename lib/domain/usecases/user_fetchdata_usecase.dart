@@ -1,13 +1,12 @@
-// import 'package:blutut_clasic/domain/repositories/user_repository.dart';
+import '../entities/user_entity.dart';
+import '../repositories/user_repository.dart';
 
-// class UserFetchdataUsecase {
-//   final UserRepository _userRepository;
+class UserFetchDataUsecase {
+  final UserRepository _userRepository;
 
-//   UserFetchdataUsecase({required UserRepository userRepository}) : _userRepository = userRepository;
+  UserFetchDataUsecase(this._userRepository);
 
-//   Future<Map<String, dynamic>?> call (String token) async {
-//     return await _userRepository.fetchUserInfo(token);
-
-//   }
-
-// }
+  Future<UserEntity> call() async {
+    return await _userRepository.getUserInfo();
+  }
+}
