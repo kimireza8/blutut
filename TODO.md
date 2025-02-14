@@ -12,8 +12,9 @@
 
 - [x] Implementasi halaman login. (Done)
 - [x] Implementasi penyimpanan lokal untuk menyimpan data pengiriman. (Done)
-- [ ] Implementasi bottom navbar untuk home page dan profile page. (Ongoing)
+- [x] Implementasi bottom navbar untuk home page dan profile page. (Done)
 - [ ] Implementasi halaman profil dengan fungsi logout. (Ongoing)
+- [ ] Consume endpoint API user info dan logout di halaman profile. (Ongoing)
 - [ ] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
 
 ### **Kimi**
