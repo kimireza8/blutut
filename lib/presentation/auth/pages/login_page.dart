@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
                   rememberMe: _rememberMe ? 1 : 0),
             );
         if (context.mounted) {
-          context.router.replace(const InputRoute());
+          context.router.replace(const ProfileRoute());
 
         }
       } catch (e) {

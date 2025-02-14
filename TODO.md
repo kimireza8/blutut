@@ -20,7 +20,7 @@
 ### **Kimi**
 
 - [x] Implementasi halaman daftar data untuk informasi pengiriman. (Done)
-- [ ] Implementasi halaman untuk input data untuk informasi pengiriman. (Ongoing)
+- [x] Implementasi halaman untuk input data untuk informasi pengiriman. (Ongoing)
 - [x] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Done)
 - [x] Menghubungkan API dari halaman master ke dalam model. (Done)
 - [ ] Implementasi halaman cetak kode QR untuk label pengiriman. (Ongoing)
