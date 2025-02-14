@@ -11,9 +11,10 @@
 ### **Andrey**
 
 - [x] Implementasi halaman login. (Done)
+- [x] Implementasi penyimpanan lokal untuk menyimpan data pengiriman. (Done)
+- [ ] Implementasi bottom navbar untuk home page dan profile page. (Ongoing)
 - [ ] Implementasi halaman profil dengan fungsi logout. (Ongoing)
 - [ ] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
-- [ ] Implementasi penyimpanan lokal untuk menyimpan data pengiriman. (Ongoing)
 
 ### **Kimi**
 
