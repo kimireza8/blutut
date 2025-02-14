@@ -1,3 +1,4 @@
+import 'package:blutut_clasic/domain/entities/shipping_entity.dart';
 import 'package:blutut_clasic/domain/repositories/receipt_repository.dart';
 
 class ReceiptFetchUsecase{
@@ -5,7 +6,7 @@ class ReceiptFetchUsecase{
 
   ReceiptFetchUsecase({required ReceiptRepository receiptRepository}) : _receiptRepository = receiptRepository;
 
-  Future<List<Map<String, dynamic>>> call (String token) async {
+  Future<List<Shipment>> call (String token) async {
     return await _receiptRepository.getOprIncomingReceipts(token);
   }
 

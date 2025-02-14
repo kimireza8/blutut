@@ -26,15 +26,15 @@ class HomeRoute extends _i3.PageRouteInfo<HomeRouteArgs> {
 
   static const String name = 'HomeRoute';
 
-  static _i3.PageInfo page = _i3.PageInfo(
-    name,
-    builder: (data) {
-      final args = data.argsAs<HomeRouteArgs>(
-        orElse: () => const HomeRouteArgs(),
-      );
-      return _i1.HomePage(key: args.key);
-    },
-  );
+  // static _i3.PageInfo page = _i3.PageInfo(
+  //   name,
+  //   builder: (data) {
+  //     final args = data.argsAs<HomeRouteArgs>(
+  //       orElse: () => const HomeRouteArgs(),
+  //     );
+  //     return _i1.HomePage(key: args.key);
+  //   },
+  // );
 }
 
 class HomeRouteArgs {

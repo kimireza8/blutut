@@ -28,15 +28,15 @@ class DataListPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final receipt = state.receipts[index];
                 final number =
-                    receipt["oprincomingreceipt_number"] ?? "No Number";
+                    receipt.trackingNumber ?? "No Number";
                 final date =
-                    receipt["oprincomingreceipt_date"] ?? "No Date";
+                    receipt.date ?? "No Date";
                 final shipper =
-                    receipt["oprincomingreceipt_shippername"] ?? "Unknown";
+                    receipt.shipperName ?? "Unknown";
                 final consignee =
-                    receipt["oprincomingreceipt_consigneename"] ?? "Unknown";
+                    receipt.consigneeName ?? "Unknown";
                 final status =
-                    receipt["oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_name"] ??
+                    receipt.status ??
                         "Unknown";
 
                 return Card(

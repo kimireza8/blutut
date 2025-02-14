@@ -156,7 +156,7 @@ class _PrintState extends State<Print> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${shipment.sender} -> ${shipment.receiver}'),
+                        Text('${shipment.customer} -> ${shipment.shipperName}'),
                         const SizedBox(height: 8),
                         QrImageView(
                           data: shipment.trackingNumber,

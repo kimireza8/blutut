@@ -4,14 +4,14 @@ import 'dart:convert';
 
 import '../../core/services/shared_preferences_service.dart';
 import '../../dependency_injections.dart';
+import '../models/shipping_model.dart';
 
 class RemoteReceiptProvider {
   final Dio _dio;
 
   const RemoteReceiptProvider({required Dio dio}) : _dio = dio;
 
-  Future<List<Map<String, dynamic>>> getOprIncomingReceipts(
-      String cookie) async {
+  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     var token = serviceLocator<SharedPreferencesService>().getCookie();
     log('Cookie: $cookie');
@@ -53,7 +53,7 @@ class RemoteReceiptProvider {
             },
             {
               "field_name":
-                  "oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_id",
+              "oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_id",
               "field_value": null
             }
           ]),
@@ -93,7 +93,8 @@ class RemoteReceiptProvider {
       }
 
       final data = (responseData['rows'] as List?) ?? [];
-      return data.cast<Map<String, dynamic>>();
+
+      return data.map((json) => ShipmentModel.fromJson(json)).toList();
     } on DioException catch (e) {
       log('Dio Error: ${e.message}, ${e.response?.statusCode}, ${e.response?.data}');
       throw Exception('Failed to load data: ${e.message}');
@@ -102,4 +103,5 @@ class RemoteReceiptProvider {
       throw Exception('An error occurred: ${e.toString()}');
     }
   }
+
 }

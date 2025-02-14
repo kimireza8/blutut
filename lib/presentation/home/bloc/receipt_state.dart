@@ -12,7 +12,7 @@ class ReceiptInitial extends ReceiptState {}
 class ReceiptLoading extends ReceiptState {}
 
 class ReceiptLoaded extends ReceiptState {
-  final List<Map<String, dynamic>> receipts;
+  final List<Shipment> receipts;
 
   const ReceiptLoaded(this.receipts);
 

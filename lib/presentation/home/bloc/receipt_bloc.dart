@@ -2,6 +2,8 @@ import 'package:blutut_clasic/domain/usecases/receipt_fetch_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../domain/entities/shipping_entity.dart';
+
 part 'receipt_event.dart';
 part 'receipt_state.dart';
 
