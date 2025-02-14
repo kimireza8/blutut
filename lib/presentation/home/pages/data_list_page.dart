@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/receipt_bloc.dart';
+import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 
 class DataListPage extends StatelessWidget {
   const DataListPage({super.key});
@@ -9,12 +9,12 @@ class DataListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Receipts")),
+      appBar: AppBar(title: const Text('Receipts')),
       body: BlocConsumer<ReceiptBloc, ReceiptState>(
         listener: (context, state) {
           if (state is ReceiptError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Error: ${state.message}")),
+              SnackBar(content: Text('Error: ${state.message}')),
             );
           }
         },
@@ -28,16 +28,16 @@ class DataListPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final receipt = state.receipts[index];
                 final number =
-                    receipt.trackingNumber ?? "No Number";
+                    receipt.trackingNumber ?? 'No Number';
                 final date =
-                    receipt.date ?? "No Date";
+                    receipt.date ?? 'No Date';
                 final shipper =
-                    receipt.shipperName ?? "Unknown";
+                    receipt.shipperName ?? 'Unknown';
                 final consignee =
-                    receipt.consigneeName ?? "Unknown";
+                    receipt.consigneeName ?? 'Unknown';
                 final status =
                     receipt.status ??
-                        "Unknown";
+                        'Unknown';
 
                 return Card(
                   elevation: 3,
@@ -52,7 +52,7 @@ class DataListPage extends StatelessWidget {
                       size: 36,
                     ),
                     title: Text(
-                      "No: $number",
+                      'No: $number',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -61,9 +61,9 @@ class DataListPage extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Tanggal: $date"),
-                        Text("Pengirim: $shipper"),
-                        Text("Penerima: $consignee"),
+                        Text('Tanggal: $date'),
+                        Text('Pengirim: $shipper'),
+                        Text('Penerima: $consignee'),
                         Container(
                           margin: const EdgeInsets.only(top: 5),
                           padding: const EdgeInsets.symmetric(
@@ -87,7 +87,7 @@ class DataListPage extends StatelessWidget {
               },
             );
           }
-          return const Center(child: Text("No Data Available"));
+          return const Center(child: Text('No Data Available'));
         },
       ),
     );
@@ -95,11 +95,11 @@ class DataListPage extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case "completed":
+      case 'completed':
         return Colors.green;
-      case "pending":
+      case 'pending':
         return Colors.orange;
-      case "canceled":
+      case 'canceled':
         return Colors.red;
       default:
         return Colors.grey;
