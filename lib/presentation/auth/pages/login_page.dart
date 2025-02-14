@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
                   rememberMe: _rememberMe ? 1 : 0),
             );
         if (context.mounted) {
-          context.router.replace(HomeRoute());
+          // context.router.replace(HomeRoute());
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
