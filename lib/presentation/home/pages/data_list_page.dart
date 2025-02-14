@@ -23,16 +23,66 @@ class DataListPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ReceiptLoaded) {
             return ListView.builder(
+              padding: const EdgeInsets.all(8),
               itemCount: state.receipts.length,
               itemBuilder: (context, index) {
                 final receipt = state.receipts[index];
                 final number =
                     receipt["oprincomingreceipt_number"] ?? "No Number";
-                final date = receipt["oprincomingreceipt_date"] ?? "No Date";
+                final date =
+                    receipt["oprincomingreceipt_date"] ?? "No Date";
+                final shipper =
+                    receipt["oprincomingreceipt_shippername"] ?? "Unknown";
+                final consignee =
+                    receipt["oprincomingreceipt_consigneename"] ?? "Unknown";
+                final status =
+                    receipt["oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_name"] ??
+                        "Unknown";
 
-                return ListTile(
-                  title: Text(number),
-                  subtitle: Text(date),
+                return Card(
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(12),
+                    leading: Icon(
+                      Icons.receipt_long,
+                      color: Colors.blueAccent,
+                      size: 36,
+                    ),
+                    title: Text(
+                      "No: $number",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Tanggal: $date"),
+                        Text("Pengirim: $shipper"),
+                        Text("Penerima: $consignee"),
+                        Container(
+                          margin: const EdgeInsets.only(top: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(status),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            status,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             );
@@ -41,5 +91,18 @@ class DataListPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return Colors.green;
+      case "pending":
+        return Colors.orange;
+      case "canceled":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }

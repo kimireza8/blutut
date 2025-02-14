@@ -1,26 +1,31 @@
-class Shipment {
-  final String trackingNumber;
-  final String branchOffice;
-  final String date;
-  final String relationName;
-  final String sender;
-  final String receiver;
-  final double weight;
-  final String shipmentNumber;
-  final String deliveryRoute;
-  final int totalColi;
+import '../../domain/entities/shipping_entity.dart';
 
-  Shipment({
-    required this.trackingNumber,
-    required this.branchOffice,
-    required this.date,
-    required this.relationName,
-    required this.sender,
-    required this.receiver,
-    required this.weight,
-    required this.shipmentNumber,
-    required this.deliveryRoute,
-    required this.totalColi,
+class ShipmentModel extends Shipment {
+  ShipmentModel({
+    required super.trackingNumber,
+    required super.sender,
+    required super.receiver,
+    required super.branchOffice,
+    required super.totalColi,
+    required super.date,
+    required super.relationName,
+    required super.deliveryRoute,
+    required super.shipmentNumber,
   });
 
+  factory ShipmentModel.fromJson(Map<String, dynamic> json) {
+    return ShipmentModel(
+      trackingNumber: json['trackingNumber'] as String? ?? '',
+      sender: json['sender'] as String? ?? '',
+      receiver: json['receiver'] as String? ?? '',
+      branchOffice: json['branchOffice'] as String? ?? '',
+      totalColi: json['totalColi'] as int? ?? 0,
+      date: json['date'] as String? ?? '',
+      relationName: json['relationName'] as String? ?? '',
+      deliveryRoute: json['deliveryRoute'] as String? ?? '',
+      shipmentNumber: json['shipmentNumber'] as String? ?? '',
+
+    );
   }
+
+}

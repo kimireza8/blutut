@@ -1,8 +1,15 @@
+
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 import 'package:blutut_clasic/presentation/home/pages/print_page.dart';
 
-import '../../../data/models/shipping_model.dart';
+import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../domain/entities/shipping_entity.dart';
+
+
 
 @RoutePage()
 class HomePage extends StatelessWidget {
@@ -19,7 +26,7 @@ class HomePage extends StatelessWidget {
       relationName: 'Company A',
       deliveryRoute: 'Bandung - Surabaya',
       shipmentNumber: 'SJ-001',
-      weight: 10,
+
     ),
     Shipment(
       trackingNumber: '987654321',
@@ -31,7 +38,7 @@ class HomePage extends StatelessWidget {
       relationName: 'Company B',
       deliveryRoute: 'Surabaya - Bandung',
       shipmentNumber: 'SJ-002',
-      weight: 20,
+
     ),
   ];
 

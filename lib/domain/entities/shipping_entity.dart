@@ -1,4 +1,4 @@
-class ShippingEntity {
+class Shipment {
   final String trackingNumber;
   final String sender;
   final String receiver;
@@ -8,9 +8,9 @@ class ShippingEntity {
   final String relationName;
   final String deliveryRoute;
   final String shipmentNumber;
-  final int weight;
 
-  ShippingEntity({
+
+  Shipment({
     required this.trackingNumber,
     required this.sender,
     required this.receiver,
@@ -20,6 +20,6 @@ class ShippingEntity {
     required this.relationName,
     required this.deliveryRoute,
     required this.shipmentNumber,
-    required this.weight,
+
   });
 }
