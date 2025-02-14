@@ -7,6 +7,7 @@ import '../models/login_request_model.dart';
 
 class RemoteAuthProvider {
   final Dio _dio;
+  final SharedPreferencesService _sharedPreferencesService;
 
   static final _loginHeaders = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -19,7 +20,8 @@ class RemoteAuthProvider {
   const RemoteAuthProvider({
     required Dio dio,
     required SharedPreferencesService sharedPreferencesService,
-  })  : _dio = dio;
+  })  : _dio = dio,
+        _sharedPreferencesService = sharedPreferencesService;
 
   Future<String> login(LoginRequest loginRequest) async {
     try {
@@ -35,6 +37,8 @@ class RemoteAuthProvider {
 
       final token = _extractSessionToken(response.headers['set-cookie'] ?? []);
 
+      await _sharedPreferencesService.setCookie(token);
+
       final statusCode = response.statusCode;
       if (statusCode == 401) {
         throw InvalidCredentialsException('Invalid username or password.');
@@ -48,6 +52,26 @@ class RemoteAuthProvider {
       throw _handleDioError(e);
     } catch (e) {
       throw AuthException('Unexpected error during login: $e');
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      final cookie = _sharedPreferencesService.getCookie();
+      final response = await _dio.get(
+        '${Constant.baseUrl}/auth/logout/',
+        options: Options(headers: {'Cookie': "siklonsession=$cookie"}),
+      );
+
+      final statusCode = response.statusCode;
+      if (statusCode != 200) {
+        throw ServerException('Logout failed with status code: $statusCode');
+      }
+      await _sharedPreferencesService.clearCookie();
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw AuthException('Unexpected error during logout: $e');
     }
   }
 
@@ -83,7 +107,6 @@ class RemoteAuthProvider {
         return ServerException('Server error. Status code: $statusCode');
       }
     }
-
     return NetworkException('Network error. Please check your internet connection.');
   }
 }

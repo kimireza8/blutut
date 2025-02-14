@@ -13,3 +13,9 @@ class AuthLoaded extends AuthState {
 
   AuthLoaded(this.cookie);
 }
+
+class AuthError extends AuthState {
+  final String message;
+
+  AuthError({required this.message}); // Add required message parameter
+}

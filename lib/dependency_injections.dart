@@ -44,7 +44,7 @@ Future<void> initDependency() async {
     )
     ..registerLazySingleton(() => AuthCubit(
         serviceLocator<SharedPreferencesService>(),
-        serviceLocator<LoginUsecase>()))
+        serviceLocator<AuthUsecase>()))
     ..registerLazySingleton(() => HiveService());
 
   serviceLocator
@@ -56,7 +56,7 @@ Future<void> initDependency() async {
         remoteUserProvider: serviceLocator<RemoteUserProvider>()))
     ..registerFactory<ReceiptFetchUsecase>(
         () => ReceiptFetchUsecase(receiptRepository: serviceLocator()))
-    ..registerFactory(() => LoginUsecase(serviceLocator<AuthRepository>()))
+    ..registerFactory(() => AuthUsecase(serviceLocator<AuthRepository>()))
     ..registerFactory<UserFetchDataUsecase>(
         () => UserFetchDataUsecase(serviceLocator<UserRepository>()))
     ..registerFactory(() => ProfileCubit(

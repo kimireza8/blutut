@@ -1,15 +1,16 @@
 import 'package:bloc/bloc.dart';
-import 'package:blutut_clasic/core/services/shared_preferences_service.dart';
-import 'package:blutut_clasic/domain/entities/login_request_entity.dart';
-import 'package:blutut_clasic/domain/usecases/auth_usecases.dart';
+
+import '../../../core/services/shared_preferences_service.dart';
+import '../../../domain/entities/login_request_entity.dart';
+import '../../../domain/usecases/auth_usecases.dart';
 
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final SharedPreferencesService _sharedPreferencesService;
-  final LoginUsecase _loginUsecase;
+  final AuthUsecase _authUsecase;
 
-  AuthCubit(this._sharedPreferencesService, this._loginUsecase) : super(AuthInitial());
+  AuthCubit(this._sharedPreferencesService, this._authUsecase) : super(AuthInitial());
 
   Future<void> storeCookie(String cookie) async {
     emit(AuthLoading());
@@ -30,7 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(LoginRequestEntity loginRequest) async {
     emit(AuthLoading());
     try {
-      final cookie = await _loginUsecase.call(loginRequest);
+      final cookie = await _authUsecase.login(loginRequest);
       if (cookie != null) {
         await storeCookie(cookie);
       } else {
@@ -38,6 +39,17 @@ class AuthCubit extends Cubit<AuthState> {
       }
     } catch (e) {
       emit(AuthInitial());
+    }
+  }
+
+  Future<void> logout() async {
+    emit(AuthLoading());
+    try {
+      await _authUsecase.logout();
+      await _sharedPreferencesService.clearCookie();
+      emit(AuthInitial()); // Go back to initial state after logout
+    } catch (e) {
+      emit(AuthError(message: e.toString())); // Handle logout errors
     }
   }
 }

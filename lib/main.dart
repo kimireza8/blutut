@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthCubit>(
           create: (context) => AuthCubit(
             serviceLocator<SharedPreferencesService>(),
-            serviceLocator<LoginUsecase>(),
+            serviceLocator<AuthUsecase>(),
           ),
         ),
         BlocProvider(

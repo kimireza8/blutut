@@ -2,8 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/router/app_router.gr.dart';
 import '../../widgets/bottom_navbar_widget.dart';
 import '../cubit/profile_cubit.dart';
+import '../../auth/cubit/auth_cubit.dart';
 
 @RoutePage()
 class ProfilePage extends StatelessWidget {
@@ -41,7 +43,7 @@ class ProfilePage extends StatelessWidget {
                     child: ListTile(
                       leading: const Icon(Icons.person),
                       title: const Text('Username'),
-                      subtitle: Text(user.userName),
+                      subtitle: Text(user.userUsername),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -51,6 +53,16 @@ class ProfilePage extends StatelessWidget {
                       leading: const Icon(Icons.work),
                       title: const Text('User Type'),
                       subtitle: Text(user.userType),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<AuthCubit>(context).logout();
+                        context.router.replace(const LoginRoute());
+                      },
+                      child: const Text('Logout'),
                     ),
                   ),
                 ],

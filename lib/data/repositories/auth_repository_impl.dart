@@ -13,4 +13,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final cookie = _remoteAuthProvider.login(loginRequest);
     return cookie;
   }
+
+  @override
+  Future<void> logout() async {
+    return await _remoteAuthProvider.logout();
+  }
 }
