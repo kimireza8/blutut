@@ -7,7 +7,7 @@ environment:
   sdk: ^3.6.1
 
 dependencies:
-  auto_route: ^9.3.0+1
+  auto_route: ^8.0.3
   bluetooth_classic:
     path: pkgs/bluetooth_classic
   bloc: ^9.0.0
@@ -21,10 +21,13 @@ dependencies:
   image: ^4.5.2
   shared_preferences: ^2.5.2
   qr_flutter: ^4.1.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
-  auto_route_generator: ^9.3.1
+  auto_route_generator: ^8.0.0
   build_runner: ^2.4.15
+  hive_generator: ^2.0.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0

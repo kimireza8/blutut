@@ -1,3 +1,4 @@
+import 'package:blutut_clasic/core/services/hive_service.dart';
 import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +12,7 @@ import 'domain/usecases/auth_usecases.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependency();
+  await HiveService().init();
   runApp(MyApp());
 }
 

@@ -1,3 +1,4 @@
+import 'package:blutut_clasic/core/services/hive_service.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +30,8 @@ Future<void> initDependency() async {
     )
     ..registerLazySingleton(() => AuthCubit(
         serviceLocator<SharedPreferencesService>(),
-        serviceLocator<LoginUsecase>()));
+        serviceLocator<LoginUsecase>()))
+    ..registerLazySingleton(() => HiveService());
 
   serviceLocator
     ..registerFactory<AuthRepository>(() => AuthRepositoryImpl(
