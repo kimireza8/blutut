@@ -21,8 +21,8 @@
 
 - [x] Implementasi halaman daftar data untuk informasi pengiriman. (Done)
 - [ ] Implementasi halaman untuk input data untuk informasi pengiriman. (Ongoing)
-- [ ] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Ongoing)
-- [ ] Menghubungkan API dari halaman master ke dalam model. (Ongoing)
+- [x] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Done)
+- [x] Menghubungkan API dari halaman master ke dalam model. (Done)
 - [ ] Implementasi halaman cetak kode QR untuk label pengiriman. (Ongoing)
 
 ## Tugas Tim
