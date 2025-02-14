@@ -15,11 +15,11 @@ class Shipment {
   @HiveField(3)
   final String date;
   @HiveField(4)
-  final int totalColi;
+  final String totalColi;
   @HiveField(5)
-  final int colliesNum;
+  final String colliesNum;
   @HiveField(6)
-  final int cargoNum;
+  final String cargoNum;
   @HiveField(7)
   final String serviceType;
   @HiveField(8)

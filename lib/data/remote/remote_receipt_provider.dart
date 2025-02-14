@@ -14,7 +14,7 @@ class RemoteReceiptProvider {
 
   Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
-    var token = serviceLocator<SharedPreferencesService>().getCookie();
+    final cookie = serviceLocator<SharedPreferencesService>().getCookie();
     log('Cookie: $cookie');
     log('Timestamp: $timestamp');
 
@@ -70,7 +70,7 @@ class RemoteReceiptProvider {
         },
         options: Options(
           headers: {
-            'Cookie': "siklonsession=$token",
+            'Cookie': "siklonsession=$cookie",
             'Content-Type': 'application/x-www-form-urlencoded',
           },
         ),
@@ -104,6 +104,7 @@ class RemoteReceiptProvider {
       throw Exception('An error occurred: ${e.toString()}');
     }
   }
+
   Future<DetailShipmentModel> getDetailprOutgoingReceipts(String cookie, String id) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     var token = serviceLocator<SharedPreferencesService>().getCookie();

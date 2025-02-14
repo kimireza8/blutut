@@ -1,6 +1,9 @@
 import 'package:blutut_clasic/data/models/route_model.dart';
 import 'package:dio/dio.dart';
 
+import '../../core/services/shared_preferences_service.dart';
+import '../../dependency_injections.dart';
+
 class RemoteOprRouteProvider {
   final Dio _dio;
 
@@ -8,6 +11,7 @@ class RemoteOprRouteProvider {
 
   Future<List<RouteModel>> getOprRoutes() async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
+    final cookie = serviceLocator<SharedPreferencesService>().getCookie();
     try {
       final response = await _dio.post(
         'https://app.ptmakassartrans.com/index.php/oprroute/index.mod?_dc=$timestamp',
@@ -27,6 +31,12 @@ class RemoteOprRouteProvider {
           "start": 0,
           "limit": 50
         },
+        options: Options(
+          headers: {
+            'Cookie': "siklonsession=$cookie",
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        ),
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {

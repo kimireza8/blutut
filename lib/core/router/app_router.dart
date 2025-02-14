@@ -10,6 +10,8 @@ class AppRouter extends $AppRouter {
           initial: true,
         ),
         // AutoRoute(page: HomeRoute.page),
-        AutoRoute(page: ProfileRoute.page)
+        AutoRoute(page: ProfileRoute.page),
+        AutoRoute(page: DataListRoute.page),
+        AutoRoute(page: InputRoute.page),
       ];
 }

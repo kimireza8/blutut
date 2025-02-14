@@ -1,7 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:blutut_clasic/core/router/app_router.gr.dart';
+import 'package:blutut_clasic/core/services/shared_preferences_service.dart';
+import 'package:blutut_clasic/dependency_injections.dart';
 import 'package:blutut_clasic/domain/entities/login_request_entity.dart';
 import 'package:blutut_clasic/presentation/auth/cubit/auth_cubit.dart';
+import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -39,7 +42,8 @@ class _LoginPageState extends State<LoginPage> {
                   rememberMe: _rememberMe ? 1 : 0),
             );
         if (context.mounted) {
-          context.router.replace(const ProfileRoute());
+          context.router.replace(const InputRoute());
+
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

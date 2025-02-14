@@ -30,6 +30,12 @@ class RemoteRelationProvider {
           "start": 0,
           "limit": 50
         },
+        options: Options(
+          headers: {
+            'Cookie': "siklonsession=$cookie",
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        ),
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {

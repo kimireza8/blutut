@@ -1,8 +1,10 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
 
+@RoutePage()
 class DataListPage extends StatelessWidget {
   const DataListPage({super.key});
 
