@@ -1,46 +1,39 @@
-# Team TODO List
+# Daftar TODO Tim
 
-## Unassigned Tasks
+## Tugas yang Belum Dibagikan
 
-### Feature: User Authentication
-- [ ] **[High Priority]** Implement error handling for every API calls. (Unassigned)
-- [ ] **[Medium Priority]** Validate input data for every forms. (Unassigned)
+### Feature: Authentication
+- [ ] Implementasi penanganan kesalahan untuk setiap panggilan API. (Belum Ditugaskan)
+- [ ] Validasi data masukan untuk setiap formulir. (Belum Ditugaskan)
 
-### Feature: Data Synchronization
-- [ ] **[High Priority]** Consume API endpoint from master page to fetch shipping data. (Unassigned)
-- [ ] **[Medium Priority]** Implement local storage store shipping data. (Unassigned)
+## Tugas yang Sudah Dibagikan
 
-## Assigned Tasks
+### **Andrey**
 
-### Andrey
+- [x] Implementasi halaman login. (Done)
+- [ ] Implementasi halaman profil dengan fungsi logout. (Ongoing)
+- [ ] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
+- [ ] Implementasi penyimpanan lokal untuk menyimpan data pengiriman. (Ongoing)
 
-#### Feature: User Authentication
-- [x] **[High Priority]** Implement login page. (Done)
-- [ ] **[High Priority]** Implement profile page with logout functionality. (To Do)
+### **Kimi**
 
-#### Feature: Data Display
-- [ ] **[High Priority]** Implement detail data list page for shipping information. (To Do)
+- [x] Implementasi halaman daftar data untuk informasi pengiriman. (Done)
+- [ ] Implementasi halaman untuk input data untuk informasi pengiriman. (Ongoing)
+- [ ] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Ongoing)
+- [ ] Menghubungkan API dari halaman master ke dalam model. (Ongoing)
+- [ ] Implementasi halaman cetak kode QR untuk label pengiriman. (Ongoing)
 
-
-### Kimi
-
-#### Feature: Data Display
-- [x] **[High Priority]** Implement data list page for shipping information. (Done)
-
-#### Feature: Printing
-- [ ] **[High Priority]** Implement print QR code page for shipping labels. (To Do)
-
-## Team Tasks
+## Tugas Tim
 
 ### Routing
-- [x] **[High Priority]** Configure application routing. (Done)
+- [ ] Konfigurasi routing aplikasi. (Ongoing)
 
-### Repository Layer
-- [ ] **[Medium Priority]** Create BLoC components for repository management. (In Progress)
-- [ ] **[Medium Priority]** Create repository interfaces and implementations. (In Progress)
+### Layer Repository
+- [ ] Buat komponen BLoC untuk manajemen repository. (Ongoing)
+- [ ] Buat antarmuka dan implementasi repository. (Ongoing)
 
-### Feature: Bluetooth Printing
-- [ ] **[High Priority]** Research and identify compatible Bluetooth printers for the application. (Team)
+### Printer Bluetooth
+- [ ] Riset dan identifikasi printer Bluetooth yang kompatibel untuk aplikasi. (Ongoing)
 
 ### Refactoring
-- [ ] **[Medium Priority]** Refactor 'blutut' codebase for improved maintainability and performance. (Team)
+- [ ] Refactor codebase 'blutut' untuk peningkatan maintainability dan performance. (Ongoing)
