@@ -1,4 +1,6 @@
-import 'package:hive_flutter/hive_flutter.dart';
+
+
+import 'package:hive/hive.dart';
 
 part 'shipping_entity.g.dart';
 

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import '../../core/services/shared_preferences_service.dart';
 import '../../dependency_injections.dart';
+import '../models/detail_shipment_model.dart';
 import '../models/shipping_model.dart';
 
 class RemoteReceiptProvider {
@@ -101,6 +102,30 @@ class RemoteReceiptProvider {
     } catch (e) {
       log('Error: ${e.toString()}');
       throw Exception('An error occurred: ${e.toString()}');
+    }
+  }
+  Future<DetailShipmentModel> getDetailprOutgoingReceipts(String cookie, String id) async {
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    var token = serviceLocator<SharedPreferencesService>().getCookie();
+
+    try {
+      final response = await _dio.get(
+        "https://app.ptmakassartrans.com/index.php/oprincomingreceipt/detail.mod?_dc=$timestamp&primary_key=$id",
+        options: Options(
+          headers: {
+            'Cookie': "siklonsession=$token",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        Map<String, dynamic> row = response.data['row'] ?? {};
+        return DetailShipmentModel.fromJson(row);
+      } else {
+        throw Exception("Failed to fetch data");
+      }
+    } catch (e) {
+      throw Exception("Error fetching data: $e");
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:blutut_clasic/data/models/detail_shipment_model.dart';
 import 'package:blutut_clasic/data/models/shipping_model.dart';
 
 import '../../domain/repositories/receipt_repository.dart';
@@ -13,6 +14,11 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
   @override
   Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async {
     final response = await _remoteReceiptProvider.getOprIncomingReceipts(cookie);
+    return response;
+  }
+  @override
+  Future<DetailShipmentModel> getDetailprOutgoingReceipts(String cookie, String id) async {
+    final response = await _remoteReceiptProvider.getDetailprOutgoingReceipts(cookie, id);
     return response;
   }
 }
