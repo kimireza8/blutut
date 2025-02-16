@@ -1,12 +1,11 @@
-import 'package:blutut_clasic/domain/entities/detail_shipment_entity.dart';
-import 'package:blutut_clasic/domain/repositories/receipt_repository.dart';
+import '../entities/detail_shipment_entity.dart';
+import '../repositories/receipt_repository.dart';
 
-class ReceiptDetailUsecase{
+class ReceiptDetailUsecase {
+  ReceiptDetailUsecase({required ReceiptRepository receiptRepository})
+      : _receiptRepository = receiptRepository;
   final ReceiptRepository _receiptRepository;
 
-  ReceiptDetailUsecase({required ReceiptRepository receiptRepository}) : _receiptRepository = receiptRepository;
-
-  Future<DetailShipmentEntity> call (String token, String id) async {
-    return await _receiptRepository.getDetailprOutgoingReceipts(token, id);
-  }
+  Future<DetailShipmentEntity> call(String token, String id) async =>
+      _receiptRepository.getDetailprOutgoingReceipts(token, id);
 }

@@ -1,21 +1,18 @@
-import 'package:blutut_clasic/data/remote/remote_auth_provider.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/login_request_model.dart';
+import '../remote/remote_auth_provider.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final RemoteAuthProvider _remoteAuthProvider;
-
   AuthRepositoryImpl({required RemoteAuthProvider remoteAuthProvider})
       : _remoteAuthProvider = remoteAuthProvider;
+  final RemoteAuthProvider _remoteAuthProvider;
 
   @override
   Future<String> login(LoginRequest loginRequest) async {
-    final cookie = _remoteAuthProvider.login(loginRequest);
+    Future<String> cookie = _remoteAuthProvider.login(loginRequest);
     return cookie;
   }
 
   @override
-  Future<void> logout() async {
-    return await _remoteAuthProvider.logout();
-  }
+  Future<void> logout() async => _remoteAuthProvider.logout();
 }

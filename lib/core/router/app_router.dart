@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:blutut_clasic/core/router/app_router.gr.dart';
+import 'app_router.gr.dart';
 
 @AutoRouterConfig()
 class AppRouter extends $AppRouter {
@@ -9,7 +9,6 @@ class AppRouter extends $AppRouter {
           page: LoginRoute.page,
           initial: true,
         ),
-        // AutoRoute(page: HomeRoute.page),
         AutoRoute(page: ProfileRoute.page),
         AutoRoute(page: DataListRoute.page),
         AutoRoute(page: InputRoute.page),

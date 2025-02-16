@@ -1,22 +1,19 @@
 class AuthException implements Exception {
+  AuthException(this.message);
   final String message;
 
-  AuthException(this.message);
-
   @override
-  String toString() {
-    return 'AuthException: $message';
-  }
+  String toString() => 'AuthException: $message';
 }
 
 class InvalidCredentialsException extends AuthException {
-  InvalidCredentialsException(String message) : super(message);
+  InvalidCredentialsException(super.message);
 }
 
 class NetworkException extends AuthException {
-  NetworkException(String message) : super(message);
+  NetworkException(super.message);
 }
 
 class ServerException extends AuthException {
-  ServerException(String message) : super(message);
+  ServerException(super.message);
 }

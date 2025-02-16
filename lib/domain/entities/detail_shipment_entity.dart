@@ -1,4 +1,30 @@
 class DetailShipmentEntity {
+  DetailShipmentEntity({
+    required this.id,
+    required this.barcode,
+    required this.branch,
+    required this.consigneeAddress,
+    required this.consigneeCity,
+    required this.consigneeName,
+    required this.consigneePhone,
+    required this.date,
+    required this.incomingDate,
+    required this.number,
+    required this.customer,
+    required this.customerRole,
+    required this.status,
+    required this.serviceType,
+    required this.receiveMode,
+    required this.route,
+    required this.passDocument,
+    required this.paymentLocation,
+    required this.receiptNumber,
+    required this.shipperAddress,
+    required this.shipperName,
+    required this.totalCollies,
+    required this.year,
+    this.shipperPhone,
+  });
   final String id;
   final String barcode;
   final String branch;
@@ -23,31 +49,4 @@ class DetailShipmentEntity {
   final String? shipperPhone;
   final String totalCollies;
   final String year;
-
-  DetailShipmentEntity({
-    required this.id,
-    required this.barcode,
-    required this.branch,
-    required this.consigneeAddress,
-    required this.consigneeCity,
-    required this.consigneeName,
-    required this.consigneePhone,
-    required this.date,
-    required this.incomingDate,
-    required this.number,
-    required this.customer,
-    required this.customerRole,
-    required this.status,
-    required this.serviceType,
-    required this.receiveMode,
-    required this.route,
-    required this.passDocument,
-    required this.paymentLocation,
-    required this.receiptNumber,
-    required this.shipperAddress,
-    required this.shipperName,
-    this.shipperPhone,
-    required this.totalCollies,
-    required this.year,
-  });
 }

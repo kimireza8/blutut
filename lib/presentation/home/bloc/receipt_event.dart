@@ -8,9 +8,9 @@ abstract class ReceiptEvent extends Equatable {
 }
 
 class FetchOprIncomingReceipts extends ReceiptEvent {
-  final String token;
 
   const FetchOprIncomingReceipts(this.token);
+  final String token;
 
   @override
   List<Object> get props => [token];

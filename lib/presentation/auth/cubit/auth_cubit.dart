@@ -7,10 +7,10 @@ import '../../../domain/usecases/auth_usecases.dart';
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
+  AuthCubit(this._sharedPreferencesService, this._authUsecase)
+      : super(AuthInitial());
   final SharedPreferencesService _sharedPreferencesService;
   final AuthUsecase _authUsecase;
-
-  AuthCubit(this._sharedPreferencesService, this._authUsecase) : super(AuthInitial());
 
   Future<void> storeCookie(String cookie) async {
     emit(AuthLoading());
@@ -20,7 +20,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   void loadCookie() {
     emit(AuthLoading());
-    final cookie = _sharedPreferencesService.getString('cookie');
+    String? cookie = _sharedPreferencesService.getString('cookie');
     if (cookie != null) {
       emit(AuthLoaded(cookie));
     } else {
@@ -31,14 +31,10 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(LoginRequestEntity loginRequest) async {
     emit(AuthLoading());
     try {
-      final cookie = await _authUsecase.login(loginRequest);
-      if (cookie != null) {
-        await storeCookie(cookie);
-      } else {
-        emit(AuthInitial());
-      }
+      String cookie = await _authUsecase.login(loginRequest);
+      await storeCookie(cookie);
     } catch (e) {
-      emit(AuthInitial());
+      emit(AuthError(message: 'Login failed'));
     }
   }
 
@@ -47,9 +43,9 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authUsecase.logout();
       await _sharedPreferencesService.clearCookie();
-      emit(AuthInitial()); // Go back to initial state after logout
+      emit(AuthInitial());
     } catch (e) {
-      emit(AuthError(message: e.toString())); // Handle logout errors
+      emit(AuthError(message: e.toString()));
     }
   }
 }

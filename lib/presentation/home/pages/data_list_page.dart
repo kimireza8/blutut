@@ -2,17 +2,61 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:blutut_clasic/presentation/home/bloc/receipt_bloc.dart';
+import '../../../core/utils/status_color_util.dart';
+import '../../../domain/entities/shippment_entity.dart';
+import '../../profile/pages/profile_page.dart';
+import '../bloc/receipt_bloc.dart';
 
 @RoutePage()
-class DataListPage extends StatelessWidget {
+class DataListPage extends StatefulWidget {
   const DataListPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Receipts')),
-      body: BlocConsumer<ReceiptBloc, ReceiptState>(
+  State<DataListPage> createState() => _DataListPageState();
+}
+
+class _DataListPageState extends State<DataListPage>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.index = 0;
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Makassar Trans'),
+            bottom: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Receipts'),
+                Tab(text: 'Profile'),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              buildReceiptsTab(),
+              const ProfilePage(),
+            ],
+          ),
+        ),
+      );
+
+  Widget buildReceiptsTab() => BlocConsumer<ReceiptBloc, ReceiptState>(
         listener: (context, state) {
           if (state is ReceiptError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -28,18 +72,12 @@ class DataListPage extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               itemCount: state.receipts.length,
               itemBuilder: (context, index) {
-                final receipt = state.receipts[index];
-                final number =
-                    receipt.trackingNumber ?? 'No Number';
-                final date =
-                    receipt.date ?? 'No Date';
-                final shipper =
-                    receipt.shipperName ?? 'Unknown';
-                final consignee =
-                    receipt.consigneeName ?? 'Unknown';
-                final status =
-                    receipt.status ??
-                        'Unknown';
+                ShipmentEntity receipt = state.receipts[index];
+                String number = receipt.trackingNumber;
+                String date = receipt.date;
+                String shipper = receipt.shipperName;
+                String consignee = receipt.consigneeName;
+                String status = receipt.status;
 
                 return Card(
                   elevation: 3,
@@ -48,7 +86,7 @@ class DataListPage extends StatelessWidget {
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(12),
-                    leading: Icon(
+                    leading: const Icon(
                       Icons.receipt_long,
                       color: Colors.blueAccent,
                       size: 36,
@@ -69,9 +107,13 @@ class DataListPage extends StatelessWidget {
                         Container(
                           margin: const EdgeInsets.only(top: 5),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: _getStatusColor(status),
+                            color: StatusColorUtil.getStatusColor(
+                              status,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -91,20 +133,5 @@ class DataListPage extends StatelessWidget {
           }
           return const Center(child: Text('No Data Available'));
         },
-      ),
-    );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return Colors.green;
-      case 'pending':
-        return Colors.orange;
-      case 'canceled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+      );
 }

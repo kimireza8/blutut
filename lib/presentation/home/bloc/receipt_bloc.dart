@@ -1,18 +1,24 @@
-import 'package:blutut_clasic/domain/usecases/receipt_fetch_usecase.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../domain/entities/shipping_entity.dart';
+import '../../../core/services/hive_service.dart';
+import '../../../domain/entities/shippment_entity.dart';
+import '../../../domain/usecases/receipt_fetch_usecase.dart';
 
 part 'receipt_event.dart';
 part 'receipt_state.dart';
 
 class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
-  final ReceiptFetchUsecase _receiptFetchUsecase;
-
-  ReceiptBloc({required ReceiptFetchUsecase receiptFetchUsecase}) : _receiptFetchUsecase = receiptFetchUsecase, super(ReceiptInitial()) {
+  ReceiptBloc({
+    required ReceiptFetchUsecase receiptFetchUsecase,
+    required HiveService hiveService,
+  })  : _receiptFetchUsecase = receiptFetchUsecase,
+        _hiveService = hiveService,
+        super(ReceiptInitial()) {
     on<FetchOprIncomingReceipts>(_onFetchOprIncomingReceipts);
   }
+  final ReceiptFetchUsecase _receiptFetchUsecase;
+  final HiveService _hiveService;
 
   Future<void> _onFetchOprIncomingReceipts(
     FetchOprIncomingReceipts event,
@@ -20,7 +26,9 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
   ) async {
     emit(ReceiptLoading());
     try {
-      final receipts = await _receiptFetchUsecase.call(event.token);
+      List<ShipmentEntity> receipts =
+          await _receiptFetchUsecase.call(event.token);
+      await _hiveService.saveShipment(receipts);
       emit(ReceiptLoaded(receipts));
     } catch (e) {
       emit(ReceiptError(e.toString()));

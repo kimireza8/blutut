@@ -3,31 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/router/app_router.gr.dart';
-import '../../widgets/bottom_navbar_widget.dart';
-import '../cubit/profile_cubit.dart';
+import '../../../domain/entities/user_entity.dart';
 import '../../auth/cubit/auth_cubit.dart';
+import '../cubit/profile_cubit.dart';
 
 @RoutePage()
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  
   @override
-  Widget build(final BuildContext context) {
+  Widget build(BuildContext context) {
     BlocProvider.of<ProfileCubit>(context).fetchUserData();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: Colors.blueAccent,
-      ),
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ProfileLoaded) {
-            final user = state.user;
+            UserEntity user = state.user;
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -43,7 +40,7 @@ class ProfilePage extends StatelessWidget {
                     child: ListTile(
                       leading: const Icon(Icons.person),
                       title: const Text('Username'),
-                      subtitle: Text(user.userUsername),
+                      subtitle: Text(user.userName),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -58,9 +55,9 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton(
-                      onPressed: () {
-                        BlocProvider.of<AuthCubit>(context).logout();
-                        context.router.replace(const LoginRoute());
+                      onPressed: () async {
+                        await BlocProvider.of<AuthCubit>(context).logout();
+                        await context.router.replace(const LoginRoute());
                       },
                       child: const Text('Logout'),
                     ),
@@ -75,7 +72,7 @@ class ProfilePage extends StatelessWidget {
           }
         },
       ),
-      bottomNavigationBar: const BottomNavbarWidget(),
+      
     );
   }
 }

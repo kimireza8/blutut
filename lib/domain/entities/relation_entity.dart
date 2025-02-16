@@ -1,9 +1,15 @@
-
 import 'package:hive/hive.dart';
 part 'relation_entity.g.dart';
 
 @HiveType(typeId: 2)
 class RelationEntity {
+  const RelationEntity({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.address,
+    required this.phone,
+  });
   @HiveField(0)
   final String id;
   @HiveField(1)
@@ -14,12 +20,4 @@ class RelationEntity {
   final String address;
   @HiveField(4)
   final String phone;
-
-  const RelationEntity({
-    required this.id,
-    required this.code,
-    required this.name,
-    required this.address,
-    required this.phone,
-  });
 }

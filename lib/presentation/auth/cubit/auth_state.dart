@@ -9,13 +9,11 @@ class AuthLoading extends AuthState {}
 class AuthStored extends AuthState {}
 
 class AuthLoaded extends AuthState {
-  final String cookie;
-
   AuthLoaded(this.cookie);
+  final String cookie;
 }
 
 class AuthError extends AuthState {
+  AuthError({required this.message});
   final String message;
-
-  AuthError({required this.message}); // Add required message parameter
 }

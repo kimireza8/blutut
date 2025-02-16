@@ -1,5 +1,4 @@
-
-import 'package:blutut_clasic/domain/entities/relation_entity.dart';
+import '../../domain/entities/relation_entity.dart';
 
 class RelationModel extends RelationEntity {
   RelationModel({
@@ -10,13 +9,11 @@ class RelationModel extends RelationEntity {
     required super.phone,
   });
 
-  factory RelationModel.fromJson(Map<String, dynamic> json) {
-    return RelationModel(
-      id: json['oprcustomer_id'] ?? '',
-      code: json['oprcustomer_code'] ?? '',
-      name: json['oprcustomer_name'] ?? '',
-      address: json['oprcustomer_address'] ?? '',
-      phone: json['oprcustomer_phone'] ?? '',
-    );
-  }
+  factory RelationModel.fromJson(Map<String, dynamic> json) => RelationModel(
+        id: json['oprcustomer_id']?.toString() ?? '',
+        code: json['oprcustomer_code']?.toString() ?? '',
+        name: json['oprcustomer_name']?.toString() ?? '',
+        address: json['oprcustomer_address']?.toString() ?? '',
+        phone: json['oprcustomer_phone']?.toString() ?? '',
+      );
 }

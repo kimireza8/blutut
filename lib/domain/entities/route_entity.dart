@@ -4,6 +4,13 @@ part 'route_entity.g.dart';
 
 @HiveType(typeId: 1)
 class RouteEntity {
+
+  RouteEntity({
+    required this.id,
+    required this.branchOfficeName,
+    required this.routeName,
+    required this.serviceType,
+  });
   @HiveField(0)
   final String id;
   @HiveField(1)
@@ -12,11 +19,4 @@ class RouteEntity {
   final String routeName;
   @HiveField(3)
   final String serviceType;
-
-  RouteEntity({
-    required this.id,
-    required this.branchOfficeName,
-    required this.routeName,
-    required this.serviceType,
-  });
 }

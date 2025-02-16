@@ -1,11 +1,25 @@
-
-
 import 'package:hive/hive.dart';
 
-part 'shipping_entity.g.dart';
+part 'shippment_entity.g.dart';
 
 @HiveType(typeId: 0)
-class Shipment {
+class ShipmentEntity {
+  ShipmentEntity({
+    required this.id,
+    required this.branchOffice,
+    required this.trackingNumber,
+    required this.date,
+    required this.totalColi,
+    required this.colliesNum,
+    required this.cargoNum,
+    required this.serviceType,
+    required this.route,
+    required this.customer,
+    required this.customerRole,
+    required this.shipperName,
+    required this.consigneeName,
+    required this.status,
+  });
   @HiveField(0)
   final String id;
   @HiveField(1)
@@ -34,21 +48,4 @@ class Shipment {
   final String consigneeName;
   @HiveField(13)
   final String status;
-
-  Shipment({
-    required this.id,
-    required this.branchOffice,
-    required this.trackingNumber,
-    required this.date,
-    required this.totalColi,
-    required this.colliesNum,
-    required this.cargoNum,
-    required this.serviceType,
-    required this.route,
-    required this.customer,
-    required this.customerRole,
-    required this.shipperName,
-    required this.consigneeName,
-    required this.status,
-  });
 }

@@ -1,13 +1,11 @@
-import 'package:blutut_clasic/domain/entities/shipping_entity.dart';
-import 'package:blutut_clasic/domain/repositories/receipt_repository.dart';
+import '../entities/shippment_entity.dart';
+import '../repositories/receipt_repository.dart';
 
-class ReceiptFetchUsecase{
+class ReceiptFetchUsecase {
+  ReceiptFetchUsecase({required ReceiptRepository receiptRepository})
+      : _receiptRepository = receiptRepository;
   final ReceiptRepository _receiptRepository;
 
-  ReceiptFetchUsecase({required ReceiptRepository receiptRepository}) : _receiptRepository = receiptRepository;
-
-  Future<List<Shipment>> call (String token) async {
-    return await _receiptRepository.getOprIncomingReceipts(token);
-  }
-
+  Future<List<ShipmentEntity>> call(String token) async =>
+      _receiptRepository.getOprIncomingReceipts(token);
 }

@@ -1,130 +1,134 @@
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
+import '../models/user_model.dart';
 import '../remote/remote_user_provider.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final RemoteUserProvider _remoteUserProvider;
-
-  UserRepositoryImpl({required RemoteUserProvider remoteUserProvider})
+  const UserRepositoryImpl({required RemoteUserProvider remoteUserProvider})
       : _remoteUserProvider = remoteUserProvider;
+
+  final RemoteUserProvider _remoteUserProvider;
 
   @override
   Future<UserEntity> getUserInfo() async {
-    final userModel = await _remoteUserProvider.getUserInfo();
-    return UserEntity(
-      userId: userModel.userId,
-      userUsername: userModel.userUsername,
-      userName: userModel.userName,
-      userType: userModel.userType,
-      userLanguage: userModel.userLanguage,
-      userTimezone: userModel.userTimezone,
-      userRole: UserRoleEntity(
-        roleId: userModel.userRole?.roleId ?? '',
-        roleCode: userModel.userRole?.roleCode ?? '',
-        roleName: userModel.userRole?.roleName ?? '',
-        roleInternalcode: userModel.userRole?.roleInternalcode ?? '',
-      ),
-      userProfiles: userModel.userProfiles
-              ?.map((profile) => UserProfileEntity(
-                    profileId: profile.profileId,
-                    profileCode: profile.profileCode,
-                    profileName: profile.profileName,
-                    profileDescription: profile.profileDescription,
-                    profileVisible: profile.profileVisible,
-                    profileParentId: profile.profileParentId,
-                    profileUpdatedBy: profile.profileUpdatedBy,
-                    profileUpdatedDate: profile.profileUpdatedDate,
-                    profileCreatedBy: profile.profileCreatedBy,
-                    profileCreatedDate: profile.profileCreatedDate,
-                    profileRowActive: profile.profileRowActive,
-                    roleProfile2profileId: profile.roleProfile2profileId,
-                    roleProfile2profileRoleId: profile.roleProfile2profileRoleId,
-                    roleProfile2profileProfileId:
-                        profile.roleProfile2profileProfileId,
-                  ))
-              .toList() ??
-          [],
-      userRoles: userModel.userRoles
-              ?.map((role) => UserRoleEntity(
-                    roleId: role.roleId,
-                    roleCode: role.roleCode,
-                    roleName: role.roleName,
-                    roleInternalcode: role.roleInternalcode,
-                  ))
-              .toList() ??
-          [],
-      userEmployee: userModel.userEmployee,
-      userCompany: userModel.userCompany,
-      userUnit: userModel.userUnit,
-      userDepartment: userModel.userDepartment,
-      userSubdepartment: userModel.userSubdepartment,
-      userOrganization: UserOrganizationEntity(
-        organizationId: userModel.userOrganization?.organizationId ?? '',
-        organizationCode: userModel.userOrganization?.organizationCode ?? '',
-        organizationName: userModel.userOrganization?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganization?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganization?.organizationInternalcodelevel ?? '',
-      ),
-      organizationDepth: userModel.organizationDepth,
-      userCanloginweb: userModel.userCanloginweb,
-      userEndpoint: userModel.userEndpoint,
-      userEmail: userModel.userEmail,
-      userOrganizationU0: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU0?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU0?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU0?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU0?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU0?.organizationInternalcodelevel ?? '',
-      ),
-      userOrganizationU1: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU1?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU1?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU1?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU1?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU1?.organizationInternalcodelevel ?? '',
-      ),
-      userOrganizationU2: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU2?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU2?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU2?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU2?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU2?.organizationInternalcodelevel ?? '',
-      ),
-      userOrganizationU3: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU3?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU3?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU3?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU3?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU3?.organizationInternalcodelevel ?? '',
-      ),
-      userOrganizationU4: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU4?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU4?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU4?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU4?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU4?.organizationInternalcodelevel ?? '',
-      ),
-      userOrganizationU5: UserOrganizationEntity(
-        organizationId: userModel.userOrganizationU5?.organizationId ?? '',
-        organizationCode: userModel.userOrganizationU5?.organizationCode ?? '',
-        organizationName: userModel.userOrganizationU5?.organizationName ?? '',
-        organizationInternalcode:
-            userModel.userOrganizationU5?.organizationInternalcode ?? '',
-        organizationInternalcodelevel:
-            userModel.userOrganizationU5?.organizationInternalcodelevel ?? '',
-      ),
+    UserModel userModel = await _remoteUserProvider.getUserInfo();
+    return _mapUserModelToEntity(userModel);
+  }
+
+  UserEntity _mapUserModelToEntity(UserModel userModel) =>
+      UserEntity(
+        userId: userModel.userId,
+        userUsername: userModel.userUsername,
+        userName: userModel.userName,
+        userType: userModel.userType,
+        userLanguage: userModel.userLanguage,
+        userTimezone: userModel.userTimezone,
+        userRole: _mapUserRoleModelToEntity(
+          userModel.userRole?.toJson(),
+        ),
+        userProfiles: _mapUserProfileListModelToEntityList(
+          userModel.userProfiles?.map((e) => e.toJson()).toList(),
+        ),
+        userRoles: _mapUserRoleListModelToEntityList(
+          userModel.userRoles?.map((e) => e.toJson()).toList(),
+        ),
+        userEmployee: userModel.userEmployee.toString(),
+        userCompany: userModel.userCompany.toString(),
+        userUnit: userModel.userUnit.toString(),
+        userDepartment: userModel.userDepartment.toString(),
+        userSubdepartment: userModel.userSubdepartment.toString(),
+        userOrganization: _mapUserOrganizationModelToEntity(
+          userModel.userOrganization?.toJson(),
+        ),
+        organizationDepth: userModel.organizationDepth,
+        userCanloginweb: userModel.userCanloginweb,
+        userEndpoint: userModel.userEndpoint.toString(),
+        userEmail: userModel.userEmail,
+        userOrganizationU0: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU0?.toJson(),
+        ),
+        userOrganizationU1: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU1?.toJson(),
+        ),
+        userOrganizationU2: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU2?.toJson(),
+        ),
+        userOrganizationU3: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU3?.toJson(),
+        ),
+        userOrganizationU4: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU4?.toJson(),
+        ),
+        userOrganizationU5: _mapUserOrganizationModelToEntity(
+          userModel.userOrganizationU5?.toJson(),
+        ),
+      );
+
+  UserRoleEntity? _mapUserRoleModelToEntity(Map<String, dynamic>? roleModel) {
+    if (roleModel == null) {
+      return null;
+    }
+    return UserRoleEntity(
+      roleId: roleModel['roleId'] as String? ?? '',
+      roleCode: roleModel['roleCode'] as String? ?? '',
+      roleName: roleModel['roleName'] as String? ?? '',
+      roleInternalcode: roleModel['roleInternalcode'] as String? ?? '',
+    );
+  }
+
+  List<UserProfileEntity>? _mapUserProfileListModelToEntityList(
+    List<dynamic>? profileList,
+  ) =>
+      profileList?.map((profileModel) {
+        var profileMap = profileModel as Map<String, dynamic>;
+        return UserProfileEntity(
+          profileId: profileMap['profileId'] as String? ?? '',
+          profileCode: profileMap['profileCode'] as String? ?? '',
+          profileName: profileMap['profileName'] as String? ?? '',
+          profileDescription: profileMap['profileDescription'] as String? ?? '',
+          profileVisible: profileMap['profileVisible'] as String? ?? '',
+          profileParentId: profileMap['profileParentId'] as String? ?? '',
+          profileUpdatedBy: profileMap['profileUpdatedBy'] as String? ?? '',
+          profileUpdatedDate: profileMap['profileUpdatedDate'] as String? ?? '',
+          profileCreatedBy: profileMap['profileCreatedBy'] as String? ?? '',
+          profileCreatedDate: profileMap['profileCreatedDate'] as String? ?? '',
+          profileRowActive: profileMap['profileRowActive'] as String? ?? '',
+          roleProfile2profileId:
+              profileMap['roleProfile2profileId'] as String? ?? '',
+          roleProfile2profileRoleId:
+              profileMap['roleProfile2profileRoleId'] as String? ?? '',
+          roleProfile2profileProfileId:
+              profileMap['roleProfile2profileProfileId'] as String? ?? '',
+        );
+      }).toList();
+
+  List<UserRoleEntity>? _mapUserRoleListModelToEntityList(
+    List<dynamic>? roleList,
+  ) =>
+      roleList?.map((roleModel) {
+        var roleMap = roleModel as Map<String, dynamic>;
+        return UserRoleEntity(
+          roleId: roleMap['roleId'] as String? ?? '',
+          roleCode: roleMap['roleCode'] as String? ?? '',
+          roleName: roleMap['roleName'] as String? ?? '',
+          roleInternalcode: roleMap['roleInternalcode'] as String? ?? '',
+        );
+      }).toList();
+
+  UserOrganizationEntity? _mapUserOrganizationModelToEntity(
+    Map<String, dynamic>? organizationModel,
+  ) {
+    if (organizationModel == null) {
+      return null;
+    }
+    return UserOrganizationEntity(
+      organizationId: organizationModel['organizationId'] as String? ?? '',
+      organizationCode: organizationModel['organizationCode'] as String? ?? '',
+      organizationName: organizationModel['organizationName'] as String? ?? '',
+      organizationInternalcode:
+          organizationModel['organizationInternalcode'] as String? ?? '',
+      organizationInternalcodelevel:
+          organizationModel['organizationInternalcodelevel'] as String? ?? '',
     );
   }
 }

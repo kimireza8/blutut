@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'shipping_entity.dart';
+part of 'shippment_entity.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ShipmentAdapter extends TypeAdapter<Shipment> {
+class ShipmentEntityAdapter extends TypeAdapter<ShipmentEntity> {
   @override
   final int typeId = 0;
 
   @override
-  Shipment read(BinaryReader reader) {
+  ShipmentEntity read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Shipment(
+    return ShipmentEntity(
       id: fields[0] as String,
       branchOffice: fields[1] as String,
       trackingNumber: fields[2] as String,
@@ -35,7 +35,7 @@ class ShipmentAdapter extends TypeAdapter<Shipment> {
   }
 
   @override
-  void write(BinaryWriter writer, Shipment obj) {
+  void write(BinaryWriter writer, ShipmentEntity obj) {
     writer
       ..writeByte(14)
       ..writeByte(0)
@@ -74,7 +74,7 @@ class ShipmentAdapter extends TypeAdapter<Shipment> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ShipmentAdapter &&
+      other is ShipmentEntityAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,16 +1,18 @@
-import 'package:bluetooth_classic/bluetooth_classic.dart';
-import 'package:bluetooth_classic/models/device.dart';
-import 'package:blutut_clasic/domain/entities/shipping_entity.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'dart:async';
 import 'dart:typed_data';
-import 'package:qr_flutter/qr_flutter.dart';
+
+import 'package:bluetooth_classic/bluetooth_classic.dart';
+import 'package:bluetooth_classic/models/device.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:image/image.dart' as img;
+import 'package:qr_flutter/qr_flutter.dart';
+
+import '../../../domain/entities/shippment_entity.dart';
 
 class Print extends StatefulWidget {
-  final List<Shipment> shipments;
-  const Print({super.key, required this.shipments});
+  const Print({required this.shipments, super.key});
+  final List<ShipmentEntity> shipments;
 
   @override
   State<Print> createState() => _PrintState();
@@ -19,24 +21,21 @@ class Print extends StatefulWidget {
 class _PrintState extends State<Print> {
   final BluetoothClassic _bluetoothClassicPlugin = BluetoothClassic();
   List<Device> _pairedDevices = [];
-  List<Device> _discoveredDevices = [];
+  final List<Device> _discoveredDevices = [];
   bool _scanning = false;
-  int _deviceStatus = Device.disconnected;
   Device? _selectedDevice;
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
-    _initBluetooth();
+    await _initBluetooth();
   }
 
   Future<void> _initBluetooth() async {
     await _bluetoothClassicPlugin.initPermissions();
     _bluetoothClassicPlugin.onDeviceStatusChanged().listen((event) {
       if (mounted) {
-        setState(() {
-          _deviceStatus = event;
-        });
+        setState(() {});
       }
     });
 
@@ -44,7 +43,7 @@ class _PrintState extends State<Print> {
   }
 
   Future<void> _getPairedDevices() async {
-    var devices = await _bluetoothClassicPlugin.getPairedDevices();
+    List<Device> devices = await _bluetoothClassicPlugin.getPairedDevices();
     if (mounted) {
       setState(() {
         _pairedDevices = devices;
@@ -55,7 +54,9 @@ class _PrintState extends State<Print> {
   Future<void> _scanDevices() async {
     if (_scanning) {
       await _bluetoothClassicPlugin.stopScan();
-      if (mounted) setState(() => _scanning = false);
+      if (mounted) {
+        setState(() => _scanning = false);
+      }
     } else {
       setState(() {
         _discoveredDevices.clear();
@@ -72,19 +73,23 @@ class _PrintState extends State<Print> {
         }
       });
 
-      if (mounted) setState(() => _scanning = true);
+      if (mounted) {
+        setState(() => _scanning = true);
+      }
     }
   }
 
   Future<void> _connectToDevice(Device device) async {
     try {
       await _bluetoothClassicPlugin.connect(
-          device.address, '00001101-0000-1000-8000-00805F9B34FB');
+        device.address,
+        '00001101-0000-1000-8000-00805F9B34FB',
+      );
       setState(() {
         _selectedDevice = device;
       });
     } catch (e) {
-      print("Failed to connect: $e");
+      print('Failed to connect: $e');
     }
   }
 
@@ -95,14 +100,14 @@ class _PrintState extends State<Print> {
     });
   }
 
-  Future<void> _printQR(Shipment shipment) async {
+  Future<void> _printQR(ShipmentEntity shipment) async {
     try {
-      final qrCode = await _generateQrEscPos(shipment.trackingNumber);
+      Uint8List qrCode = await _generateQrEscPos(shipment.trackingNumber);
 
       print('imagebite $qrCode');
       await _bluetoothClassicPlugin.write(qrCode);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('QR Code sent to printer')),
+        const SnackBar(content: Text('QR Code sent to printer')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,23 +117,28 @@ class _PrintState extends State<Print> {
   }
 
   Future<Uint8List> _generateQrEscPos(String trackingNumber) async {
-    final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    CapabilityProfile profile = await CapabilityProfile.load();
+    var generator = Generator(PaperSize.mm58, profile);
 
     List<int> bytes = [];
 
     // Tambahkan teks
-    bytes += generator.text('Tracking Number:', styles: PosStyles(align: PosAlign.center));
-    bytes += generator.text(trackingNumber, styles: PosStyles(align: PosAlign.center, bold: true));
+    bytes += generator.text(
+      'Tracking Number:',
+      styles: const PosStyles(align: PosAlign.center),
+    );
+    bytes += generator.text(
+      trackingNumber,
+      styles: const PosStyles(align: PosAlign.center, bold: true),
+    );
 
     // Buat QR Code sebagai gambar
-    final qrImage = await QrPainter(
+    ByteData? qrImage = await QrPainter(
       data: trackingNumber,
       version: QrVersions.auto,
-      gapless: false,
     ).toImageData(200);
 
-    final imgData = img.decodeImage(qrImage!.buffer.asUint8List());
+    img.Image? imgData = img.decodeImage(qrImage!.buffer.asUint8List());
 
     // Convert image ke format printer
     bytes += generator.image(imgData!);
@@ -140,108 +150,113 @@ class _PrintState extends State<Print> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Print QR Code')),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.shipments.length,
-              itemBuilder: (context, index) {
-                final shipment = widget.shipments[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(shipment.trackingNumber),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${shipment.customer} -> ${shipment.shipperName}'),
-                        const SizedBox(height: 8),
-                        QrImageView(
-                          data: shipment.trackingNumber,
-                          version: QrVersions.auto,
-                          size: 100.0,
-                        ),
-                      ],
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Print QR Code')),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.shipments.length,
+                itemBuilder: (context, index) {
+                  ShipmentEntity shipment = widget.shipments[index];
+                  return Card(
+                    child: ListTile(
+                      title: Text(shipment.trackingNumber),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${shipment.customer} -> ${shipment.shipperName}',
+                          ),
+                          const SizedBox(height: 8),
+                          QrImageView(
+                            data: shipment.trackingNumber,
+                            size: 100,
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.print),
+                        onPressed: _selectedDevice == null
+                            ? null
+                            : () async => _printQR(shipment),
+                      ),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.print),
-                      onPressed: _selectedDevice == null
-                          ? null
-                          : () => _printQR(shipment),
-                    ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
+            const Divider(),
 
-          // TOMBOL SCAN
-          ElevatedButton.icon(
-            onPressed: _scanDevices,
-            icon: Icon(_scanning ? Icons.stop : Icons.search),
-            label: Text(_scanning ? "Stop Scanning" : "Scan Devices"),
-          ),
-          ElevatedButton.icon(
-            onPressed: _getPairedDevices,
-            icon: Icon(_scanning ? Icons.stop : Icons.search),
-            label: Text(_scanning ? "Stop Scanning" : "paired Devices"),
-          ),
-
-          const Divider(),
-
-          // LIST PAIRED DEVICES
-          const Text("Paired Devices:", style: TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(
-            child: _pairedDevices.isEmpty
-                ? const Center(child: Text("No Paired Bluetooth Devices"))
-                : ListView.builder(
-              itemCount: _pairedDevices.length,
-              itemBuilder: (context, index) {
-                final device = _pairedDevices[index];
-                return ListTile(
-                  title: Text(device.name ?? 'Unknown'),
-                  subtitle: Text(device.address),
-                  trailing: _selectedDevice?.address == device.address
-                      ? const Icon(Icons.check, color: Colors.green)
-                      : null,
-                  onTap: () => _connectToDevice(device),
-                );
-              },
-            ),
-          ),
-
-          const Divider(),
-
-          // LIST DISCOVERED DEVICES
-          const Text("Discovered Devices:", style: TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(
-            child: _discoveredDevices.isEmpty
-                ? const Center(child: Text("No New Devices Found"))
-                : ListView.builder(
-              itemCount: _discoveredDevices.length,
-              itemBuilder: (context, index) {
-                final device = _discoveredDevices[index];
-                return ListTile(
-                  title: Text(device.name ?? 'Unknown'),
-                  subtitle: Text(device.address),
-                  trailing: const Icon(Icons.bluetooth_searching),
-                  onTap: () => _connectToDevice(device),
-                );
-              },
-            ),
-          ),
-
-          if (_selectedDevice != null)
+            // TOMBOL SCAN
             ElevatedButton.icon(
-              onPressed: _disconnectDevice,
-              icon: const Icon(Icons.bluetooth_disabled),
-              label: const Text("Disconnect"),
+              onPressed: _scanDevices,
+              icon: Icon(_scanning ? Icons.stop : Icons.search),
+              label: Text(_scanning ? 'Stop Scanning' : 'Scan Devices'),
             ),
-        ],
-      ),
-    );
-  }
+            ElevatedButton.icon(
+              onPressed: _getPairedDevices,
+              icon: Icon(_scanning ? Icons.stop : Icons.search),
+              label: Text(_scanning ? 'Stop Scanning' : 'paired Devices'),
+            ),
+
+            const Divider(),
+
+            // LIST PAIRED DEVICES
+            const Text(
+              'Paired Devices:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Expanded(
+              child: _pairedDevices.isEmpty
+                  ? const Center(child: Text('No Paired Bluetooth Devices'))
+                  : ListView.builder(
+                      itemCount: _pairedDevices.length,
+                      itemBuilder: (context, index) {
+                        Device device = _pairedDevices[index];
+                        return ListTile(
+                          title: Text(device.name ?? 'Unknown'),
+                          subtitle: Text(device.address),
+                          trailing: _selectedDevice?.address == device.address
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : null,
+                          onTap: () async => _connectToDevice(device),
+                        );
+                      },
+                    ),
+            ),
+
+            const Divider(),
+
+            // LIST DISCOVERED DEVICES
+            const Text(
+              'Discovered Devices:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Expanded(
+              child: _discoveredDevices.isEmpty
+                  ? const Center(child: Text('No New Devices Found'))
+                  : ListView.builder(
+                      itemCount: _discoveredDevices.length,
+                      itemBuilder: (context, index) {
+                        Device device = _discoveredDevices[index];
+                        return ListTile(
+                          title: Text(device.name ?? 'Unknown'),
+                          subtitle: Text(device.address),
+                          trailing: const Icon(Icons.bluetooth_searching),
+                          onTap: () async => _connectToDevice(device),
+                        );
+                      },
+                    ),
+            ),
+
+            if (_selectedDevice != null)
+              ElevatedButton.icon(
+                onPressed: _disconnectDevice,
+                icon: const Icon(Icons.bluetooth_disabled),
+                label: const Text('Disconnect'),
+              ),
+          ],
+        ),
+      );
 }

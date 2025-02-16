@@ -7,16 +7,16 @@ import '../../../domain/usecases/user_fetchdata_usecase.dart';
 part 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
-  final UserFetchDataUsecase _userFetchDataUsecase;
 
   ProfileCubit({required UserFetchDataUsecase userFetchDataUsecase})
       : _userFetchDataUsecase = userFetchDataUsecase,
         super(ProfileInitial());
+  final UserFetchDataUsecase _userFetchDataUsecase;
 
   Future<void> fetchUserData() async {
     emit(ProfileLoading());
     try {
-      final user = await _userFetchDataUsecase.call();
+      UserEntity user = await _userFetchDataUsecase.call();
       emit(ProfileLoaded(user: user));
     } catch (e) {
       emit(ProfileError(message: e.toString()));

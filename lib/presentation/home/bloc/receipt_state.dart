@@ -12,18 +12,18 @@ class ReceiptInitial extends ReceiptState {}
 class ReceiptLoading extends ReceiptState {}
 
 class ReceiptLoaded extends ReceiptState {
-  final List<Shipment> receipts;
 
   const ReceiptLoaded(this.receipts);
+  final List<ShipmentEntity> receipts;
 
   @override
   List<Object> get props => [receipts];
 }
 
 class ReceiptError extends ReceiptState {
-  final String message;
 
   const ReceiptError(this.message);
+  final String message;
 
   @override
   List<Object> get props => [message];
