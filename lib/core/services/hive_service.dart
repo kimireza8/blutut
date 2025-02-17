@@ -24,7 +24,7 @@ class HiveService {
 
   Box<ShipmentEntity>? get shipmentBox => _shipmentBox;
 
-  Future<void> saveShipment(List<ShipmentEntity> shipments) async {
+  Future<void> saveShipments(List<ShipmentEntity> shipments) async {
     for (ShipmentEntity shipment in shipments) {
       await _shipmentBox?.put(shipment.id, shipment);
     }

@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'shippment_entity.g.dart';
 
 @HiveType(typeId: 0)
-class ShipmentEntity {
+class ShipmentEntity extends HiveObject {
   ShipmentEntity({
     required this.id,
     required this.branchOffice,

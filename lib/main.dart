@@ -7,35 +7,35 @@ import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/home/bloc/receipt_bloc.dart';
 import 'presentation/profile/cubit/profile_cubit.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependency();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-  final _appRouter = AppRouter();
-
+  const MyApp({super.key});
   @override
-  Widget build(BuildContext context) => MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthCubit>(
-            create: (context) => serviceLocator<AuthCubit>(),
-          ),
-          BlocProvider(
-            create: (context) => ReceiptBloc(
-              receiptFetchUsecase: serviceLocator(),
-              hiveService: serviceLocator(),
-            ),
-          ),
-          BlocProvider<ProfileCubit>(
-            create: (context) => serviceLocator<ProfileCubit>(),
-          ),
-        ],
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          routerConfig: _appRouter.config(),
-        ),
-      );
+  Widget build(BuildContext context) {
+    var appRouter = AppRouter();
+    return MultiBlocProvider(
+      providers: _getBlocProviders(context),
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: appRouter.config(),
+      ),
+    );
+  }
+
+  List<BlocProvider> _getBlocProviders(BuildContext context) => [
+      BlocProvider<AuthCubit>(
+        create: (context) => serviceLocator<AuthCubit>(),
+      ),
+      BlocProvider<ReceiptBloc>(
+        create: (context) => serviceLocator<ReceiptBloc>(),
+      ),
+      BlocProvider<ProfileCubit>(
+        create: (context) => serviceLocator<ProfileCubit>(),
+      ),
+    ];
 }

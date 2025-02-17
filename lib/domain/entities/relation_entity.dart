@@ -2,8 +2,8 @@ import 'package:hive/hive.dart';
 part 'relation_entity.g.dart';
 
 @HiveType(typeId: 2)
-class RelationEntity {
-  const RelationEntity({
+class RelationEntity extends HiveObject {
+  RelationEntity({
     required this.id,
     required this.code,
     required this.name,

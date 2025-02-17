@@ -15,49 +15,58 @@ class RemoteAuthProvider {
   final Dio _dio;
   final SharedPreferencesService _sharedPreferencesService;
 
-  Future<String> login(LoginRequest loginRequest) async {
-    try {
-      Response response = await _dio.post(
-        Constant.baseUrl + Constant.loginEndpoint,
-        data: {
-          'username': loginRequest.username,
-          'password': loginRequest.password,
-          'remember': loginRequest.rememberMe,
+  Future<String> login(LoginRequest loginRequest) async => _executeAuthRequest(
+        () async {
+          Response response = await _dio.post(
+            Constant.baseUrl + Constant.loginEndpoint,
+            data: {
+              'username': loginRequest.username,
+              'password': loginRequest.password,
+              'remember': loginRequest.rememberMe,
+            },
+          );
+          String token =
+              _extractSessionToken(response.headers['set-cookie'] ?? []);
+          await _sharedPreferencesService.setCookie(token);
+
+          int? statusCode = response.statusCode;
+          if (statusCode == 401) {
+            throw InvalidCredentialsException('Invalid username or password.');
+          } else if (statusCode != 200) {
+            throw ServerException('Login failed with status code: $statusCode');
+          }
+          return token;
         },
+        'login',
       );
-      String token = _extractSessionToken(response.headers['set-cookie'] ?? []);
-      await _sharedPreferencesService.setCookie(token);
 
-      int? statusCode = response.statusCode;
-      if (statusCode == 401) {
-        throw InvalidCredentialsException('Invalid username or password.');
-      } else if (statusCode != 200) {
-        throw ServerException('Login failed with status code: $statusCode');
-      }
-      return token;
-    } on DioException catch (e) {
-      throw DioErrorUtil.handleDioError(e);
-    } catch (e) {
-      throw AuthException('Unexpected error during login: $e');
-    }
-  }
+  Future<void> logout() async => _executeAuthRequest(
+        () async {
+          String? cookie = _sharedPreferencesService.getCookie();
+          Response response = await _dio.get(
+            '${Constant.baseUrl}/auth/logout/',
+            options: Options(headers: {'Cookie': 'siklonsession=$cookie'}),
+          );
+          int? statusCode = response.statusCode;
+          if (statusCode != 200) {
+            throw ServerException(
+                'Logout failed with status code: $statusCode');
+          }
+          await _sharedPreferencesService.clearCookie();
+        },
+        'logout',
+      );
 
-  Future<void> logout() async {
+  Future<T> _executeAuthRequest<T>(
+    Future<T> Function() request,
+    String operationName,
+  ) async {
     try {
-      String? cookie = _sharedPreferencesService.getCookie();
-      Response response = await _dio.get(
-        '${Constant.baseUrl}/auth/logout/',
-        options: Options(headers: {'Cookie': 'siklonsession=$cookie'}),
-      );
-      int? statusCode = response.statusCode;
-      if (statusCode != 200) {
-        throw ServerException('Logout failed with status code: $statusCode');
-      }
-      await _sharedPreferencesService.clearCookie();
+      return await request();
     } on DioException catch (e) {
       throw DioErrorUtil.handleDioError(e);
     } catch (e) {
-      throw AuthException('Unexpected error during logout: $e');
+      throw AuthException('Unexpected error during $operationName: $e');
     }
   }
 
@@ -72,7 +81,4 @@ class RemoteAuthProvider {
     }
     return lastCookie ?? '';
   }
-
-  AuthException handleDioError(DioException error) =>
-      DioErrorUtil.handleDioError(error);
 }

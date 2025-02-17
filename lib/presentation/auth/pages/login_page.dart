@@ -56,7 +56,9 @@ class _LoginPageState extends State<LoginPage> {
                         '',
                   ),
                 );
-            await context.router.replace(const DataListRoute());
+            if (context.mounted) {
+                await context.router.replace(const DataListRoute());
+            }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),

@@ -12,8 +12,8 @@ class RemoteRelationProvider {
   Future<List<RelationModel>> getOprRelations(String cookie) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     try {
-      Response<Map<String, dynamic>> response =
-          await dio.post<Map<String, dynamic>>(
+      Response response =
+          await dio.post(
         'https://app.ptmakassartrans.com/index.php/oprrelation/index.mod?_dc=$timestamp',
         data: _buildRelationListRequestData(),
         options: Options(

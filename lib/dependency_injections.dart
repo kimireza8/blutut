@@ -26,13 +26,25 @@ final serviceLocator = GetIt.instance;
 Future<void> initDependency() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
+  _registerServices(sharedPreferences);
+  _registerRemoteProviders();
+  _registerRepositories();
+  _registerUseCases();
+  _registerCubits();
+}
+
+void _registerServices(SharedPreferences sharedPreferences) {
   serviceLocator
-    ..registerLazySingleton(
-      () => Dio()..interceptors.add(serviceLocator<AuthInterceptor>()),
-    )
     ..registerLazySingleton(() => SharedPreferencesService(sharedPreferences))
     ..registerLazySingleton(HiveService.new)
     ..registerLazySingleton(AuthInterceptor.new)
+    ..registerLazySingleton(
+      () => Dio()..interceptors.add(serviceLocator<AuthInterceptor>()),
+    );
+}
+
+void _registerRemoteProviders() {
+  serviceLocator
     ..registerLazySingleton<RemoteAuthProvider>(
       () => RemoteAuthProvider(
         dio: serviceLocator<Dio>(),
@@ -47,7 +59,11 @@ Future<void> initDependency() async {
         dio: serviceLocator<Dio>(),
         sharedPreferencesService: serviceLocator<SharedPreferencesService>(),
       ),
-    )
+    );
+}
+
+void _registerRepositories() {
+  serviceLocator
     ..registerFactory<AuthRepository>(
       () => AuthRepositoryImpl(
         remoteAuthProvider: serviceLocator<RemoteAuthProvider>(),
@@ -62,7 +78,11 @@ Future<void> initDependency() async {
       () => UserRepositoryImpl(
         remoteUserProvider: serviceLocator<RemoteUserProvider>(),
       ),
-    )
+    );
+}
+
+void _registerUseCases() {
+  serviceLocator
     ..registerFactory<AuthUsecase>(
       () => AuthUsecase(serviceLocator<AuthRepository>()),
     )
@@ -73,7 +93,11 @@ Future<void> initDependency() async {
     )
     ..registerFactory<UserFetchDataUsecase>(
       () => UserFetchDataUsecase(serviceLocator<UserRepository>()),
-    )
+    );
+}
+
+void _registerCubits() {
+  serviceLocator
     ..registerFactory(
       () => AuthCubit(
         serviceLocator<SharedPreferencesService>(),

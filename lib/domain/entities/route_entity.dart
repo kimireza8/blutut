@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'route_entity.g.dart';
 
 @HiveType(typeId: 1)
-class RouteEntity {
+class RouteEntity extends HiveObject {
 
   RouteEntity({
     required this.id,

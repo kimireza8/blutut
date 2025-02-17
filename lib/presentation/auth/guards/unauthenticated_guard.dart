@@ -4,7 +4,7 @@ import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 
-class AuthenticatedGuard extends AutoRouteGuard {
+class UnAuthenticatedGuard extends AutoRouteGuard {
   @override
   Future<void> onNavigation(
     NavigationResolver resolver,
@@ -13,8 +13,8 @@ class AuthenticatedGuard extends AutoRouteGuard {
     SharedPreferencesService sharedPreferencesService =
         serviceLocator<SharedPreferencesService>();
     String? cookie = sharedPreferencesService.getCookie();
-    if (cookie == null) {
-      await router.replace(const LoginRoute());
+    if (cookie != null) {
+      await router.replace(const DataListRoute());
     } else {
       resolver.next();
     }

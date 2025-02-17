@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import '../utils/exceptions/auth_exceptions.dart';
 
 class DioErrorUtil {
+  DioErrorUtil._(); // Private constructor to prevent instantiation
+
   static AuthException handleDioError(DioException error) {
     DioExceptionType type = error.type;
     Response? response = error.response;

@@ -21,7 +21,7 @@ class RemoteUserProvider {
   Future<UserModel> getUserInfo() async {
     try {
       String? cookie = _sharedPreferencesService.getCookie();
-      Response<Map<String, dynamic>> response = await _dio.post(
+      Response response = await _dio.post(
         '${Constant.baseUrl}/index.php/usermanagement/info.json',
         options: Options(
           headers: {'Cookie': 'siklonsession=$cookie'},
@@ -62,7 +62,4 @@ class RemoteUserProvider {
       throw Exception('Unexpected error during user info fetch: $e');
     }
   }
-
-  AuthException handleDioError(DioException error) =>
-      DioErrorUtil.handleDioError(error);
 }

@@ -14,72 +14,80 @@ class RemoteReceiptProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
-    log('cookie opr: $cookie');
-    Map<String, String> headers = {
-      'Cookie': 'siklonsession=$cookie',
-      ..._defaultHeaders,
-    };
+  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async =>
+      _executeReceiptRequest<List<ShipmentModel>>(
+        () async {
+          int timestamp = DateTime.now().millisecondsSinceEpoch;
+          Map<String, String> headers = {
+            'Cookie': 'siklonsession=$cookie',
+            ..._defaultHeaders,
+          };
 
-    try {
-      Response response = await _dio.post(
-        '${Constant.baseUrl}/index.php/oprincomingreceipt/index.mod?_dc=$timestamp',
-        data: _buildReceiptListRequestData(),
-        options: Options(headers: headers),
+          Response response = await _dio.post(
+            '${Constant.baseUrl}/index.php/oprincomingreceipt/index.mod?_dc=$timestamp',
+            data: _buildReceiptListRequestData(),
+            options: Options(headers: headers),
+          );
+
+          Map<String, dynamic> responseData =
+              _decodeResponseData(response.data);
+
+          if (!_isValidResponse(responseData)) {
+            throw Exception(
+              'Invalid API response format: Missing or incorrect "rows" key',
+            );
+          }
+
+          List<dynamic> data = responseData['rows'] as List? ?? [];
+          return data
+              .map(
+                (json) => ShipmentModel.fromJson(json as Map<String, dynamic>),
+              )
+              .toList();
+        },
+        'fetch incoming receipts',
       );
-
-      log('Response Status Code: ${response.statusCode}');
-      log('Response Data: ${response.data}');
-
-      Map<String, dynamic> responseData = _decodeResponseData(response.data);
-
-      if (!_isValidResponse(responseData)) {
-        throw Exception(
-          'Invalid API response format: Missing or incorrect "rows" key',
-        );
-      }
-
-      List<dynamic> data = responseData['rows'] as List? ?? [];
-      return data
-          .map(
-            (json) => ShipmentModel.fromJson(json as Map<String, dynamic>),
-          )
-          .toList();
-    } on DioException catch (e) {
-      log('Dio Error: ${e.message}, ${e.response?.statusCode}, ${e.response?.data}');
-      throw Exception('Failed to load data: ${e.message}');
-    } catch (e) {
-      log('Error: $e');
-      throw Exception('An error occurred: $e');
-    }
-  }
 
   Future<DetailShipmentModel> getDetailprOutgoingReceipts(
     String cookie,
     String id,
-  ) async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
-    Map<String, String> headers = {
-      'Cookie': 'siklonsession=$cookie',
-      ..._defaultHeaders,
-    };
+  ) async =>
+      _executeReceiptRequest<DetailShipmentModel>(
+        () async {
+          int timestamp = DateTime.now().millisecondsSinceEpoch;
+          Map<String, String> headers = {
+            'Cookie': 'siklonsession=$cookie',
+            ..._defaultHeaders,
+          };
 
-    try {
-      Response<Map<String, dynamic>> response =
-          await _dio.get<Map<String, dynamic>>(
-        '${Constant.baseUrl}/index.php/oprincomingreceipt/detail.mod?_dc=$timestamp&primary_key=$id',
-        options: Options(headers: headers),
+          Response<Map<String, dynamic>> response =
+              await _dio.get<Map<String, dynamic>>(
+            '${Constant.baseUrl}/index.php/oprincomingreceipt/detail.mod?_dc=$timestamp&primary_key=$id',
+            options: Options(headers: headers),
+          );
+
+          if (_isSuccessResponse(response)) {
+            dynamic row = response.data?['row'] ?? {};
+            return DetailShipmentModel.fromJson(row as Map<String, dynamic>);
+          } else {
+            throw Exception('Failed to fetch data');
+          }
+        },
+        'fetch receipt detail',
       );
 
-      if (_isSuccessResponse(response)) {
-        dynamic row = response.data?['row'] ?? {};
-        return DetailShipmentModel.fromJson(row as Map<String, dynamic>);
-      } else {
-        throw Exception('Failed to fetch data');
-      }
+  Future<T> _executeReceiptRequest<T>(
+    Future<T> Function() request,
+    String operationName,
+  ) async {
+    try {
+      return await request();
+    } on DioException catch (e) {
+      log('Dio Error: ${e.message}, ${e.response?.statusCode}, ${e.response?.data}');
+      throw Exception('API error during $operationName: ${e.message}');
     } catch (e) {
-      throw Exception('Error fetching data: $e');
+      log('Error: $e');
+      throw Exception('Unexpected error during $operationName: $e');
     }
   }
 

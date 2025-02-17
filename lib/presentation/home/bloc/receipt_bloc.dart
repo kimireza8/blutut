@@ -28,7 +28,7 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
     try {
       List<ShipmentEntity> receipts =
           await _receiptFetchUsecase.call(event.token);
-      await _hiveService.saveShipment(receipts);
+      await _hiveService.saveShipments(receipts);
       emit(ReceiptLoaded(receipts));
     } catch (e) {
       emit(ReceiptError(e.toString()));

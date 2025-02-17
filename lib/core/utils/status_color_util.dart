@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class StatusColorUtil {
+  StatusColorUtil._(); // Private constructor to prevent instantiation
+
   static Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
