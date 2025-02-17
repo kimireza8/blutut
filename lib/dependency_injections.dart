@@ -19,6 +19,7 @@ import 'domain/usecases/receipt_fetch_usecase.dart';
 import 'domain/usecases/user_fetchdata_usecase.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/home/bloc/receipt_bloc.dart';
+import 'presentation/home/print_cubit/print_cubit.dart';
 import 'presentation/profile/cubit/profile_cubit.dart';
 
 final serviceLocator = GetIt.instance;
@@ -114,5 +115,8 @@ void _registerCubits() {
       () => ProfileCubit(
         userFetchDataUsecase: serviceLocator<UserFetchDataUsecase>(),
       ),
+    )
+    ..registerFactory(
+      () => PrintCubit(),
     );
 }

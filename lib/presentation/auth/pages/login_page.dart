@@ -52,12 +52,12 @@ class _LoginPageState extends State<LoginPage> {
             context.read<ReceiptBloc>().add(
                   FetchOprIncomingReceipts(
                     serviceLocator<SharedPreferencesService>()
-                        .getString('cookie') ??
+                            .getString('cookie') ??
                         '',
                   ),
                 );
             if (context.mounted) {
-                await context.router.replace(const DataListRoute());
+              await context.router.replace(const DataListRoute());
             }
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
