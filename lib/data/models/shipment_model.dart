@@ -1,4 +1,4 @@
-import '../../domain/entities/shippment_entity.dart';
+import '../../domain/entities/shipment_entity.dart';
 
 class ShipmentModel extends ShipmentEntity {
   ShipmentModel({

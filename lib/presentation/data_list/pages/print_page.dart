@@ -3,8 +3,9 @@ import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '../../../domain/entities/shippment_entity.dart';
-import '../print_cubit/print_cubit.dart';
+
+import '../../../domain/entities/shipment_entity.dart';
+import '../../home/print_cubit/print_cubit.dart';
 
 @RoutePage()
 class Print extends StatelessWidget {
@@ -59,7 +60,7 @@ class Print extends StatelessWidget {
                 onPressed: () {
                   context.read<PrintCubit>().getPairedDevices();
                 },
-                icon: Icon(Icons.search),
+                icon: const Icon(Icons.search),
                 label: const Text('Paired Devices'),
               ),
               const Divider(),

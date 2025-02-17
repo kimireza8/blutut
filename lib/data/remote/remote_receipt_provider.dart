@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/constants/constant.dart';
 import '../models/detail_shipment_model.dart';
-import '../models/shipping_model.dart';
+import '../models/shipment_model.dart';
 
 class RemoteReceiptProvider {
   const RemoteReceiptProvider({required Dio dio}) : _dio = dio;
@@ -60,14 +60,21 @@ class RemoteReceiptProvider {
             ..._defaultHeaders,
           };
 
-          Response<Map<String, dynamic>> response =
-              await _dio.get<Map<String, dynamic>>(
+          Response response = await _dio.get(
             '${Constant.baseUrl}/index.php/oprincomingreceipt/detail.mod?_dc=$timestamp&primary_key=$id',
             options: Options(headers: headers),
           );
 
+          Map<String, dynamic> responseData = _decodeResponseData(response.data);
+
+          if (!_isValidDetailResponse(responseData)) {
+            throw Exception(
+              'Invalid API response format: Missing or incorrect "row" key in detail receipt response',
+            );
+          }
+
           if (_isSuccessResponse(response)) {
-            dynamic row = response.data?['row'] ?? {};
+            dynamic row = responseData['row'] ?? {};
             return DetailShipmentModel.fromJson(row as Map<String, dynamic>);
           } else {
             throw Exception('Failed to fetch data');
@@ -104,8 +111,11 @@ class RemoteReceiptProvider {
   bool _isValidResponse(Map<String, dynamic> responseData) =>
       responseData.containsKey('rows') && responseData['rows'] is List;
 
-  bool _isSuccessResponse(Response<Map<String, dynamic>> response) =>
-      response.statusCode == 200 && response.data?['success'] == true;
+  bool _isValidDetailResponse(Map<String, dynamic> responseData) =>
+      responseData.containsKey('row') && responseData['row'] is Map;
+
+  bool _isSuccessResponse(Response<dynamic> response) =>
+      response.statusCode == 200;
 
   Map<String, dynamic> _buildReceiptListRequestData() => {
         'select': jsonEncode([

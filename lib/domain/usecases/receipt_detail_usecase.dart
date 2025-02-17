@@ -6,6 +6,6 @@ class ReceiptDetailUsecase {
       : _receiptRepository = receiptRepository;
   final ReceiptRepository _receiptRepository;
 
-  Future<DetailShipmentEntity> call(String token, String id) async =>
-      _receiptRepository.getDetailprOutgoingReceipts(token, id);
+  Future<DetailShipmentEntity> call(String cookie, String id) async =>
+      _receiptRepository.getDetailOprOutgoingReceipts(cookie, id);
 }

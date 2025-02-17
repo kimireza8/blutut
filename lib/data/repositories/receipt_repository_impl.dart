@@ -1,6 +1,6 @@
 import '../../domain/repositories/receipt_repository.dart';
 import '../models/detail_shipment_model.dart';
-import '../models/shipping_model.dart';
+import '../models/shipment_model.dart';
 import '../remote/remote_receipt_provider.dart';
 
 class ReceiptRepositoryImpl implements ReceiptRepository {
@@ -16,7 +16,7 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
   }
 
   @override
-  Future<DetailShipmentModel> getDetailprOutgoingReceipts(
+  Future<DetailShipmentModel> getDetailOprOutgoingReceipts(
     String cookie,
     String id,
   ) async {

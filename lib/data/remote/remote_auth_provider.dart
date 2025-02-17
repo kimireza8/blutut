@@ -50,7 +50,8 @@ class RemoteAuthProvider {
           int? statusCode = response.statusCode;
           if (statusCode != 200) {
             throw ServerException(
-                'Logout failed with status code: $statusCode');
+              'Logout failed with status code: $statusCode',
+            );
           }
           await _sharedPreferencesService.clearCookie();
         },
@@ -72,7 +73,7 @@ class RemoteAuthProvider {
 
   String _extractSessionToken(List<String> cookies) {
     String? lastCookie;
-    for (final String cookie in cookies) {
+    for (String cookie in cookies) {
       List<String> cookieParts = cookie.split(';');
       String cookieName = cookieParts[0].split('=')[0].trim();
       if (cookieName == 'siklonsession') {

@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'shippment_entity.g.dart';
+part 'shipment_entity.g.dart';
 
 @HiveType(typeId: 0)
 class ShipmentEntity extends HiveObject {

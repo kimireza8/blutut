@@ -2,7 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../domain/entities/relation_entity.dart';
 import '../../domain/entities/route_entity.dart';
-import '../../domain/entities/shippment_entity.dart';
+import '../../domain/entities/shipment_entity.dart';
 
 class HiveService {
   HiveService();

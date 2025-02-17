@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meta/meta.dart';
 
 import '../../../core/services/hive_service.dart';
-import '../../../domain/entities/shippment_entity.dart';
+import '../../../domain/entities/shipment_entity.dart';
 import '../../../domain/usecases/receipt_fetch_usecase.dart';
 
 part 'receipt_event.dart';

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'shippment_entity.dart';
+part of 'shipment_entity.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator

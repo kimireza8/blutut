@@ -1,5 +1,6 @@
 part of 'receipt_bloc.dart';
 
+@immutable
 abstract class ReceiptState extends Equatable {
   const ReceiptState();
 

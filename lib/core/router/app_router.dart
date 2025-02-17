@@ -29,5 +29,10 @@ class AppRouter extends $AppRouter {
           page: InputRoute.page,
           guards: [AuthenticatedGuard()],
         ),
+        AutoRoute(
+          page: DetailDataListRoute.page,
+          guards: [AuthenticatedGuard()],
+          path: '/detail/:shipmentId',
+        ),
       ];
 }

@@ -9,14 +9,14 @@ import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:image/image.dart' as img;
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../domain/entities/shippment_entity.dart';
+import '../../../domain/entities/shipment_entity.dart';
 
 part 'print_state.dart';
 
 class PrintCubit extends Cubit<PrintState> {
-  final BluetoothClassic _bluetoothClassicPlugin = BluetoothClassic();
 
-  PrintCubit() : super(PrintInitial());
+  PrintCubit() : super(const PrintInitial());
+  final BluetoothClassic _bluetoothClassicPlugin = BluetoothClassic();
 
   Future<void> initBluetooth() async {
     await _bluetoothClassicPlugin.initPermissions();
@@ -35,7 +35,7 @@ class PrintCubit extends Cubit<PrintState> {
       discoveredDevices: state.discoveredDevices,
       selectedDevice: state.selectedDevice,
       scanning: state.scanning,
-    ));
+    ),);
   }
 
   Future<void> scanDevices() async {
@@ -45,17 +45,15 @@ class PrintCubit extends Cubit<PrintState> {
         pairedDevices: state.pairedDevices,
         discoveredDevices: state.discoveredDevices,
         selectedDevice: state.selectedDevice,
-        scanning: false,
-      ));
+      ),);
     } else {
       emit(PrintLoaded(
         pairedDevices: state.pairedDevices,
-        discoveredDevices: [],
         selectedDevice: state.selectedDevice,
         scanning: true,
-      ));
+      ),);
 
-      _bluetoothClassicPlugin.startScan();
+      await _bluetoothClassicPlugin.startScan();
       _bluetoothClassicPlugin.onDeviceDiscovered().listen((event) {
         if (!state.discoveredDevices.any((d) => d.address == event.address)) {
           emit(PrintLoaded(
@@ -63,7 +61,7 @@ class PrintCubit extends Cubit<PrintState> {
             discoveredDevices: List.from(state.discoveredDevices)..add(event),
             selectedDevice: state.selectedDevice,
             scanning: state.scanning,
-          ));
+          ),);
         }
       });
     }
@@ -86,16 +84,15 @@ class PrintCubit extends Cubit<PrintState> {
     emit(PrintLoaded(
       pairedDevices: state.pairedDevices,
       discoveredDevices: state.discoveredDevices,
-      selectedDevice: null,
       scanning: state.scanning,
-    ));
+    ),);
   }
 
   Future<void> printQR(ShipmentEntity shipment) async {
     try {
       Uint8List qrCode = await _generateQrEscPos(shipment.trackingNumber);
       await _bluetoothClassicPlugin.write(qrCode);
-      emit(PrintSuccess('QR Code sent to printer'));
+      emit(const PrintSuccess('QR Code sent to printer'));
     } catch (e) {
       emit(PrintError('Print failed: $e'));
     }

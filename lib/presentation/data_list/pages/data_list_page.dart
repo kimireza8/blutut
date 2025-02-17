@@ -6,7 +6,7 @@ import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../core/utils/status_color_util.dart';
 import '../../../dependency_injections.dart';
-import '../../../domain/entities/shippment_entity.dart';
+import '../../../domain/entities/shipment_entity.dart';
 import '../../profile/pages/profile_page.dart';
 import '../bloc/receipt_bloc.dart';
 
@@ -37,8 +37,11 @@ class _DataListPageState extends State<DataListPage>
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<ReceiptBloc>(context).add(FetchOprIncomingReceipts(
-        serviceLocator<SharedPreferencesService>().getString('cookie') ?? ''));
+    BlocProvider.of<ReceiptBloc>(context).add(
+      FetchOprIncomingReceipts(
+        serviceLocator<SharedPreferencesService>().getString('cookie') ?? '',
+      ),
+    );
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -89,9 +92,10 @@ class _DataListPageState extends State<DataListPage>
                     String status = receipt.status;
 
                     return InkWell(
-                      onTap: () {
-                        context.router
-                            .replace(Print(shipment: state.receipts[index]));
+                      onTap: () async {
+                        await AutoRouter.of(context).push(
+                          DetailDataListRoute(shipmentId: receipt.id),
+                        );
                       },
                       child: Card(
                         elevation: 3,
@@ -148,10 +152,10 @@ class _DataListPageState extends State<DataListPage>
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16),
                     child: FloatingActionButton(
-                      onPressed: () {
-                        context.router.replace(InputRoute());
+                      onPressed: () async {
+                        await context.router.replace(const InputRoute());
                       },
                       child: const Icon(Icons.add),
                     ),

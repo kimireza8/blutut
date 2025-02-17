@@ -14,11 +14,14 @@ import 'data/repositories/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/receipt_repository.dart';
 import 'domain/repositories/user_repository.dart';
-import 'domain/usecases/auth_usecases.dart';
+import 'domain/usecases/login_usecase.dart';
+import 'domain/usecases/logout_usecase.dart';
+import 'domain/usecases/receipt_detail_usecase.dart';
 import 'domain/usecases/receipt_fetch_usecase.dart';
-import 'domain/usecases/user_fetchdata_usecase.dart';
+import 'domain/usecases/user_fetch_usecase.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
-import 'presentation/home/bloc/receipt_bloc.dart';
+import 'presentation/data_list/bloc/receipt_bloc.dart';
+import 'presentation/detail_data_list/cubit/detail_data_list_cubit.dart';
 import 'presentation/home/print_cubit/print_cubit.dart';
 import 'presentation/profile/cubit/profile_cubit.dart';
 
@@ -84,16 +87,24 @@ void _registerRepositories() {
 
 void _registerUseCases() {
   serviceLocator
-    ..registerFactory<AuthUsecase>(
-      () => AuthUsecase(serviceLocator<AuthRepository>()),
+    ..registerFactory<LoginUsecase>(
+      () => LoginUsecase(serviceLocator<AuthRepository>()),
+    )
+    ..registerFactory<LogoutUsecase>(
+      () => LogoutUsecase(serviceLocator<AuthRepository>()),
     )
     ..registerFactory<ReceiptFetchUsecase>(
       () => ReceiptFetchUsecase(
         receiptRepository: serviceLocator<ReceiptRepository>(),
       ),
     )
-    ..registerFactory<UserFetchDataUsecase>(
-      () => UserFetchDataUsecase(serviceLocator<UserRepository>()),
+    ..registerFactory<ReceiptDetailUsecase>(
+      () => ReceiptDetailUsecase(
+        receiptRepository: serviceLocator<ReceiptRepository>(),
+      ),
+    )
+    ..registerFactory<UserFetchUseCase>(
+      () => UserFetchUseCase(serviceLocator<UserRepository>()),
     );
 }
 
@@ -102,7 +113,8 @@ void _registerCubits() {
     ..registerFactory(
       () => AuthCubit(
         serviceLocator<SharedPreferencesService>(),
-        serviceLocator<AuthUsecase>(),
+        serviceLocator<LoginUsecase>(),
+        serviceLocator<LogoutUsecase>(),
       ),
     )
     ..registerLazySingleton(
@@ -113,10 +125,14 @@ void _registerCubits() {
     )
     ..registerFactory(
       () => ProfileCubit(
-        userFetchDataUsecase: serviceLocator<UserFetchDataUsecase>(),
+        userFetchDataUsecase: serviceLocator<UserFetchUseCase>(),
       ),
     )
     ..registerFactory(
-      () => PrintCubit(),
-    );
+      () => DetailDataListCubit(
+        serviceLocator<ReceiptDetailUsecase>(),
+        serviceLocator<SharedPreferencesService>(),
+      ),
+    )
+    ..registerFactory(PrintCubit.new);
 }

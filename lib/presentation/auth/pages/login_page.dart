@@ -6,7 +6,7 @@ import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/login_request_entity.dart';
-import '../../home/bloc/receipt_bloc.dart';
+import '../../data_list/bloc/receipt_bloc.dart';
 import '../cubit/auth_cubit.dart';
 
 @RoutePage()
@@ -48,12 +48,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) => BlocListener<AuthCubit, AuthState>(
         listener: (context, state) async {
-          if (state is AuthLoaded || state is AuthStored) {
+          if (state is AuthLoaded) {
             context.read<ReceiptBloc>().add(
                   FetchOprIncomingReceipts(
                     serviceLocator<SharedPreferencesService>()
-                            .getString('cookie') ??
-                        '',
+                        .getString('cookie')!,
                   ),
                 );
             if (context.mounted) {

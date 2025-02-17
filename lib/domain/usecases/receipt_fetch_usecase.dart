@@ -1,4 +1,4 @@
-import '../entities/shippment_entity.dart';
+import '../entities/shipment_entity.dart';
 import '../repositories/receipt_repository.dart';
 
 class ReceiptFetchUsecase {
