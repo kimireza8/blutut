@@ -16,7 +16,7 @@
 - [x] Implementasi bottom navbar untuk home page dan profile page. (Done)
 - [x] Consume endpoint API user info dan logout di halaman profile. (Done)
 - [x] Implementasi halaman profil dengan fungsi logout. (Ongoing)
-- [ ] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
+- [x] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
 
 ### **Kimi**
 
