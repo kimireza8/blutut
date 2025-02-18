@@ -2,20 +2,6 @@
 
 ## Tugas yang Belum Dibagikan
 
-### Feature: Authentication
-
-- [ ] Refactor error handling untuk setiap panggilan API. (Belum Ditugaskan)
-- [ ] Refactor cubit & state. (Belum Ditugaskan)
-- [ ] Refactor logika consume state management. (Belum Ditugaskan)
-- [ ] Validasi data masukan untuk setiap formulir. (Belum Ditugaskan)
-- [ ] Consume Input API di halaman input. (Belum Ditugaskan)
-- [ ] Revisi desain halaman Login. (Belum Ditugaskan)
-- [ ] Revisi desain halaman Receipt. (Belum Ditugaskan)
-- [ ] Revisi desain halaman Profile. (Belum Ditugaskan)
-- [ ] Revisi desain halaman Detail Receipt. (Belum Ditugaskan)
-- [ ] Revisi desain halaman Cetak. (Belum Ditugaskan)
-- [ ] Membuat Widget Search Bar. (Belum Ditugaskan)
-
 ## Tugas yang Sudah Dibagikan
 
 ### **Andrey**
@@ -24,8 +10,12 @@
 - [x] Implementasi penyimpanan lokal untuk menyimpan data pengiriman. (Done)
 - [x] Implementasi bottom navbar untuk home page dan profile page. (Done)
 - [x] Consume endpoint API user info dan logout di halaman profile. (Done)
-- [x] Implementasi halaman profil dengan fungsi logout. (Ongoing)
-- [x] Implementasi halaman detail daftar data untuk informasi pengiriman. (Ongoing)
+- [x] Implementasi halaman profil dengan fungsi logout. (Done)
+- [x] Implementasi halaman detail daftar data untuk informasi pengiriman. (Done)
+- [ ] Revisi desain halaman Login. (Ongoing)
+- [ ] Revisi desain halaman Profile. (Ongoing)
+- [ ] Revisi desain halaman Detail Receipt. (Ongoing)
+- [ ] Membuat Widget Search Bar. (Ongoing)
 
 ### **Kimi**
 
@@ -34,6 +24,10 @@
 - [x] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Done)
 - [x] Menghubungkan API dari halaman master ke dalam model. (Done)
 - [x] Implementasi halaman cetak kode QR untuk label pengiriman. (Done)
+- [ ] Validasi data masukan untuk setiap formulir. (Ongoing)
+- [ ] Consume Input API di halaman input. (Ongoing)
+- [ ] Revisi desain halaman Receipt. (Ongoing)
+- [ ] Revisi desain halaman Cetak. (Ongoing)
 
 ## Tugas Tim
 
@@ -53,3 +47,6 @@
 ### Refactoring
 
 - [ ] Refactor codebase 'blutut' untuk peningkatan maintainability dan performance. (Ongoing)
+- [ ] Refactor error handling untuk setiap panggilan API. (Ongoing)
+- [ ] Refactor cubit & state. (Ongoing)
+- [ ] Refactor logika consume state management. (Ongoing)
