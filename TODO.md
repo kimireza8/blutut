@@ -4,8 +4,17 @@
 
 ### Feature: Authentication
 
-- [ ] Implementasi penanganan kesalahan untuk setiap panggilan API. (Belum Ditugaskan)
+- [ ] Refactor error handling untuk setiap panggilan API. (Belum Ditugaskan)
+- [ ] Refactor cubit & state. (Belum Ditugaskan)
+- [ ] Refactor logika consume state management. (Belum Ditugaskan)
 - [ ] Validasi data masukan untuk setiap formulir. (Belum Ditugaskan)
+- [ ] Consume Input API di halaman input. (Belum Ditugaskan)
+- [ ] Revisi desain halaman Login. (Belum Ditugaskan)
+- [ ] Revisi desain halaman Receipt. (Belum Ditugaskan)
+- [ ] Revisi desain halaman Profile. (Belum Ditugaskan)
+- [ ] Revisi desain halaman Detail Receipt. (Belum Ditugaskan)
+- [ ] Revisi desain halaman Cetak. (Belum Ditugaskan)
+- [ ] Membuat Widget Search Bar. (Belum Ditugaskan)
 
 ## Tugas yang Sudah Dibagikan
 
