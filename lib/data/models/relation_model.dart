@@ -10,10 +10,10 @@ class RelationModel extends RelationEntity {
   });
 
   factory RelationModel.fromJson(Map<String, dynamic> json) => RelationModel(
-        id: json['oprcustomer_id']?.toString() ?? '',
-        code: json['oprcustomer_code']?.toString() ?? '',
-        name: json['oprcustomer_name']?.toString() ?? '',
-        address: json['oprcustomer_address']?.toString() ?? '',
-        phone: json['oprcustomer_phone']?.toString() ?? '',
+        id: json['oprcustomer_id'] as String ?? '',
+        code: json['oprcustomer_code'] as String ?? '',
+        name: json['oprcustomer_name'] as String ?? '',
+        address: json['oprcustomer_address'] as String ?? '',
+        phone: json['oprcustomer_phone'] as String ?? '',
       );
 }

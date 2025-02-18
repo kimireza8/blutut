@@ -8,6 +8,7 @@ import '../../../core/utils/status_color_util.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/shipment_entity.dart';
 import '../../profile/pages/profile_page.dart';
+import '../../receipt/bloc/cubit/data_provider_cubit.dart';
 import '../bloc/receipt_bloc.dart';
 
 @RoutePage()
@@ -42,6 +43,7 @@ class _DataListPageState extends State<DataListPage>
         serviceLocator<SharedPreferencesService>().getString('cookie') ?? '',
       ),
     );
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -96,6 +98,11 @@ class _DataListPageState extends State<DataListPage>
                         await AutoRouter.of(context).push(
                           DetailDataListRoute(shipmentId: receipt.id),
                         );
+                      },
+                      onLongPress: () async {
+                        await context.router.replace(Print(
+                          shipment: receipt,
+                        ));
                       },
                       child: Card(
                         elevation: 3,

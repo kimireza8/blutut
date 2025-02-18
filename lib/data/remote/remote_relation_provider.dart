@@ -1,50 +1,78 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 
+import '../../core/constants/constant.dart';
+import '../../core/services/shared_preferences_service.dart';
 import '../../data/models/relation_model.dart';
+import '../../dependency_injections.dart';
 
 class RemoteRelationProvider {
-  const RemoteRelationProvider({required this.dio});
-  final Dio dio;
+  const RemoteRelationProvider({required Dio dio}) : _dio = dio;
+  final Dio _dio;
 
-  Future<List<RelationModel>> getOprRelations(String cookie) async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
-    try {
-      Response response =
-          await dio.post(
-        'https://app.ptmakassartrans.com/index.php/oprrelation/index.mod?_dc=$timestamp',
-        data: _buildRelationListRequestData(),
-        options: Options(
-          headers: <String, dynamic>{
-            'Cookie': 'siklonsession=$cookie',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        ),
-      );
+  static final Map<String, String> _defaultHeaders = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
 
-      log('Response Status Code: ${response.statusCode}');
-      log('Response Data: ${response.data}');
+  Future<List<RelationModel>> getOprRelations() async {
+    return _executeRequest<List<RelationModel>>(
+      () async {
+        String? cookie = serviceLocator<SharedPreferencesService>().getCookie();
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
 
-      if (response.statusCode == 200 && response.data?['success'] == true) {
-        var rows = response.data?['rows'] as List;
+        Map<String, String> headers = {
+          'Cookie': 'siklonsession=$cookie',
+          ..._defaultHeaders,
+        };
+
+        Response response = await _dio.post(
+          '${Constant.baseUrl}/index.php/oprcustomer/index.mod?_dc=$timestamp',
+          data: _buildRelationListRequestData(),
+          options: Options(headers: headers),
+        );
+
+        Map<String, dynamic> responseData = _decodeResponseData(response.data);
+
+        if (!_isValidResponse(responseData)) {
+          throw Exception(
+              'Invalid API response format: Missing or incorrect "rows" key');
+        }
+
+        List<dynamic> rows = responseData['rows'] as List? ?? [];
         return rows
-            .map(
-              (json) => RelationModel.fromJson(json as Map<String, dynamic>),
-            )
+            .map((json) => RelationModel.fromJson(json as Map<String, dynamic>))
             .toList();
-      } else {
-        throw Exception('Failed to fetch data');
-      }
+      },
+      'fetch operator relations',
+    );
+  }
+
+  Future<T> _executeRequest<T>(
+      Future<T> Function() request, String operationName) async {
+    try {
+      return await request();
     } on DioException catch (e) {
       log('Dio Error: ${e.message}, ${e.response?.statusCode}, ${e.response?.data}');
-      throw Exception('Failed to load data: ${e.message}');
+      throw Exception('API error during $operationName: ${e.message}');
     } catch (e) {
       log('Error: $e');
-      throw Exception('An error occurred: $e');
+      throw Exception('Unexpected error during $operationName: $e');
     }
   }
+
+  Map<String, dynamic> _decodeResponseData(dynamic responseData) {
+    if (responseData is String) {
+      return jsonDecode(responseData) as Map<String, dynamic>;
+    } else if (responseData is Map) {
+      return responseData as Map<String, dynamic>;
+    } else {
+      return <String, dynamic>{};
+    }
+  }
+
+  bool _isValidResponse(Map<String, dynamic> responseData) =>
+      responseData.containsKey('rows') && responseData['rows'] is List;
 
   Map<String, dynamic> _buildRelationListRequestData() => <String, dynamic>{
         'select': jsonEncode([
@@ -63,6 +91,6 @@ class RemoteRelationProvider {
         'flyoversearch': jsonEncode([]),
         'page': '1',
         'start': '0',
-        'limit': '50',
+        'limit': '10',
       };
 }

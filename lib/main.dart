@@ -4,11 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/router/app_router.dart';
 import 'core/services/hive_service.dart';
 import 'dependency_injections.dart';
+import 'domain/usecases/oprroute_fetch_usecase.dart';
+import 'domain/usecases/relation_fetch_usecase.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/data_list/bloc/receipt_bloc.dart';
 import 'presentation/detail_data_list/cubit/detail_data_list_cubit.dart';
 import 'presentation/home/print_cubit/print_cubit.dart';
 import 'presentation/profile/cubit/profile_cubit.dart';
+import 'presentation/receipt/bloc/cubit/data_provider_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,5 +51,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<PrintCubit>(
           create: (context) => PrintCubit()..initBluetooth(),
         ),
+        BlocProvider<DataProviderCubit>(
+            create: (context) => DataProviderCubit(
+                relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
+                oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>())),
       ];
 }

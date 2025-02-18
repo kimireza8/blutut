@@ -7,6 +7,7 @@ import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/login_request_entity.dart';
 import '../../data_list/bloc/receipt_bloc.dart';
+import '../../receipt/bloc/cubit/data_provider_cubit.dart';
 import '../cubit/auth_cubit.dart';
 
 @RoutePage()
@@ -56,6 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
             if (context.mounted) {
+              await context.read<DataProviderCubit>().fetchData();
               await context.router.replace(const DataListRoute());
             }
           } else if (state is AuthError) {
