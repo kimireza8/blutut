@@ -9,9 +9,10 @@ abstract class ReceiptEvent extends Equatable {
 
 class FetchOprIncomingReceipts extends ReceiptEvent {
 
-  const FetchOprIncomingReceipts(this.token);
+  const FetchOprIncomingReceipts(this.token, {this.searchQuery});
   final String token;
+  final String? searchQuery;
 
   @override
-  List<Object> get props => [token];
+  List<Object> get props => [token, searchQuery ?? ''];
 }

@@ -18,10 +18,6 @@ class AppRouter extends $AppRouter {
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
-          page: ProfileRoute.page,
-          guards: [AuthenticatedGuard()],
-        ),
-        AutoRoute(
           page: Print.page,
           guards: [AuthenticatedGuard()],
         ),

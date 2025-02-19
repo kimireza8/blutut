@@ -15,38 +15,40 @@ class RemoteOprRouteProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<RouteModel>> getOprRoutes() async {
-    return _executeRequest<List<RouteModel>>(
-      () async {
-        int timestamp = DateTime.now().millisecondsSinceEpoch;
-        String? cookie = serviceLocator<SharedPreferencesService>().getCookie();
+  Future<List<RouteModel>> getOprRoutes() async =>
+      _executeRequest<List<RouteModel>>(
+        () async {
+          int timestamp = DateTime.now().millisecondsSinceEpoch;
+          String? cookie =
+              serviceLocator<SharedPreferencesService>().getCookie();
 
-        Map<String, String> headers = {
-          'Cookie': 'siklonsession=$cookie',
-          ..._defaultHeaders,
-        };
+          Map<String, String> headers = {
+            'Cookie': 'siklonsession=$cookie',
+            ..._defaultHeaders,
+          };
 
-        Response response = await _dio.post(
-          '${Constant.baseUrl}/index.php/oprroute/index.mod?_dc=$timestamp',
-          data: _buildRouteListRequestData(),
-          options: Options(headers: headers),
-        );
+          Response response = await _dio.post(
+            '${Constant.baseUrl}/index.php/oprroute/index.mod?_dc=$timestamp',
+            data: _buildRouteListRequestData(),
+            options: Options(headers: headers),
+          );
 
-        Map<String, dynamic> responseData = _decodeResponseData(response.data);
+          Map<String, dynamic> responseData =
+              _decodeResponseData(response.data);
 
-        if (!_isValidResponse(responseData)) {
-          throw Exception(
-              'Invalid API response format: Missing or incorrect "rows" key');
-        }
+          if (!_isValidResponse(responseData)) {
+            throw Exception(
+              'Invalid API response format: Missing or incorrect "rows" key',
+            );
+          }
 
-        List<dynamic> rows = responseData['rows'] as List? ?? [];
-        return rows
-            .map((json) => RouteModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-      },
-      'fetch opr routes',
-    );
-  }
+          List<dynamic> rows = responseData['rows'] as List? ?? [];
+          return rows
+              .map((json) => RouteModel.fromJson(json as Map<String, dynamic>))
+              .toList();
+        },
+        'fetch opr routes',
+      );
 
   Future<T> _executeRequest<T>(
     Future<T> Function() request,

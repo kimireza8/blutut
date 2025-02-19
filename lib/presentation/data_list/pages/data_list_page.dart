@@ -6,7 +6,9 @@ import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/shipment_entity.dart';
+import '../../profile/widgets/profile_widget.dart';
 import '../bloc/receipt_bloc.dart';
+import '../widgets/search_bar_widget.dart';
 
 @RoutePage()
 class DataListPage extends StatefulWidget {
@@ -41,15 +43,16 @@ class _DataListPageState extends State<DataListPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 24, right: 24, top: 24),
                     child: Row(
                       children: [
-                        Image(
+                        const Image(
                           image: AssetImage('assets/dahsboard_logo.png'),
                         ),
-                        SizedBox(width: 8),
-                        Column(
+                        const SizedBox(width: 8),
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -67,30 +70,33 @@ class _DataListPageState extends State<DataListPage> {
                             ),
                           ],
                         ),
-                        Spacer(),
-                        CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.person,
-                            color: Color.fromRGBO(29, 79, 215, 1),
+                        const Spacer(),
+                        InkWell(
+                          onTap: () async => showProfileBottomSheet(context),
+                          child: const CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.person,
+                              color: Color.fromRGBO(29, 79, 215, 1),
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
+                    padding: const EdgeInsets.all(16),
+                    child: SearchBarWidget(
+                      onSearch: (query) {
+                        context.read<ReceiptBloc>().add(
+                              FetchOprIncomingReceipts(
+                                serviceLocator<SharedPreferencesService>()
+                                        .getString('cookie') ??
+                                    '',
+                                searchQuery: query,
+                              ),
+                            );
+                      },
                     ),
                   ),
                 ],
@@ -110,14 +116,19 @@ class _DataListPageState extends State<DataListPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is ReceiptLoaded) {
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        left: 16,
+                        right: 16,
+                      ),
                       itemCount: state.receipts.length,
                       itemBuilder: (context, index) {
                         ShipmentEntity receipt = state.receipts[index];
                         return InkWell(
-                          onTap: () {
-                            context.router.push(
-                                DetailDataListRoute(shipmentId: receipt.id));
+                          onTap: () async {
+                            await context.router.push(
+                              DetailDataListRoute(shipmentId: receipt.id),
+                            );
                           },
                           child: Card(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -147,15 +158,17 @@ class _DataListPageState extends State<DataListPage> {
                                           Text(
                                             receipt.date,
                                             style: const TextStyle(
-                                                color: Colors.grey),
+                                              color: Colors.grey,
+                                            ),
                                           ),
                                           const SizedBox(height: 8),
                                           if (receipt.totalColi.isNotEmpty)
                                             Container(
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
                                               decoration: BoxDecoration(
                                                 color: Colors.blue[100],
                                                 borderRadius:
@@ -165,17 +178,23 @@ class _DataListPageState extends State<DataListPage> {
                                                 'Total Colli : ${receipt.totalColi}',
                                                 style: const TextStyle(
                                                   color: Color.fromRGBO(
-                                                      29, 79, 215, 1),
+                                                    29,
+                                                    79,
+                                                    215,
+                                                    1,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                         ],
                                       ),
                                       IconButton(
-                                        onPressed: () {
-                                          context.router.push(Print(
-                                            shipment: receipt,
-                                          ));
+                                        onPressed: () async {
+                                          await context.router.push(
+                                            Print(
+                                              shipment: receipt,
+                                            ),
+                                          );
                                         },
                                         icon: const Icon(
                                           Icons.print,
@@ -185,7 +204,7 @@ class _DataListPageState extends State<DataListPage> {
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  Divider(),
+                                  const Divider(),
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
@@ -198,7 +217,8 @@ class _DataListPageState extends State<DataListPage> {
                                             Text(
                                               receipt.shipperName,
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
@@ -214,7 +234,8 @@ class _DataListPageState extends State<DataListPage> {
                                             Text(
                                               receipt.branchOffice,
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
@@ -234,7 +255,8 @@ class _DataListPageState extends State<DataListPage> {
                                             Text(
                                               receipt.customer,
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
@@ -250,7 +272,8 @@ class _DataListPageState extends State<DataListPage> {
                                             Text(
                                               receipt.route,
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ],

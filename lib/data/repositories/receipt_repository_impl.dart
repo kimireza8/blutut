@@ -9,9 +9,9 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
   final RemoteReceiptProvider _remoteReceiptProvider;
 
   @override
-  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async {
+  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie, {String? searchQuery}) async {
     List<ShipmentModel> response =
-        await _remoteReceiptProvider.getOprIncomingReceipts(cookie);
+        await _remoteReceiptProvider.getOprIncomingReceipts(cookie, searchQuery: searchQuery);
     return response;
   }
 
