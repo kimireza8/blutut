@@ -3,6 +3,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/cubit/data_provider_cubit.dart';
+import 'preview_input.dart';
 
 @RoutePage()
 class InputPage extends StatefulWidget {
@@ -173,9 +174,14 @@ class _InputPageState extends State<InputPage> {
                               _buildOutlinedButton('Cancel', () {}),
                               const SizedBox(width: 8),
                               _buildElevatedButton(
-                                  'Next',
-                                  const Color.fromRGBO(29, 79, 215, 1),
-                                  _submitForm),
+                                  'Next', const Color.fromRGBO(29, 79, 215, 1),
+                                  () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PreviewInputScreen()));
+                              }),
                             ],
                           ),
                         ],
