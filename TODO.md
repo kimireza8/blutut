@@ -15,7 +15,7 @@
 - [x] Revisi desain halaman Login. (Ongoing)
 - [x] Membuat Widget Search Bar. (Ongoing)
 - [x] Membuat Consume API untuk Widget Search. (Ongoing)
-- [ ] Revisi desain halaman Profile. (Ongoing)
+- [x] Revisi desain halaman Profile. (Ongoing)
 - [ ] Revisi desain halaman Detail Receipt. (Ongoing)
 
 ### **Kimi**
