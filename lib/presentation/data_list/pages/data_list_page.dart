@@ -125,20 +125,51 @@ class _DataListPageState extends State<DataListPage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(15),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          receipt.trackingNumber,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            receipt.trackingNumber,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
                                           ),
-                                        ),
+                                          Text(
+                                            receipt.date,
+                                            style: const TextStyle(
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          if (receipt.totalColi.isNotEmpty)
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                'Total Colli : ${receipt.totalColi}',
+                                                style: const TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      29, 79, 215, 1),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       IconButton(
                                         onPressed: () {
@@ -153,25 +184,8 @@ class _DataListPageState extends State<DataListPage> {
                                       ),
                                     ],
                                   ),
-                                  Text(
-                                    receipt.date,
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
                                   const SizedBox(height: 8),
-                                  if (receipt.totalColi.isNotEmpty)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue[100],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        'Total Colli : ${receipt.totalColi}',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
+                                  Divider(),
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [

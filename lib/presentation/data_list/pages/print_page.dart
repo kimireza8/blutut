@@ -1,9 +1,7 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 import '../../../domain/entities/shipment_entity.dart';
 import '../../home/print_cubit/print_cubit.dart';
 
@@ -14,119 +12,168 @@ class Print extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Print QR Code')),
+        appBar: AppBar(
+          title: const Text('Barcode', style: TextStyle(color: Colors.white)),
+          backgroundColor: const Color.fromRGBO(29, 79, 215, 1),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => context.router.pop(),
+              color: Colors.white,
+            )
+          ],
+        ),
         body: BlocBuilder<PrintCubit, PrintState>(
-          builder: (context, state) => Column(
-            children: [
-              Expanded(
-                child: Card(
-                  child: ListTile(
-                    title: Text(shipment.trackingNumber),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${shipment.customer} -> ${shipment.shipperName}',
-                        ),
-                        const SizedBox(height: 8),
-                        QrImageView(
+          builder: (context, state) => Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Card(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: QrImageView(
                           data: shipment.trackingNumber,
-                          size: 100,
+                          size: 200,
                         ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.print),
-                      onPressed: state.selectedDevice == null
-                          ? null
-                          : () async {
-                              await context
-                                  .read<PrintCubit>()
-                                  .printQR(shipment);
-                            },
-                    ),
+                      ),
+                      Text(shipment.trackingNumber,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(shipment.date,
+                          style: Theme.of(context).textTheme.bodyMedium),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.share,
+                              color: Color.fromRGBO(29, 79, 215, 1),
+                            ),
+                            label: const Text(
+                              'Share',
+                              style: TextStyle(
+                                color: Color.fromRGBO(29, 79, 215, 1),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton.icon(
+                            onPressed: state.selectedDevice == null
+                                ? null
+                                : () => context
+                                    .read<PrintCubit>()
+                                    .printQR(shipment),
+                            icon: Icon(
+                              Icons.print,
+                              color: state.selectedDevice == null
+                                  ? Colors.grey
+                                  : Color.fromRGBO(29, 79, 215, 1),
+                            ),
+                            label: Text(
+                              'Print Barcode',
+                              style: TextStyle(
+                                  color: state.selectedDevice == null
+                                      ? Colors.grey
+                                      : Color.fromRGBO(29, 79, 215, 1)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              ),
-              const Divider(),
-              ElevatedButton.icon(
-                onPressed: () {
-                  context.read<PrintCubit>().scanDevices();
-                },
-                icon: Icon(state.scanning ? Icons.stop : Icons.search),
-                label: Text(state.scanning ? 'Stop Scanning' : 'Scan Devices'),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  context.read<PrintCubit>().getPairedDevices();
-                },
-                icon: const Icon(Icons.search),
-                label: const Text('Paired Devices'),
-              ),
-              const Divider(),
-              const Text(
-                'Paired Devices:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Expanded(
-                child: state.pairedDevices.isEmpty
-                    ? const Center(child: Text('No Paired Bluetooth Devices'))
-                    : ListView.builder(
-                        itemCount: state.pairedDevices.length,
-                        itemBuilder: (context, index) {
-                          Device device = state.pairedDevices[index];
-                          return ListTile(
-                            title: Text(device.name ?? 'Unknown'),
-                            subtitle: Text(device.address),
-                            trailing: state.selectedDevice?.address ==
-                                    device.address
-                                ? const Icon(Icons.check, color: Colors.green)
-                                : null,
-                            onTap: () async {
-                              await context
-                                  .read<PrintCubit>()
-                                  .connectToDevice(device);
-                            },
-                          );
-                        },
-                      ),
-              ),
-              const Divider(),
-              const Text(
-                'Discovered Devices:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Expanded(
-                child: state.discoveredDevices.isEmpty
-                    ? const Center(child: Text('No New Devices Found'))
-                    : ListView.builder(
-                        itemCount: state.discoveredDevices.length,
-                        itemBuilder: (context, index) {
-                          Device device = state.discoveredDevices[index];
-                          return ListTile(
-                            title: Text(device.name ?? 'Unknown'),
-                            subtitle: Text(device.address),
-                            trailing: const Icon(Icons.bluetooth_searching),
-                            onTap: () async {
-                              await context
-                                  .read<PrintCubit>()
-                                  .connectToDevice(device);
-                            },
-                          );
-                        },
-                      ),
-              ),
-              if (state.selectedDevice != null)
-                ElevatedButton.icon(
-                  onPressed: () {
-                    context.read<PrintCubit>().disconnectDevice();
+                const SizedBox(height: 16),
+                Text('Connected Printer',
+                    style: Theme.of(context).textTheme.bodyMedium),
+                BlocBuilder<PrintCubit, PrintState>(
+                  builder: (context, state) {
+                    if (state is PrintConnected) {
+                      return Card(
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.print,
+                            color: Color.fromRGBO(29, 79, 215, 1),
+                          ),
+                          title: Text(
+                            state.device.name ?? 'Unknown',
+                            style: const TextStyle(
+                              color: Color.fromRGBO(29, 79, 215, 1),
+                            ),
+                          ),
+                          subtitle: const Text('Ready'),
+                        ),
+                      );
+                    } else {
+                      return const Card(
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.print_disabled,
+                            color: Color.fromRGBO(29, 79, 215, 1),
+                          ),
+                          title: Text(
+                            'No Connected Printer',
+                            style: TextStyle(
+                              color: Color.fromRGBO(29, 79, 215, 1),
+                            ),
+                          ),
+                          subtitle: Text('Connecting printer to print barcode'),
+                        ),
+                      );
+                    }
                   },
-                  icon: const Icon(Icons.bluetooth_disabled),
-                  label: const Text('Disconnect'),
                 ),
-              if (state is PrintSuccess) SnackBar(content: Text(state.message)),
-              if (state is PrintError) SnackBar(content: Text(state.error)),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Available printers',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          context.read<PrintCubit>().getPairedDevices(),
+                      icon: const Icon(
+                        Icons.refresh,
+                        color: Color.fromRGBO(29, 79, 215, 1),
+                      ),
+                      label: const Text(
+                        'Refresh',
+                        style: TextStyle(
+                          color: Color.fromRGBO(29, 79, 215, 1),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.pairedDevices.length,
+                    itemBuilder: (context, index) {
+                      final device = state.pairedDevices[index];
+                      return Card(
+                        child: ListTile(
+                          title: Text(device.name ?? 'Unknown'),
+                          subtitle: Text(device.address),
+                          trailing: ElevatedButton(
+                            onPressed: () => context
+                                .read<PrintCubit>()
+                                .connectToDevice(device),
+                            child: const Text('Connect',
+                                style: TextStyle(
+                                    color: Color.fromRGBO(29, 79, 215, 1))),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
