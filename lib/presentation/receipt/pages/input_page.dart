@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/cubit/data_provider_cubit.dart';
@@ -13,16 +14,31 @@ class InputPage extends StatefulWidget {
 
 class _InputPageState extends State<InputPage> {
   final _formKey = GlobalKey<FormState>();
-  String? selectedRelasi;
-  String? selectedRoute;
-  String? manualRelasi;
-  String? manualRoute;
   DateTime? selectedDate;
+  String? selectedRoute;
+  String? origin;
+  String? destination;
+  String? selectedRelation;
+  final TextEditingController colliController = TextEditingController();
+  final TextEditingController senderController = TextEditingController();
+  final TextEditingController receiverController = TextEditingController();
+  final TextEditingController receiptNumberController = TextEditingController();
+  final TextEditingController deliveryNoteController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     context.read<DataProviderCubit>().fetchData();
+  }
+
+  @override
+  void dispose() {
+    colliController.dispose();
+    senderController.dispose();
+    receiverController.dispose();
+    receiptNumberController.dispose();
+    deliveryNoteController.dispose();
+    super.dispose();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -39,173 +55,222 @@ class _InputPageState extends State<InputPage> {
     }
   }
 
+  void _updateRoute(String? route) {
+    if (route != null) {
+      List<String> parts = route.split(" - ");
+      setState(() {
+        selectedRoute = route;
+        origin = parts.isNotEmpty ? parts[0] : '';
+        destination = parts.length > 1 ? parts[1] : '';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Input Data Terima')),
-        body: BlocBuilder<DataProviderCubit, DataProviderState>(
-          builder: (context, state) {
-            if (state is DataProviderLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is DataProviderLoaded) {
-              List<String> relasiOptions =
-                  state.relation.map((e) => e.name).toList() + ['Lainnya'];
-              List<String> routeOptions =
-                  state.route.map((e) => e.routeName).toList() + ['Lainnya'];
-
-              return SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.all(16),
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
+        body: Column(
+          children: [
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(29, 79, 215, 1),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Form',
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                        Text(
+                          'Tanda Terima Barang',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Icon(
+                      Icons.article,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            BlocBuilder<DataProviderCubit, DataProviderState>(
+              builder: (context, state) {
+                if (state is DataProviderLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is DataProviderLoaded) {
+                  return Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Masukkan Data',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
+                          _buildHeader('Kantor Cabang', 'Surabaya', Icons.home),
+                          const SizedBox(
+                            height: 10,
                           ),
-                          const SizedBox(height: 16),
-                          _buildTextField('Kantor Cabang'),
-                          GestureDetector(
-                            onTap: () async => _selectDate(context),
-                            child: AbsorbPointer(
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  labelText: 'Tanggal',
-                                  suffixIcon: const Icon(Icons.calendar_today),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                controller: TextEditingController(
-                                  text: selectedDate == null
-                                      ? ''
-                                      : '${selectedDate!.toLocal()}'
-                                          .split(' ')[0],
-                                ),
-                                validator: (value) =>
-                                    value!.isEmpty ? 'Harus diisi' : null,
-                              ),
-                            ),
+                          _buildRelasiDropdown(
+                            'Nama Relasi',
+                            state.relation.map((e) => e.name).toList(),
                           ),
-                          const SizedBox(height: 16),
-                          _buildDropdownField('Nama Relasi', relasiOptions,
-                              (value) {
-                            setState(() {
-                              selectedRelasi = value;
-                              if (value != 'Lainnya') {
-                                manualRelasi = null;
-                              }
-                            });
-                          }),
-                          if (selectedRelasi == 'Lainnya')
-                            _buildTextField(
-                              'Masukkan Nama Relasi',
-                              onChanged: (val) => manualRelasi = val,
-                            ),
-                          _buildTextField('Pengirim'),
-                          _buildTextField('Penerima'),
-                          _buildTextField('No Resi'),
-                          _buildTextField('No SJ'),
-                          _buildDropdownField('Rute Pengiriman', routeOptions,
-                              (value) {
-                            setState(() {
-                              selectedRoute = value;
-                              if (value != 'Lainnya') {
-                                manualRoute = null;
-                              }
-                            });
-                          }),
-                          if (selectedRoute == 'Lainnya')
-                            _buildTextField(
-                              'Masukkan Rute Pengiriman',
-                              onChanged: (val) => manualRoute = val,
-                            ),
-                          _buildTextField('Total Coli',
-                              keyboardType: TextInputType.number),
+                          _buildDateField(context, 'Tanggal'),
+                          _buildTextField('Total Colli', colliController),
+                          _buildTwoColumnField('Pengirim', 'Penerima',
+                              senderController, receiverController),
+                          _buildRuteDropdown(state),
+                          _buildRouteIcon(),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          _buildTwoColumnField(
+                              'Asal',
+                              'Tujuan',
+                              TextEditingController(text: origin),
+                              TextEditingController(text: destination),
+                              isRoute: true),
+                          _buildTextField(
+                              'Nomor Resi', receiptNumberController),
+                          _buildTextField(
+                              'Nomor Surat Jalan', deliveryNoteController),
                           const SizedBox(height: 20),
-                          Center(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                backgroundColor: Colors.blueAccent,
-                              ),
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  String relasiFinal =
-                                      selectedRelasi == 'Lainnya'
-                                          ? manualRelasi ?? ''
-                                          : selectedRelasi ?? '';
-                                  String routeFinal = selectedRoute == 'Lainnya'
-                                      ? manualRoute ?? ''
-                                      : selectedRoute ?? '';
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Data berhasil disimpan!\nRelasi: $relasiFinal\nRute: $routeFinal',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: const Text(
-                                'Simpan',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
-                              ),
-                            ),
+                          Row(
+                            children: [
+                              _buildTextButton('Clear', _clearFields),
+                              const Spacer(),
+                              _buildOutlinedButton('Cancel', () {}),
+                              const SizedBox(width: 8),
+                              _buildElevatedButton(
+                                  'Next',
+                                  const Color.fromRGBO(29, 79, 215, 1),
+                                  _submitForm),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-              );
-            } else {
-              return const Center(child: Text('Gagal memuat data'));
-            }
-          },
+                  );
+                } else {
+                  return const Center(child: Text('Gagal memuat data'));
+                }
+              },
+            ),
+          ],
         ),
       );
 
-  Widget _buildTextField(
-    String label, {
-    TextInputType keyboardType = TextInputType.text,
-    Function(String)? onChanged,
-  }) =>
-      Padding(
+  Widget _buildRelasiDropdown(String label, List<String> options) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: TextFormField(
+        child: DropdownButtonFormField(
           decoration: InputDecoration(
             labelText: label,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          keyboardType: keyboardType,
-          validator: (value) => value!.isEmpty ? 'Harus diisi' : null,
-          onChanged: onChanged,
+          items: options
+              .map((option) =>
+                  DropdownMenuItem(value: option, child: Text(option)))
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedRelation = value;
+            });
+          },
+          value: selectedRelation,
         ),
       );
 
-  Widget _buildDropdownField(
-    String label,
-    List<String> options,
-    Function(String?) onChanged,
-  ) =>
+  Widget _buildRuteDropdown(DataProviderLoaded state) => _buildDropdownField(
+        'Rute Pengiriman',
+        state.route.map((e) => e.routeName).toList(),
+        _updateRoute,
+      );
+
+  void _clearFields() {
+    setState(() {
+      colliController.clear();
+      senderController.clear();
+      receiverController.clear();
+      receiptNumberController.clear();
+      deliveryNoteController.clear();
+      selectedDate = null;
+      selectedRoute = null;
+      origin = null;
+      destination = null;
+    });
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState?.validate() ?? false) {
+      print('relasi $selectedRelation');
+    }
+  }
+
+  Widget _buildHeader(String label, String value, IconData icon) => Row(
+        children: [
+          Icon(icon, size: 24, color: Colors.black54),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 12)),
+              Text(value,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ],
+      );
+
+  Widget _buildTextField(String label, TextEditingController controller) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      );
+
+  Widget _buildTwoColumnField(
+          String leftLabel,
+          String rightLabel,
+          TextEditingController leftController,
+          TextEditingController rightController,
+          {bool isRoute = false}) =>
+      Row(
+        children: [
+          Expanded(child: _buildTextField(leftLabel, leftController)),
+          const SizedBox(
+            width: 5,
+          ),
+          if (isRoute)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(Icons.route, color: Colors.red),
+            ),
+          const SizedBox(
+            width: 5,
+          ),
+          Expanded(child: _buildTextField(rightLabel, rightController)),
+        ],
+      );
+
+  Widget _buildDropdownField(String label, List<String> options,
+          void Function(String?)? onChanged) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: DropdownButtonFormField(
@@ -214,13 +279,97 @@ class _InputPageState extends State<InputPage> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           items: options
-              .map(
-                (option) =>
-                    DropdownMenuItem(value: option, child: Text(option)),
-              )
+              .map((option) =>
+                  DropdownMenuItem(value: option, child: Text(option)))
               .toList(),
           onChanged: onChanged,
-          validator: (value) => value == null ? 'Pilih salah satu' : null,
         ),
+      );
+
+  Widget _buildTextButton(String label, VoidCallback onPressed) => TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          foregroundColor: const Color.fromRGBO(29, 79, 215, 1),
+        ),
+        child: Text(label),
+      );
+
+  Widget _buildOutlinedButton(String label, VoidCallback onPressed) =>
+      OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color.fromRGBO(29, 79, 215, 1),
+          side: const BorderSide(
+            color: Color.fromRGBO(29, 79, 215, 1),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        child: Text(label),
+      );
+
+  Widget _buildElevatedButton(
+          String label, Color color, VoidCallback onPressed) =>
+      ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: onPressed,
+        child: Text(label, style: const TextStyle(color: Colors.white)),
+      );
+
+  Widget _buildDateField(BuildContext context, String label) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: GestureDetector(
+          onTap: () => _selectDate(context),
+          child: AbsorbPointer(
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: label,
+                suffixIcon: const Icon(Icons.calendar_today),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              controller: TextEditingController(
+                text: selectedDate == null
+                    ? ''
+                    : '${selectedDate!.toLocal()}'.split(' ')[0],
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Widget _buildRouteIcon() => const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.my_location,
+            size: 20,
+            color: Colors.blue,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: SizedBox(
+              width: 200,
+              child: DottedLine(
+                direction: Axis.horizontal,
+                lineThickness: 2,
+                dashLength: 6,
+                dashColor: Colors.black,
+              ),
+            ),
+          ),
+          Icon(
+            Icons.location_on,
+            size: 20,
+            color: Colors.red,
+          ),
+        ],
       );
 }
