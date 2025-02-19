@@ -4,11 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
-import '../../../core/utils/status_color_util.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/shipment_entity.dart';
-import '../../profile/pages/profile_page.dart';
-import '../../receipt/bloc/cubit/data_provider_cubit.dart';
 import '../bloc/receipt_bloc.dart';
 
 @RoutePage()
@@ -19,159 +16,256 @@ class DataListPage extends StatefulWidget {
   State<DataListPage> createState() => _DataListPageState();
 }
 
-class _DataListPageState extends State<DataListPage>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-
+class _DataListPageState extends State<DataListPage> {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.index = 0;
+    Future.microtask(() {
+      context.read<ReceiptBloc>().add(
+            FetchOprIncomingReceipts(
+              serviceLocator<SharedPreferencesService>().getString('cookie') ??
+                  '',
+            ),
+          );
+    });
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    BlocProvider.of<ReceiptBloc>(context).add(
-      FetchOprIncomingReceipts(
-        serviceLocator<SharedPreferencesService>().getString('cookie') ?? '',
-      ),
-    );
-
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Makassar Trans'),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(text: 'Receipts'),
-              Tab(text: 'Profile'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
+  Widget build(BuildContext context) => Scaffold(
+        body: Column(
           children: [
-            buildReceiptsTab(),
-            const ProfilePage(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildReceiptsTab() => BlocConsumer<ReceiptBloc, ReceiptState>(
-        listener: (context, state) {
-          if (state is ReceiptError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${state.message}')),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is ReceiptLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is ReceiptLoaded) {
-            return Stack(
-              children: [
-                ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  itemCount: state.receipts.length,
-                  itemBuilder: (context, index) {
-                    ShipmentEntity receipt = state.receipts[index];
-                    String number = receipt.trackingNumber;
-                    String date = receipt.date;
-                    String shipper = receipt.shipperName;
-                    String consignee = receipt.consigneeName;
-                    String status = receipt.status;
-
-                    return InkWell(
-                      onTap: () async {
-                        await AutoRouter.of(context).push(
-                          DetailDataListRoute(shipmentId: receipt.id),
-                        );
-                      },
-                      onLongPress: () async {
-                        await context.router.replace(Print(
-                          shipment: receipt,
-                        ));
-                      },
-                      child: Card(
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                color: Color.fromRGBO(29, 79, 215, 1),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+                    child: Row(
+                      children: [
+                        Image(
+                          image: AssetImage('assets/dahsboard_logo.png'),
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: const Icon(
-                            Icons.receipt_long,
-                            color: Colors.blueAccent,
-                            size: 36,
-                          ),
-                          title: Text(
-                            'No: $number',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Tanggal: $date'),
-                              Text('Pengirim: $shipper'),
-                              Text('Penerima: $consignee'),
-                              Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: StatusColorUtil.getStatusColor(
-                                    status,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  status,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                        SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'MATRANS',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
+                            ),
+                            Text(
+                              'PT Makassar Trans',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    );
-                  },
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: FloatingActionButton(
-                      onPressed: () async {
-                        await context.router.replace(const InputRoute());
-                      },
-                      child: const Icon(Icons.add),
+                        Spacer(),
+                        CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.person,
+                            color: Color.fromRGBO(29, 79, 215, 1),
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                ),
-              ],
-            );
-          }
-          return const Center(child: Text('No Data Available'));
-        },
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: BlocConsumer<ReceiptBloc, ReceiptState>(
+                listener: (context, state) {
+                  if (state is ReceiptError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: ${state.message}')),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is ReceiptLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is ReceiptLoaded) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: state.receipts.length,
+                      itemBuilder: (context, index) {
+                        ShipmentEntity receipt = state.receipts[index];
+                        return InkWell(
+                          onTap: () {
+                            context.router.push(
+                                DetailDataListRoute(shipmentId: receipt.id));
+                          },
+                          child: Card(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          receipt.trackingNumber,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          context.router.push(Print(
+                                            shipment: receipt,
+                                          ));
+                                        },
+                                        icon: const Icon(
+                                          Icons.print,
+                                          color: Color.fromRGBO(29, 79, 215, 1),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    receipt.date,
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  if (receipt.totalColi.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        'Total Colli : ${receipt.totalColi}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Pengirim'),
+                                            Text(
+                                              receipt.shipperName,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Tujuan'),
+                                            Text(
+                                              receipt.branchOffice,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Penerima'),
+                                            Text(
+                                              receipt.customer,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Route'),
+                                            Text(
+                                              receipt.route,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return const Center(child: Text('No Data Available'));
+                },
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () async {
+            await context.router.push(const InputRoute());
+          },
+          label: const Text('Add New', style: TextStyle(color: Colors.white)),
+          icon: const Icon(Icons.add, color: Colors.white),
+          backgroundColor: const Color.fromRGBO(29, 79, 215, 1),
+        ),
       );
 }
