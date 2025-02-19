@@ -115,179 +115,192 @@ class _DataListPageState extends State<DataListPage> {
                   if (state is ReceiptLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is ReceiptLoaded) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(
-                        top: 16,
-                        left: 16,
-                        right: 16,
-                      ),
-                      itemCount: state.receipts.length,
-                      itemBuilder: (context, index) {
-                        ShipmentEntity receipt = state.receipts[index];
-                        return InkWell(
-                          onTap: () async {
-                            await context.router.push(
-                              DetailDataListRoute(shipmentId: receipt.id),
-                            );
-                          },
-                          child: Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            receipt.trackingNumber,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          Text(
-                                            receipt.date,
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          if (receipt.totalColi.isNotEmpty)
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
+                    return RefreshIndicator(
+                      color: Color.fromRGBO(29, 79, 215, 1),
+                      onRefresh: () async {
+                        context
+                            .read<ReceiptBloc>()
+                            .add(FetchOprIncomingReceipts(
+                              serviceLocator<SharedPreferencesService>()
+                                      .getString('cookie') ??
+                                  '',
+                            ));
+                      },
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(
+                          top: 16,
+                          left: 16,
+                          right: 16,
+                        ),
+                        itemCount: state.receipts.length,
+                        itemBuilder: (context, index) {
+                          ShipmentEntity receipt = state.receipts[index];
+                          return InkWell(
+                            onTap: () async {
+                              await context.router.push(
+                                DetailDataListRoute(shipmentId: receipt.id),
+                              );
+                            },
+                            child: Card(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              receipt.trackingNumber,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
                                               ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.blue[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                            ),
+                                            Text(
+                                              receipt.date,
+                                              style: const TextStyle(
+                                                color: Colors.grey,
                                               ),
-                                              child: Text(
-                                                'Total Colli : ${receipt.totalColi}',
-                                                style: const TextStyle(
-                                                  color: Color.fromRGBO(
-                                                    29,
-                                                    79,
-                                                    215,
-                                                    1,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            if (receipt.totalColi.isNotEmpty)
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue[100],
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  'Total Colli : ${receipt.totalColi}',
+                                                  style: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                      29,
+                                                      79,
+                                                      215,
+                                                      1,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                        ],
-                                      ),
-                                      IconButton(
-                                        onPressed: () async {
-                                          await context.router.push(
-                                            Print(
-                                              shipment: receipt,
-                                            ),
-                                          );
-                                        },
-                                        icon: const Icon(
-                                          Icons.print,
-                                          color: Color.fromRGBO(29, 79, 215, 1),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Divider(),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Pengirim'),
-                                            Text(
-                                              receipt.shipperName,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
                                           ],
                                         ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Tujuan'),
-                                            Text(
-                                              receipt.branchOffice,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                        IconButton(
+                                          onPressed: () async {
+                                            await context.router.push(
+                                              Print(
+                                                shipment: receipt,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
+                                            );
+                                          },
+                                          icon: const Icon(
+                                            Icons.print,
+                                            color:
+                                                Color.fromRGBO(29, 79, 215, 1),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Penerima'),
-                                            Text(
-                                              receipt.customer,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Divider(),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Pengirim'),
+                                              Text(
+                                                receipt.shipperName,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text('Route'),
-                                            Text(
-                                              receipt.route,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Tujuan'),
+                                              Text(
+                                                receipt.branchOffice,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Penerima'),
+                                              Text(
+                                                receipt.customer,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Route'),
+                                              Text(
+                                                receipt.route,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     );
                   }
                   return const Center(child: Text('No Data Available'));

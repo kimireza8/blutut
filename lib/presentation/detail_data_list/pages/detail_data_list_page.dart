@@ -72,8 +72,10 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                 children: [
                   Icon(Icons.inbox_outlined, size: 48, color: Colors.grey),
                   SizedBox(height: 16),
-                  Text('No Data Available',
-                      style: TextStyle(color: Colors.grey),),
+                  Text(
+                    'No Data Available',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ],
               ),
             );

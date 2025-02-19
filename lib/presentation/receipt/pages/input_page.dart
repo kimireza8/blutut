@@ -66,6 +66,26 @@ class _InputPageState extends State<InputPage> {
     }
   }
 
+  void _clearFields() {
+    setState(() {
+      colliController.clear();
+      senderController.clear();
+      receiverController.clear();
+      receiptNumberController.clear();
+      deliveryNoteController.clear();
+      selectedDate = null;
+      selectedRoute = null;
+      origin = null;
+      destination = null;
+    });
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState?.validate() ?? false) {
+      print('relasi $selectedRelation');
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Column(
@@ -196,26 +216,6 @@ class _InputPageState extends State<InputPage> {
         state.route.map((e) => e.routeName).toList(),
         _updateRoute,
       );
-
-  void _clearFields() {
-    setState(() {
-      colliController.clear();
-      senderController.clear();
-      receiverController.clear();
-      receiptNumberController.clear();
-      deliveryNoteController.clear();
-      selectedDate = null;
-      selectedRoute = null;
-      origin = null;
-      destination = null;
-    });
-  }
-
-  void _submitForm() {
-    if (_formKey.currentState?.validate() ?? false) {
-      print('relasi $selectedRelation');
-    }
-  }
 
   Widget _buildHeader(String label, String value, IconData icon) => Row(
         children: [
