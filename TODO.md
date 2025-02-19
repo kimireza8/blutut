@@ -12,10 +12,11 @@
 - [x] Consume endpoint API user info dan logout di halaman profile. (Done)
 - [x] Implementasi halaman profil dengan fungsi logout. (Done)
 - [x] Implementasi halaman detail daftar data untuk informasi pengiriman. (Done)
-- [ ] Revisi desain halaman Login. (Ongoing)
+- [x] Revisi desain halaman Login. (Ongoing)
+- [x] Membuat Widget Search Bar. (Ongoing)
+- [x] Membuat Consume API untuk Widget Search. (Ongoing)
 - [ ] Revisi desain halaman Profile. (Ongoing)
 - [ ] Revisi desain halaman Detail Receipt. (Ongoing)
-- [ ] Membuat Widget Search Bar. (Ongoing)
 
 ### **Kimi**
 
@@ -24,10 +25,10 @@
 - [x] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Done)
 - [x] Menghubungkan API dari halaman master ke dalam model. (Done)
 - [x] Implementasi halaman cetak kode QR untuk label pengiriman. (Done)
+- [x] Revisi desain halaman Receipt. (Ongoing)
+- [x] Revisi desain halaman Cetak. (Ongoing)
 - [ ] Validasi data masukan untuk setiap formulir. (Ongoing)
 - [ ] Consume Input API di halaman input. (Ongoing)
-- [ ] Revisi desain halaman Receipt. (Ongoing)
-- [ ] Revisi desain halaman Cetak. (Ongoing)
 
 ## Tugas Tim
 

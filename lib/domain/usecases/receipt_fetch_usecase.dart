@@ -6,6 +6,6 @@ class ReceiptFetchUsecase {
       : _receiptRepository = receiptRepository;
   final ReceiptRepository _receiptRepository;
 
-  Future<List<ShipmentEntity>> call(String token) async =>
-      _receiptRepository.getOprIncomingReceipts(token);
+  Future<List<ShipmentEntity>> call(String token, {String? searchQuery}) async =>
+      _receiptRepository.getOprIncomingReceipts(token, searchQuery: searchQuery);
 }

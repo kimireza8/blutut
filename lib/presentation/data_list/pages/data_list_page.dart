@@ -7,6 +7,7 @@ import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/shipment_entity.dart';
 import '../bloc/receipt_bloc.dart';
+import '../widgets/search_bar_widget.dart';
 
 @RoutePage()
 class DataListPage extends StatefulWidget {
@@ -80,17 +81,17 @@ class _DataListPageState extends State<DataListPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
+                    child: SearchBarWidget(
+                      onSearch: (query) {
+                        context.read<ReceiptBloc>().add(
+                              FetchOprIncomingReceipts(
+                                serviceLocator<SharedPreferencesService>()
+                                    .getString('cookie') ??
+                                    '',
+                                searchQuery: query,
+                              ),
+                            );
+                      },
                     ),
                   ),
                 ],

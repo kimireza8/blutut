@@ -14,7 +14,10 @@ class RemoteReceiptProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<ShipmentModel>> getOprIncomingReceipts(String cookie) async =>
+  Future<List<ShipmentModel>> getOprIncomingReceipts(
+    String cookie, {
+    String? searchQuery,
+  }) async =>
       _executeReceiptRequest<List<ShipmentModel>>(
         () async {
           int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -25,7 +28,7 @@ class RemoteReceiptProvider {
 
           Response response = await _dio.post(
             '${Constant.baseUrl}/index.php/oprincomingreceipt/index.mod?_dc=$timestamp',
-            data: _buildReceiptListRequestData(),
+            data: _buildReceiptListRequestData(searchQuery: searchQuery),
             options: Options(headers: headers),
           );
 
@@ -47,7 +50,6 @@ class RemoteReceiptProvider {
         },
         'fetch incoming receipts',
       );
-
   Future<DetailShipmentModel> getDetailprOutgoingReceipts(
     String cookie,
     String id,
@@ -65,7 +67,8 @@ class RemoteReceiptProvider {
             options: Options(headers: headers),
           );
 
-          Map<String, dynamic> responseData = _decodeResponseData(response.data);
+          Map<String, dynamic> responseData =
+              _decodeResponseData(response.data);
 
           if (!_isValidDetailResponse(responseData)) {
             throw Exception(
@@ -117,51 +120,58 @@ class RemoteReceiptProvider {
   bool _isSuccessResponse(Response<dynamic> response) =>
       response.statusCode == 200;
 
-  Map<String, dynamic> _buildReceiptListRequestData() => {
-        'select': jsonEncode([
-          'oprincomingreceipt_id',
-          'oprincomingreceipt_branch__organization_name',
-          'oprincomingreceipt_number',
-          'oprincomingreceipt_date',
-          'oprincomingreceipt_totalcollies',
-          'oprincomingreceipt_colliesnum',
-          'oprincomingreceipt_cargonum',
-          'oprincomingreceipt_oprkindofservice__oprkindofservice_name',
-          'oprincomingreceipt_oprroute__oprroute_name',
-          'oprincomingreceipt_oprcustomer__oprcustomer_name',
-          'oprincomingreceipt_oprcustomerrole__oprcustomerrole_name',
-          'oprincomingreceipt_shippername',
-          'oprincomingreceipt_consigneename',
-          'oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_name',
-        ]),
-        'advsearch': null,
-        'prefilter': jsonEncode([
-          {
-            'field_name': 'oprincomingreceipt_branch__organization_id',
-            'field_value': null,
-          },
-          {
-            'field_name': 'oprincomingreceipt_year__year_id',
-            'field_value': null,
-          },
-          {
-            'field_name': 'oprincomingreceipt_month__month_id',
-            'field_value': null,
-          },
-          {
-            'field_name':
-                'oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_id',
-            'field_value': null,
-          }
-        ]),
-        'sorter': jsonEncode([
-          {'field_name': 'oprincomingreceipt_date', 'sort': 'DESC'},
-          {'field_name': 'oprincomingreceipt_number', 'sort': 'DESC'},
-        ]),
-        'grouper': jsonEncode([]),
-        'flyoversearch': jsonEncode([]),
-        'page': '1',
-        'start': '0',
-        'limit': '10',
-      };
+  Map<String, dynamic> _buildReceiptListRequestData({String? searchQuery}) {
+    Map<String, dynamic> requestData = {
+      'select': jsonEncode([
+        'oprincomingreceipt_id',
+        'oprincomingreceipt_branch__organization_name',
+        'oprincomingreceipt_number',
+        'oprincomingreceipt_date',
+        'oprincomingreceipt_totalcollies',
+        'oprincomingreceipt_colliesnum',
+        'oprincomingreceipt_cargonum',
+        'oprincomingreceipt_oprkindofservice__oprkindofservice_name',
+        'oprincomingreceipt_oprroute__oprroute_name',
+        'oprincomingreceipt_oprcustomer__oprcustomer_name',
+        'oprincomingreceipt_oprcustomerrole__oprcustomerrole_name',
+        'oprincomingreceipt_shippername',
+        'oprincomingreceipt_consigneename',
+        'oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_name',
+      ]),
+      'prefilter': jsonEncode([
+        {
+          'field_name': 'oprincomingreceipt_branch__organization_id',
+          'field_value': null,
+        },
+        {
+          'field_name': 'oprincomingreceipt_year__year_id',
+          'field_value': null,
+        },
+        {
+          'field_name': 'oprincomingreceipt_month__month_id',
+          'field_value': null,
+        },
+        {
+          'field_name':
+              'oprincomingreceipt_oprincomingreceiptstatus__oprincomingreceiptstatus_id',
+          'field_value': null,
+        }
+      ]),
+      'sorter': jsonEncode([
+        {'field_name': 'oprincomingreceipt_date', 'sort': 'DESC'},
+        {'field_name': 'oprincomingreceipt_number', 'sort': 'DESC'},
+      ]),
+      'grouper': jsonEncode([]),
+      'flyoversearch': jsonEncode([]),
+      'page': '1',
+      'start': '0',
+      'limit': '10',
+    };
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      requestData['filter'] = searchQuery;
+    } else {
+      requestData['filter'] = null;
+    }
+    return requestData;
+  }
 }
