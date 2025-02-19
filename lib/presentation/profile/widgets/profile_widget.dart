@@ -100,7 +100,6 @@ class ProfileBottomSheet extends StatelessWidget {
                       onTap: () async {
                         await BlocProvider.of<AuthCubit>(context).logout();
                         await context.router.replace(const LoginRoute());
-                        Navigator.pop(context);
                       },
                       child: const Row(
                         children: [
