@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,31 +21,46 @@ class DataListPage extends StatefulWidget {
 }
 
 class _DataListPageState extends State<DataListPage> {
+  final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
   String? _searchQuery;
-  bool _isLastPage = false; // Track if current page is the last page
-// Track the last valid page that had data
+  bool _isFetching = false;
+  bool _isLastPage = false;
+  Timer? _debounce;
+  List<ShipmentEntity> _allReceipts = [];
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(_fetchReceipts);
+    _fetchReceipts();
+    _scrollController.addListener(_onScroll);
   }
 
-  void _fetchReceipts({String? searchQuery}) {
-    // Only reset page when search query changes
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _fetchReceipts({String? searchQuery, bool isRefresh = false}) {
+    if (_isFetching || _isLastPage) return;
+
     if (searchQuery != null && searchQuery != _searchQuery) {
-      setState(() {
-        _currentPage = 1; // Reset page to 1 for new searches
-// Reset last valid page
-        _isLastPage = false; // Reset assumption about pagination
+      _debounce?.cancel();
+      _debounce = Timer(const Duration(milliseconds: 500), () {
+        setState(() {
+          _currentPage = 1;
+          _isLastPage = false;
+          _searchQuery = searchQuery;
+          _allReceipts.clear();
+        });
+        _fetchReceipts();
       });
+      return;
     }
 
-    // Update the current search query if provided
-    if (searchQuery != null) {
-      _searchQuery = searchQuery;
-    }
+    setState(() => _isFetching = true);
 
     context.read<ReceiptBloc>().add(
           FetchOprIncomingReceipts(
@@ -55,22 +72,15 @@ class _DataListPageState extends State<DataListPage> {
         );
   }
 
-  void _previousPage() {
-    if (_currentPage > 1) {
+  void _onScroll() {
+    if (!_scrollController.hasClients || _isFetching || _isLastPage) return;
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       setState(() {
-        _currentPage--;
-        _isLastPage =
-            false; // We know there's at least one more page (the one we just came from)
+        _currentPage++;
       });
       _fetchReceipts();
     }
-  }
-
-  void _nextPage() {
-    setState(() {
-      _currentPage++;
-    });
-    _fetchReceipts();
   }
 
   @override
@@ -80,76 +90,49 @@ class _DataListPageState extends State<DataListPage> {
             _buildAppBar(),
             Expanded(
               child: BlocConsumer<ReceiptBloc, ReceiptState>(
-                // Modify your BlocConsumer's listener to not automatically navigate back
                 listener: (context, state) {
                   if (state is ReceiptError) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Error: ${state.message}')),
                     );
-
-                    // If we get an error on a page beyond page 1, it might mean we've gone too far
-                    if (_currentPage > 1 &&
-                        state.message.contains('No data found')) {
-                      setState(() {
-                        // Mark as last page, but don't auto-navigate back
-                        _isLastPage = true;
-                      });
-                    }
+                    setState(() => _isFetching = false);
                   } else if (state is ReceiptLoaded) {
-                    // If we got data, this is a valid page - remember it
-                    if (state.receipts.isNotEmpty) {
-                      setState(() {
-                        _isLastPage = false;
-                      });
-                    } else {
-                      // We got an empty list - mark as last page but don't auto-navigate
-                      setState(() {
-                        _isLastPage = true;
-                      });
-                    }
+                    setState(() {
+                      _isFetching = false;
+                      _isLastPage = state.receipts.length < 10;
+                      if (_currentPage == 1) {
+                        _allReceipts = state.receipts;
+                      } else {
+                        _allReceipts.addAll(state.receipts);
+                      }
+                    });
                   }
                 },
                 builder: (context, state) {
-                  if (state is ReceiptLoading) {
+                  if (state is ReceiptLoading && _currentPage == 1) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (state is ReceiptLoaded) {
-                    if (state.receipts.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('No data found'),
-                            if (_searchQuery != null &&
-                                _searchQuery!.isNotEmpty)
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _searchQuery = null;
-                                    _currentPage = 1;
-                                    _isLastPage = false;
-                                  });
-                                  _fetchReceipts();
-                                },
-                                child: const Text('Clear Search'),
-                              ),
-                          ],
-                        ),
-                      );
-                    }
+                  } else if (_allReceipts.isNotEmpty) {
                     return RefreshIndicator(
                       color: const Color.fromRGBO(29, 79, 215, 1),
                       onRefresh: () async {
-                        _fetchReceipts();
+                        setState(() {
+                          _currentPage = 1;
+                          _isLastPage = false;
+                          _allReceipts.clear();
+                        });
+                        _fetchReceipts(isRefresh: true);
                       },
                       child: ListView.builder(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 16,
-                          right: 16,
-                        ),
-                        itemCount: state.receipts.length,
+                        controller: _scrollController,
+                        padding:
+                            const EdgeInsets.only(top: 16, left: 16, right: 16),
+                        itemCount: _allReceipts.length + (_isFetching ? 1 : 0),
                         itemBuilder: (context, index) {
-                          ShipmentEntity receipt = state.receipts[index];
+                          if (index >= _allReceipts.length) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          ShipmentEntity receipt = _allReceipts[index];
                           return InkWell(
                             onTap: () async {
                               await context.router.push(
@@ -176,7 +159,6 @@ class _DataListPageState extends State<DataListPage> {
                 },
               ),
             ),
-            _buildPagination(),
           ],
         ),
         floatingActionButton: _buildFloatingActionButton(),
@@ -203,9 +185,7 @@ class _DataListPageState extends State<DataListPage> {
               padding: const EdgeInsets.only(left: 24, right: 24, top: 24),
               child: Row(
                 children: [
-                  const Image(
-                    image: AssetImage('assets/dahsboard_logo.png'),
-                  ),
+                  const Image(image: AssetImage('assets/dahsboard_logo.png')),
                   const SizedBox(width: 8),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,9 +199,7 @@ class _DataListPageState extends State<DataListPage> {
                       ),
                       Text(
                         'PT Makassar Trans',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ],
                   ),
@@ -250,30 +228,6 @@ class _DataListPageState extends State<DataListPage> {
           ],
         ),
       );
-
-  Padding _buildPagination() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-              onPressed: _currentPage > 1 ? _previousPage : null,
-              child: const Text('Previous'),
-            ),
-            Text(
-              _searchQuery != null && _searchQuery!.isNotEmpty
-                  ? 'Page $_currentPage (Filtered)'
-                  : 'Page $_currentPage',
-            ),
-            ElevatedButton(
-              // Always enable Next button unless we've confirmed it's the last page
-              onPressed: _isLastPage ? null : _nextPage,
-              child: const Text('Next'),
-            ),
-          ],
-        ),
-      );
-
   Column _buildCardContent(ShipmentEntity receipt) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
