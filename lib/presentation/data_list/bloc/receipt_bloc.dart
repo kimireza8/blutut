@@ -30,6 +30,7 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
       List<ShipmentEntity> receipts = await _receiptFetchUsecase.call(
         event.token,
         searchQuery: event.searchQuery,
+        page: event.page,
       );
       await _hiveService.saveShipments(receipts);
       emit(ReceiptLoaded(receipts));

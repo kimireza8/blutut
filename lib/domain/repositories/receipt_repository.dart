@@ -5,6 +5,7 @@ abstract class ReceiptRepository {
   Future<List<ShipmentEntity>> getOprIncomingReceipts(
     String cookie, {
     String? searchQuery,
+    int? page,
   });
   Future<DetailShipmentEntity> getDetailOprOutgoingReceipts(
     String cookie,

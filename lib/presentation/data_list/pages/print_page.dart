@@ -6,8 +6,8 @@ import '../../../domain/entities/shipment_entity.dart';
 import '../../home/print_cubit/print_cubit.dart';
 
 @RoutePage()
-class Print extends StatelessWidget {
-  const Print({required this.shipment, super.key});
+class PrintPage extends StatelessWidget {
+  const PrintPage({required this.shipment, super.key});
   final ShipmentEntity shipment;
 
   @override

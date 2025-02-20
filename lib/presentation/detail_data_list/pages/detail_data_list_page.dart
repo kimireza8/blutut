@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/detail_shipment_entity.dart';
@@ -34,19 +36,396 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Shipment Details',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          elevation: 0,
-        ),
+        backgroundColor: Colors.white,
         body: BlocBuilder<DetailDataListCubit, DetailDataListState>(
           builder: (context, state) {
             if (state is DetailDataListLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is DetailDataListLoaded) {
-              return _buildDetailDataContent(state.detailShipmentEntity);
+              DetailShipmentEntity detailShipmentEntity =
+                  state.detailShipmentEntity;
+              return SafeArea(
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Color.fromRGBO(29, 79, 215, 1),
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Preview',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                Text(
+                                  'Tanda Terima Barang',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.article,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.home, size: 32),
+                                    SizedBox(width: 12),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Kantor Cabang',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Surabaya',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          'Nama Relasi',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            'Total Colli: ${detailShipmentEntity.totalCollies}',
+                                            style: const TextStyle(
+                                              color: Color.fromRGBO(
+                                                29,
+                                                79,
+                                                215,
+                                                1,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      detailShipmentEntity.consigneeName,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Tanggal',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      detailShipmentEntity.date,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Divider(),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'Pengirim',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                detailShipmentEntity
+                                                    .shipperName,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const Text(
+                                                'Penerima',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                detailShipmentEntity
+                                                    .consigneeName,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Rute Pengiriman',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                    ),
+                                                    child: SizedBox(
+                                                      height: 50,
+                                                      child: DottedLine(
+                                                        direction:
+                                                            Axis.vertical,
+                                                        lineThickness: 2,
+                                                        dashLength: 6,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.circle,
+                                                            color: Colors.blue,
+                                                            size: 12,
+                                                          ),
+                                                          SizedBox(width: 4),
+                                                          Text(
+                                                            'Surabaya',
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(
+                                                        height: 15,
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.place,
+                                                            color: Colors.red,
+                                                            size: 12,
+                                                          ),
+                                                          SizedBox(width: 4),
+                                                          Text(
+                                                            'Sragen',
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Divider(),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'No. Resi',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          detailShipmentEntity.receiptNumber,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        const Text(
+                                          'No. Surat Jalan',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        Text(
+                                          detailShipmentEntity.passDocument,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              const Spacer(),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(
+                                          color: Color.fromRGBO(29, 79, 215, 1),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Back to form',
+                                        style: TextStyle(
+                                          color: Color.fromRGBO(29, 79, 215, 1),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        // context.router.replace(PrintRoute(shipment: detailShipmentEntity));
+                                        // Sementara aku comment, karena PrintPage cuma bisa nerima shipmentEntity,
+                                        // sedangkan di page ini cuma ada detailShipmentEntity.
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromRGBO(
+                                          29,
+                                          79,
+                                          215,
+                                          1,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text('Get Barcode'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
             } else if (state is DetailDataListError) {
               return Center(
                 child: Column(
@@ -81,227 +460,5 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
             );
           },
         ),
-      );
-
-  Widget _buildDetailDataContent(DetailShipmentEntity detailData) =>
-      SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildShipmentStatusCard(detailData),
-              const SizedBox(height: 16),
-              _buildShipmentInfoCard(detailData),
-              const SizedBox(height: 16),
-              _buildSenderCard(detailData),
-              const SizedBox(height: 16),
-              _buildReceiverCard(detailData),
-              const SizedBox(height: 16),
-              _buildDeliveryDetailsCard(detailData),
-              const SizedBox(height: 16),
-              _buildPaymentDetailsCard(detailData),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildShipmentStatusCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Shipment Status',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  _buildStatusChip(detailData.status),
-                ],
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Shipment No', detailData.number),
-              const SizedBox(height: 8),
-              _buildInfoRow('Barcode', detailData.barcode),
-              const SizedBox(height: 8),
-              _buildInfoRow('Date', detailData.date),
-              const SizedBox(height: 8),
-              _buildInfoRow('Incoming Date', detailData.incomingDate),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildShipmentInfoCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Shipment Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Branch', detailData.branch),
-              const SizedBox(height: 8),
-              _buildInfoRow('Service Type', detailData.serviceType),
-              const SizedBox(height: 8),
-              _buildInfoRow('Total Collies', detailData.totalCollies),
-              const SizedBox(height: 8),
-              _buildInfoRow('Year', detailData.year),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildSenderCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Sender Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Name', detailData.shipperName),
-              const SizedBox(height: 8),
-              _buildInfoRow('Address', detailData.shipperAddress),
-              const SizedBox(height: 8),
-              if (detailData.shipperPhone != null)
-                _buildInfoRow('Phone', detailData.shipperPhone!),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildReceiverCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Receiver Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Name', detailData.consigneeName),
-              const SizedBox(height: 8),
-              _buildInfoRow('Address', detailData.consigneeAddress),
-              const SizedBox(height: 8),
-              _buildInfoRow('City', detailData.consigneeCity),
-              const SizedBox(height: 8),
-              _buildInfoRow('Phone', detailData.consigneePhone),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildDeliveryDetailsCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Delivery Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Route', detailData.route),
-              const SizedBox(height: 8),
-              _buildInfoRow('Receive Mode', detailData.receiveMode),
-              const SizedBox(height: 8),
-              _buildInfoRow('Pass Document', detailData.passDocument),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildPaymentDetailsCard(DetailShipmentEntity detailData) => Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Payment Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Divider(height: 24),
-              _buildInfoRow('Customer', detailData.customer),
-              const SizedBox(height: 8),
-              _buildInfoRow('Customer Role', detailData.customerRole),
-              const SizedBox(height: 8),
-              _buildInfoRow('Payment Location', detailData.paymentLocation),
-              const SizedBox(height: 8),
-              _buildInfoRow('Receipt Number', detailData.receiptNumber),
-            ],
-          ),
-        ),
-      );
-
-  Widget _buildStatusChip(String status) {
-    Color chipColor;
-    switch (status.toLowerCase()) {
-      case 'delivered':
-        chipColor = Colors.green;
-      case 'in transit':
-        chipColor = Colors.blue;
-      case 'pending':
-        chipColor = Colors.orange;
-      default:
-        chipColor = Colors.grey;
-    }
-
-    return Chip(
-      label: Text(
-        status,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      backgroundColor: chipColor,
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
       );
 }

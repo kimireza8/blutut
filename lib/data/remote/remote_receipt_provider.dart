@@ -17,6 +17,7 @@ class RemoteReceiptProvider {
   Future<List<ShipmentModel>> getOprIncomingReceipts(
     String cookie, {
     String? searchQuery,
+    int? page,
   }) async =>
       _executeReceiptRequest<List<ShipmentModel>>(
         () async {
@@ -28,7 +29,7 @@ class RemoteReceiptProvider {
 
           Response response = await _dio.post(
             '${Constant.baseUrl}/index.php/oprincomingreceipt/index.mod?_dc=$timestamp',
-            data: _buildReceiptListRequestData(searchQuery: searchQuery),
+            data: _buildReceiptListRequestData(searchQuery: searchQuery, page: page),
             options: Options(headers: headers),
           );
 
@@ -120,7 +121,7 @@ class RemoteReceiptProvider {
   bool _isSuccessResponse(Response<dynamic> response) =>
       response.statusCode == 200;
 
-  Map<String, dynamic> _buildReceiptListRequestData({String? searchQuery}) {
+  Map<String, dynamic> _buildReceiptListRequestData({String? searchQuery, int? page}) {
     Map<String, dynamic> requestData = {
       'select': jsonEncode([
         'oprincomingreceipt_id',
@@ -163,9 +164,9 @@ class RemoteReceiptProvider {
       ]),
       'grouper': jsonEncode([]),
       'flyoversearch': jsonEncode([]),
-      'page': '1',
-      'start': '0',
-      'limit': '10',
+      'page': page?.toString() ?? '1',
+      'start': (((page ?? 1) - 1) * 5).toString(),
+      'limit': '5',
     };
     if (searchQuery != null && searchQuery.isNotEmpty) {
       requestData['filter'] = searchQuery;
