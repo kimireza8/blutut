@@ -15,41 +15,47 @@ class RemoteRelationProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<RelationModel>> getOprRelations() async {
-    return _executeRequest<List<RelationModel>>(
-      () async {
-        String? cookie = serviceLocator<SharedPreferencesService>().getCookie();
-        int timestamp = DateTime.now().millisecondsSinceEpoch;
+  Future<List<RelationModel>> getOprRelations() async =>
+      _executeRequest<List<RelationModel>>(
+        () async {
+          String? cookie =
+              serviceLocator<SharedPreferencesService>().getCookie();
+          int timestamp = DateTime.now().millisecondsSinceEpoch;
 
-        Map<String, String> headers = {
-          'Cookie': 'siklonsession=$cookie',
-          ..._defaultHeaders,
-        };
+          Map<String, String> headers = {
+            'Cookie': 'siklonsession=$cookie',
+            ..._defaultHeaders,
+          };
 
-        Response response = await _dio.post(
-          '${Constant.baseUrl}/index.php/oprcustomer/index.mod?_dc=$timestamp',
-          data: _buildRelationListRequestData(),
-          options: Options(headers: headers),
-        );
+          Response response = await _dio.post(
+            '${Constant.baseUrl}/index.php/oprcustomer/index.mod?_dc=$timestamp',
+            data: _buildRelationListRequestData(),
+            options: Options(headers: headers),
+          );
 
-        Map<String, dynamic> responseData = _decodeResponseData(response.data);
+          Map<String, dynamic> responseData =
+              _decodeResponseData(response.data);
 
-        if (!_isValidResponse(responseData)) {
-          throw Exception(
-              'Invalid API response format: Missing or incorrect "rows" key');
-        }
+          if (!_isValidResponse(responseData)) {
+            throw Exception(
+              'Invalid API response format: Missing or incorrect "rows" key',
+            );
+          }
 
-        List<dynamic> rows = responseData['rows'] as List? ?? [];
-        return rows
-            .map((json) => RelationModel.fromJson(json as Map<String, dynamic>))
-            .toList();
-      },
-      'fetch operator relations',
-    );
-  }
+          List<dynamic> rows = responseData['rows'] as List? ?? [];
+          return rows
+              .map(
+                (json) => RelationModel.fromJson(json as Map<String, dynamic>),
+              )
+              .toList();
+        },
+        'fetch operator relations',
+      );
 
   Future<T> _executeRequest<T>(
-      Future<T> Function() request, String operationName) async {
+    Future<T> Function() request,
+    String operationName,
+  ) async {
     try {
       return await request();
     } on DioException catch (e) {
@@ -61,7 +67,7 @@ class RemoteRelationProvider {
     }
   }
 
-  Map<String, dynamic> _decodeResponseData(dynamic responseData) {
+  Map<String, dynamic> _decodeResponseData(responseData) {
     if (responseData is String) {
       return jsonDecode(responseData) as Map<String, dynamic>;
     } else if (responseData is Map) {

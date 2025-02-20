@@ -58,7 +58,7 @@ class _InputPageState extends State<InputPage> {
 
   void _updateRoute(String? route) {
     if (route != null) {
-      List<String> parts = route.split(" - ");
+      List<String> parts = route.split(' - ');
       setState(() {
         selectedRoute = route;
         origin = parts.isNotEmpty ? parts[0] : '';
@@ -79,12 +79,6 @@ class _InputPageState extends State<InputPage> {
       origin = null;
       destination = null;
     });
-  }
-
-  void _submitForm() {
-    if (_formKey.currentState?.validate() ?? false) {
-      print('relasi $selectedRelation');
-    }
   }
 
   @override
@@ -149,23 +143,32 @@ class _InputPageState extends State<InputPage> {
                           ),
                           _buildDateField(context, 'Tanggal'),
                           _buildTextField('Total Colli', colliController),
-                          _buildTwoColumnField('Pengirim', 'Penerima',
-                              senderController, receiverController),
+                          _buildTwoColumnField(
+                            'Pengirim',
+                            'Penerima',
+                            senderController,
+                            receiverController,
+                          ),
                           _buildRuteDropdown(state),
                           _buildRouteIcon(),
                           const SizedBox(
                             height: 10,
                           ),
                           _buildTwoColumnField(
-                              'Asal',
-                              'Tujuan',
-                              TextEditingController(text: origin),
-                              TextEditingController(text: destination),
-                              isRoute: true),
+                            'Asal',
+                            'Tujuan',
+                            TextEditingController(text: origin),
+                            TextEditingController(text: destination),
+                            isRoute: true,
+                          ),
                           _buildTextField(
-                              'Nomor Resi', receiptNumberController),
+                            'Nomor Resi',
+                            receiptNumberController,
+                          ),
                           _buildTextField(
-                              'Nomor Surat Jalan', deliveryNoteController),
+                            'Nomor Surat Jalan',
+                            deliveryNoteController,
+                          ),
                           const SizedBox(height: 20),
                           Row(
                             children: [
@@ -177,10 +180,12 @@ class _InputPageState extends State<InputPage> {
                                   'Next', const Color.fromRGBO(29, 79, 215, 1),
                                   () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PreviewInputScreen()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const PreviewInputScreen(),
+                                  ),
+                                );
                               }),
                             ],
                           ),
@@ -205,8 +210,10 @@ class _InputPageState extends State<InputPage> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           items: options
-              .map((option) =>
-                  DropdownMenuItem(value: option, child: Text(option)))
+              .map(
+                (option) =>
+                    DropdownMenuItem(value: option, child: Text(option)),
+              )
               .toList(),
           onChanged: (value) {
             setState(() {
@@ -231,9 +238,13 @@ class _InputPageState extends State<InputPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: const TextStyle(fontSize: 12)),
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold)),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ],
@@ -252,11 +263,12 @@ class _InputPageState extends State<InputPage> {
       );
 
   Widget _buildTwoColumnField(
-          String leftLabel,
-          String rightLabel,
-          TextEditingController leftController,
-          TextEditingController rightController,
-          {bool isRoute = false}) =>
+    String leftLabel,
+    String rightLabel,
+    TextEditingController leftController,
+    TextEditingController rightController, {
+    bool isRoute = false,
+  }) =>
       Row(
         children: [
           Expanded(child: _buildTextField(leftLabel, leftController)),
@@ -275,8 +287,11 @@ class _InputPageState extends State<InputPage> {
         ],
       );
 
-  Widget _buildDropdownField(String label, List<String> options,
-          void Function(String?)? onChanged) =>
+  Widget _buildDropdownField(
+    String label,
+    List<String> options,
+    void Function(String?)? onChanged,
+  ) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: DropdownButtonFormField(
@@ -285,8 +300,10 @@ class _InputPageState extends State<InputPage> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           items: options
-              .map((option) =>
-                  DropdownMenuItem(value: option, child: Text(option)))
+              .map(
+                (option) =>
+                    DropdownMenuItem(value: option, child: Text(option)),
+              )
               .toList(),
           onChanged: onChanged,
         ),
@@ -316,7 +333,10 @@ class _InputPageState extends State<InputPage> {
       );
 
   Widget _buildElevatedButton(
-          String label, Color color, VoidCallback onPressed) =>
+    String label,
+    Color color,
+    VoidCallback onPressed,
+  ) =>
       ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
@@ -360,14 +380,12 @@ class _InputPageState extends State<InputPage> {
             color: Colors.blue,
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            padding: EdgeInsets.symmetric(horizontal: 8),
             child: SizedBox(
               width: 200,
               child: DottedLine(
-                direction: Axis.horizontal,
                 lineThickness: 2,
                 dashLength: 6,
-                dashColor: Colors.black,
               ),
             ),
           ),

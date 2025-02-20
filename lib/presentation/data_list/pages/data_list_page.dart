@@ -22,7 +22,7 @@ class _DataListPageState extends State<DataListPage> {
   int _currentPage = 1;
   String? _searchQuery;
   bool _isLastPage = false; // Track if current page is the last page
-  int _lastValidPage = 1; // Track the last valid page that had data
+// Track the last valid page that had data
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _DataListPageState extends State<DataListPage> {
     if (searchQuery != null && searchQuery != _searchQuery) {
       setState(() {
         _currentPage = 1; // Reset page to 1 for new searches
-        _lastValidPage = 1; // Reset last valid page
+// Reset last valid page
         _isLastPage = false; // Reset assumption about pagination
       });
     }
@@ -99,7 +99,6 @@ class _DataListPageState extends State<DataListPage> {
                     // If we got data, this is a valid page - remember it
                     if (state.receipts.isNotEmpty) {
                       setState(() {
-                        _lastValidPage = _currentPage;
                         _isLastPage = false;
                       });
                     } else {
@@ -127,7 +126,6 @@ class _DataListPageState extends State<DataListPage> {
                                   setState(() {
                                     _searchQuery = null;
                                     _currentPage = 1;
-                                    _lastValidPage = 1;
                                     _isLastPage = false;
                                   });
                                   _fetchReceipts();
@@ -262,9 +260,11 @@ class _DataListPageState extends State<DataListPage> {
               onPressed: _currentPage > 1 ? _previousPage : null,
               child: const Text('Previous'),
             ),
-            Text(_searchQuery != null && _searchQuery!.isNotEmpty
-                ? 'Page $_currentPage (Filtered)'
-                : 'Page $_currentPage'),
+            Text(
+              _searchQuery != null && _searchQuery!.isNotEmpty
+                  ? 'Page $_currentPage (Filtered)'
+                  : 'Page $_currentPage',
+            ),
             ElevatedButton(
               // Always enable Next button unless we've confirmed it's the last page
               onPressed: _isLastPage ? null : _nextPage,

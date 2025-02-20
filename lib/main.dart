@@ -52,8 +52,10 @@ class MyApp extends StatelessWidget {
           create: (context) => PrintCubit()..initBluetooth(),
         ),
         BlocProvider<DataProviderCubit>(
-            create: (context) => DataProviderCubit(
-                relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
-                oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>())),
+          create: (context) => DataProviderCubit(
+            relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
+            oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>(),
+          ),
+        ),
       ];
 }

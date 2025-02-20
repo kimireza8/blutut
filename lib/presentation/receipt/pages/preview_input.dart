@@ -70,14 +70,17 @@ class PreviewInputScreen extends StatelessWidget {
                                 Text(
                                   'Kantor Cabang',
                                   style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 SizedBox(height: 4),
                                 Text(
                                   'Surabaya',
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -101,11 +104,15 @@ class PreviewInputScreen extends StatelessWidget {
                                 const Text(
                                   'Nama Relasi',
                                   style: TextStyle(
-                                      fontSize: 14, color: Colors.grey),
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Colors.blue.shade100,
                                     borderRadius: BorderRadius.circular(8),
@@ -123,7 +130,9 @@ class PreviewInputScreen extends StatelessWidget {
                             const Text(
                               'Budi Santosa',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             const Text(
@@ -134,7 +143,9 @@ class PreviewInputScreen extends StatelessWidget {
                             const Text(
                               '08 / 11 / 2025',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 16),
                             const Row(
@@ -144,15 +155,19 @@ class PreviewInputScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('Pengirim',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey)),
+                                      Text(
+                                        'Pengirim',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                       Text(
                                         'Budi Raharjo',
                                         style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -162,10 +177,13 @@ class PreviewInputScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text('Rute Pengiriman',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey)),
+                                      Text(
+                                        'Rute Pengiriman',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
                                       SizedBox(
                                         height: 10,
                                       ),
@@ -173,14 +191,14 @@ class PreviewInputScreen extends StatelessWidget {
                                         children: [
                                           Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: 8.0),
+                                              horizontal: 8,
+                                            ),
                                             child: SizedBox(
                                               height: 50,
                                               child: DottedLine(
                                                 direction: Axis.vertical,
                                                 lineThickness: 2,
                                                 dashLength: 6,
-                                                dashColor: Colors.black,
                                               ),
                                             ),
                                           ),
@@ -192,16 +210,19 @@ class PreviewInputScreen extends StatelessWidget {
                                             children: [
                                               Row(
                                                 children: [
-                                                  Icon(Icons.circle,
-                                                      color: Colors.blue,
-                                                      size: 12),
+                                                  Icon(
+                                                    Icons.circle,
+                                                    color: Colors.blue,
+                                                    size: 12,
+                                                  ),
                                                   SizedBox(width: 4),
                                                   Text(
                                                     'Surabaya',
                                                     style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -210,16 +231,19 @@ class PreviewInputScreen extends StatelessWidget {
                                               ),
                                               Row(
                                                 children: [
-                                                  Icon(Icons.place,
-                                                      color: Colors.red,
-                                                      size: 12),
+                                                  Icon(
+                                                    Icons.place,
+                                                    color: Colors.red,
+                                                    size: 12,
+                                                  ),
                                                   SizedBox(width: 4),
                                                   Text(
                                                     'Sragen',
                                                     style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -238,24 +262,34 @@ class PreviewInputScreen extends StatelessWidget {
                             const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('No. Resi',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey)),
+                                Text(
+                                  'No. Resi',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                                 Text(
                                   'EXP-20240213–123456',
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 SizedBox(height: 8),
-                                Text('No. Surat Jalan',
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.grey)),
+                                Text(
+                                  'No. Surat Jalan',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                                 Text(
                                   'TRK-20240213–XYZ789',
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -263,7 +297,7 @@ class PreviewInputScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Spacer(),
+                      const Spacer(),
                       Row(
                         children: [
                           Expanded(
@@ -295,7 +329,8 @@ class PreviewInputScreen extends StatelessWidget {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color.fromRGBO(29, 79, 215, 1),
+                                backgroundColor:
+                                    const Color.fromRGBO(29, 79, 215, 1),
                                 foregroundColor: Colors.white,
                               ),
                               child: const Text('Save'),

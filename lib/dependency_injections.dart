@@ -98,8 +98,9 @@ void _registerRepositories() {
     )
     ..registerFactory<DataRepository>(
       () => DataRepositoryImpl(
-          remoteRelationProvide: serviceLocator<RemoteRelationProvider>(),
-          remoteRouteProvider: serviceLocator<RemoteOprRouteProvider>()),
+        remoteRelationProvide: serviceLocator<RemoteRelationProvider>(),
+        remoteRouteProvider: serviceLocator<RemoteOprRouteProvider>(),
+      ),
     );
 }
 
@@ -126,11 +127,13 @@ void _registerUseCases() {
     )
     ..registerFactory<OprrouteFetchUsecase>(
       () => OprrouteFetchUsecase(
-          dataRepository: serviceLocator<DataRepository>()),
+        dataRepository: serviceLocator<DataRepository>(),
+      ),
     )
     ..registerFactory<RelationFetchUsecase>(
       () => RelationFetchUsecase(
-          dataRepository: serviceLocator<DataRepository>()),
+        dataRepository: serviceLocator<DataRepository>(),
+      ),
     );
 }
 

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:bluetooth_classic/models/device.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -19,14 +20,14 @@ class PrintPage extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () => context.router.pop(),
+              onPressed: () async => context.router.maybePop(),
               color: Colors.white,
-            )
+            ),
           ],
         ),
         body: BlocBuilder<PrintCubit, PrintState>(
           builder: (context, state) => Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -34,16 +35,16 @@ class PrintPage extends StatelessWidget {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16),
                         child: QrImageView(
                           data: shipment.trackingNumber,
                           size: 200,
                         ),
                       ),
                       Text(shipment.trackingNumber,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontWeight: FontWeight.bold),),
                       Text(shipment.date,
-                          style: Theme.of(context).textTheme.bodyMedium),
+                          style: Theme.of(context).textTheme.bodyMedium,),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -65,21 +66,21 @@ class PrintPage extends StatelessWidget {
                           ElevatedButton.icon(
                             onPressed: state.selectedDevice == null
                                 ? null
-                                : () => context
+                                : () async => context
                                     .read<PrintCubit>()
                                     .printQR(shipment),
                             icon: Icon(
                               Icons.print,
                               color: state.selectedDevice == null
                                   ? Colors.grey
-                                  : Color.fromRGBO(29, 79, 215, 1),
+                                  : const Color.fromRGBO(29, 79, 215, 1),
                             ),
                             label: Text(
                               'Print Barcode',
                               style: TextStyle(
                                   color: state.selectedDevice == null
                                       ? Colors.grey
-                                      : Color.fromRGBO(29, 79, 215, 1)),
+                                      : const Color.fromRGBO(29, 79, 215, 1),),
                             ),
                           ),
                         ],
@@ -90,7 +91,7 @@ class PrintPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text('Connected Printer',
-                    style: Theme.of(context).textTheme.bodyMedium),
+                    style: Theme.of(context).textTheme.bodyMedium,),
                 BlocBuilder<PrintCubit, PrintState>(
                   builder: (context, state) {
                     if (state is PrintConnected) {
@@ -133,9 +134,9 @@ class PrintPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Available printers',
-                        style: Theme.of(context).textTheme.bodyMedium),
+                        style: Theme.of(context).textTheme.bodyMedium,),
                     ElevatedButton.icon(
-                      onPressed: () =>
+                      onPressed: () async =>
                           context.read<PrintCubit>().getPairedDevices(),
                       icon: const Icon(
                         Icons.refresh,
@@ -154,18 +155,18 @@ class PrintPage extends StatelessWidget {
                   child: ListView.builder(
                     itemCount: state.pairedDevices.length,
                     itemBuilder: (context, index) {
-                      final device = state.pairedDevices[index];
+                      Device device = state.pairedDevices[index];
                       return Card(
                         child: ListTile(
                           title: Text(device.name ?? 'Unknown'),
                           subtitle: Text(device.address),
                           trailing: ElevatedButton(
-                            onPressed: () => context
+                            onPressed: () async => context
                                 .read<PrintCubit>()
                                 .connectToDevice(device),
                             child: const Text('Connect',
                                 style: TextStyle(
-                                    color: Color.fromRGBO(29, 79, 215, 1))),
+                                    color: Color.fromRGBO(29, 79, 215, 1),),),
                           ),
                         ),
                       );

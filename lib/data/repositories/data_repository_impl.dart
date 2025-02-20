@@ -5,13 +5,13 @@ import '../remote/remote_oprroute_provider.dart';
 import '../remote/remote_relation_provider.dart';
 
 class DataRepositoryImpl implements DataRepository {
+  DataRepositoryImpl({
+    required RemoteRelationProvider remoteRelationProvide,
+    required RemoteOprRouteProvider remoteRouteProvider,
+  })  : _remoteRelationProvide = remoteRelationProvide,
+        _remoteRouteProvider = remoteRouteProvider;
   final RemoteRelationProvider _remoteRelationProvide;
   final RemoteOprRouteProvider _remoteRouteProvider;
-  DataRepositoryImpl(
-      {required RemoteRelationProvider remoteRelationProvide,
-      required RemoteOprRouteProvider remoteRouteProvider})
-      : _remoteRelationProvide = remoteRelationProvide,
-        _remoteRouteProvider = remoteRouteProvider;
 
   @override
   Future<List<RelationModel>> getRelationData() async {

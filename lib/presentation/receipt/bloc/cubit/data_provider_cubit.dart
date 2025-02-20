@@ -9,22 +9,19 @@ import '../../../../domain/usecases/relation_fetch_usecase.dart';
 part 'data_provider_state.dart';
 
 class DataProviderCubit extends Cubit<DataProviderState> {
-  final RelationFetchUsecase _relationFetchUsecase;
-  final OprrouteFetchUsecase _oprrouteFetchUsecase;
-
   DataProviderCubit({
     required RelationFetchUsecase relationFetchUsecase,
     required OprrouteFetchUsecase oprrouteFetchUsecase,
   })  : _relationFetchUsecase = relationFetchUsecase,
         _oprrouteFetchUsecase = oprrouteFetchUsecase,
         super(DataProviderInitial());
+  final RelationFetchUsecase _relationFetchUsecase;
+  final OprrouteFetchUsecase _oprrouteFetchUsecase;
 
   Future<void> fetchData() async {
     emit(DataProviderLoading());
-    final List<RelationEntity> relation = await _relationFetchUsecase.call();
-    final List<RouteEntity> route = await _oprrouteFetchUsecase.call();
-    print('Data Provider relasi : ${relation.length}');
-    print('Data Provider rute : ${route.length}');
+    List<RelationEntity> relation = await _relationFetchUsecase.call();
+    List<RouteEntity> route = await _oprrouteFetchUsecase.call();
     emit(DataProviderLoaded(route, relation));
   }
 }

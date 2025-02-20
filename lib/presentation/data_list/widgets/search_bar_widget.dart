@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class SearchBarWidget extends StatelessWidget {
   const SearchBarWidget({
-    super.key,
-    required this.onSearch,
+    required this.onSearch, super.key,
     this.hintText = 'Search',
   });
 
@@ -11,8 +10,7 @@ class SearchBarWidget extends StatelessWidget {
   final String hintText;
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
+  Widget build(BuildContext context) => Material(
       elevation: 1,
       borderRadius: BorderRadius.circular(12),
       child: TextField(
@@ -24,10 +22,7 @@ class SearchBarWidget extends StatelessWidget {
             borderSide: BorderSide.none,
           ),
         ),
-        onSubmitted: (query) {
-          onSearch(query);
-        },
+        onSubmitted: onSearch,
       ),
     );
-  }
 }
