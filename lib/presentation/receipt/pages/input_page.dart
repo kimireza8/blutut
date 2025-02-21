@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
@@ -141,8 +143,8 @@ class _InputPageState extends State<InputPage> {
                             'Nama Relasi',
                             state.relation.map((e) => e.name).toList(),
                           ),
-                          _buildDropdownField('Relasi Sebagai',
-                              ['Penerima', 'Pengirim'], _updateRoute),
+                          _buildDropdown(
+                              'Relasi Sebagai', ['Penerima', 'Pengirim']),
                           _buildDateField(context, 'Tanggal'),
                           _buildTextField('Total Colli', colliController),
                           _buildTwoColumnField(
@@ -156,13 +158,8 @@ class _InputPageState extends State<InputPage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          _buildTwoColumnField(
-                            'Asal',
-                            'Tujuan',
-                            TextEditingController(text: origin),
-                            TextEditingController(text: destination),
-                            isRoute: true,
-                          ),
+                          _buildDropdown('Kota Tujuan',
+                              state.city.map((e) => e.name).toList()),
                           _buildTextField(
                             'Nomor Resi',
                             receiptNumberController,
@@ -308,6 +305,31 @@ class _InputPageState extends State<InputPage> {
               )
               .toList(),
           onChanged: onChanged,
+        ),
+      );
+  Widget _buildDropdown(
+    String label,
+    List<String> options,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          items: options
+              .map(
+                (option) =>
+                    DropdownMenuItem(value: option, child: Text(option)),
+              )
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              selectedRelation = value;
+            });
+          },
+          value: selectedRelation,
         ),
       );
 

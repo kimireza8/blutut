@@ -8,7 +8,7 @@ class OrganizationModel extends OrganizationEntity {
 
   factory OrganizationModel.fromJson(Map<String, dynamic> json) =>
       OrganizationModel(
-        id: json['organization_id'] as String,
-        name: json['organization_name'] as String,
+        id: json['organization_id'] as String? ?? '',
+        name: json['organization_name'] as String? ?? '',
       );
 }

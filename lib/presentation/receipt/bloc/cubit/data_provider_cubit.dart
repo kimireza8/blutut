@@ -35,6 +35,10 @@ class DataProviderCubit extends Cubit<DataProviderState> {
     List<OrganizationEntity> organization =
         await _organizationFetchUsecase.call();
     List<CityEntity> city = await _cityFetchUsecase.call();
+    print(city);
+    print(organization);
+    print(relation);
+    print(route);
     emit(DataProviderLoaded(route, relation, city, organization));
   }
 }

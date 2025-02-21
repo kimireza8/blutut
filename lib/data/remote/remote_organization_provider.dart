@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:dio/dio.dart';
 
@@ -8,43 +9,65 @@ import '../../dependency_injections.dart';
 import '../models/organization_model.dart';
 
 class RemoteOrganizationProvider {
-  final Dio _dio;
   const RemoteOrganizationProvider({required Dio dio}) : _dio = dio;
+  final Dio _dio;
 
-  Future<List<OrganizationModel>> getOprOrganizations() async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
-    String? cookie = serviceLocator<SharedPreferencesService>().getCookie();
-    try {
-      Response response = await _dio.post(
-        '${Constant.baseUrl}/index.php/organization/index.mod?_dc=$timestamp',
-        data: _buildOrganizationListRequestData(),
-        options: Options(headers: {
-          'Cookie': 'siklonsession=$cookie',
-        }),
+  static final Map<String, String> _defaultHeaders = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+
+  Future<List<OrganizationModel>> getOprOrganizations() async =>
+      _executeRequest<List<OrganizationModel>>(
+        () async {
+          int timestamp = DateTime.now().millisecondsSinceEpoch;
+          String? cookie =
+              serviceLocator<SharedPreferencesService>().getCookie();
+
+          Map<String, String> headers = {
+            'Cookie': 'siklonsession=$cookie',
+            ..._defaultHeaders,
+          };
+
+          Response response = await _dio.post(
+            '${Constant.baseUrl}/index.php/organization/index.mod?_dc=$timestamp',
+            data: _buildOrganizationListRequestData(),
+            options: Options(headers: headers),
+          );
+
+          log("Raw Response organization: ${response.data}");
+
+          Map<String, dynamic> responseData =
+              _decodeResponseData(response.data);
+
+          if (!_isValidResponse(responseData)) {
+            throw Exception(
+              'Invalid API response format: Missing or incorrect "rows" key',
+            );
+          }
+
+          List<dynamic> rows = responseData['rows'] as List? ?? [];
+          return rows
+              .map((json) =>
+                  OrganizationModel.fromJson(json as Map<String, dynamic>))
+              .toList();
+        },
+        'fetch opr organizations',
       );
-      Map<String, dynamic> responseData = _decodeResponseData(response.data);
 
-      if (!_isValidResponse(responseData)) {
-        throw Exception(
-          'Invalid API response format: Missing or incorrect "rows" key',
-        );
-      }
-
-      List<dynamic> rows = responseData['rows'] as List? ?? [];
-      return rows
-          .map(
-            (json) => OrganizationModel.fromJson(json as Map<String, dynamic>),
-          )
-          .toList();
+  Future<T> _executeRequest<T>(
+    Future<T> Function() request,
+    String operationName,
+  ) async {
+    try {
+      return await request();
     } on DioException catch (e) {
-      throw Exception('API error during fetching organizations: ${e.message}');
+      log('Dio Error: ${e.message}, ${e.response?.statusCode}, ${e.response?.data}');
+      throw Exception('API error during $operationName: ${e.message}');
     } catch (e) {
-      throw Exception('Unexpected error during fetching organizations: $e');
+      log('Error: $e');
+      throw Exception('Unexpected error during $operationName: $e');
     }
   }
-
-  bool _isValidResponse(Map<String, dynamic> responseData) =>
-      responseData.containsKey('rows') && responseData['rows'] is List;
 
   Map<String, dynamic> _decodeResponseData(responseData) {
     if (responseData is String) {
@@ -56,24 +79,25 @@ class RemoteOrganizationProvider {
     }
   }
 
+  bool _isValidResponse(Map<String, dynamic> responseData) =>
+      responseData.containsKey('rows') && responseData['rows'] is List;
+
   Map<String, dynamic> _buildOrganizationListRequestData() => {
         'select': jsonEncode([
           'organization_id',
           'organization_name',
+          'organization_name',
         ]),
-        'advsearch': null,
-        'prefilter': null,
         'sorter': jsonEncode([]),
-        'grouper': jsonEncode([]),
-        'flyoversearch': jsonEncode([]),
+        'filter': 'kantor',
+        'picklist': 'true',
+        'refSource': null,
+        'field_name': 'oprincomingreceipt_branch',
+        'picklistParam': null,
+        'ingnoreCheck': null,
+        'fiter_param': jsonEncode({}),
         'page': '1',
         'start': '0',
-        'limit': '10',
-        'filter': jsonEncode(
-          {
-            'field_name': 'organization_id',
-            'field_value': null,
-          },
-        ),
+        'limit': '50',
       };
 }

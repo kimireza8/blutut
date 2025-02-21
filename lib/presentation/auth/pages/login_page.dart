@@ -57,7 +57,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
             if (context.mounted) {
-              await context.read<DataProviderCubit>().fetchData();
               await context.router.replace(const DataListRoute());
             }
           } else if (state is AuthError) {
