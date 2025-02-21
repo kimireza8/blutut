@@ -30,7 +30,9 @@ class RemoteReceiptProvider {
           Response response = await _dio.post(
             '${Constant.baseUrl}/index.php/oprincomingreceipt/index.mod?_dc=$timestamp',
             data: _buildReceiptListRequestData(
-                searchQuery: searchQuery, page: page),
+              searchQuery: searchQuery,
+              page: page,
+            ),
             options: Options(headers: headers),
           );
 
@@ -122,8 +124,10 @@ class RemoteReceiptProvider {
   bool _isSuccessResponse(Response<dynamic> response) =>
       response.statusCode == 200;
 
-  Map<String, dynamic> _buildReceiptListRequestData(
-      {String? searchQuery, int? page}) {
+  Map<String, dynamic> _buildReceiptListRequestData({
+    String? searchQuery,
+    int? page,
+  }) {
     Map<String, dynamic> requestData = {
       'select': jsonEncode([
         'oprincomingreceipt_id',

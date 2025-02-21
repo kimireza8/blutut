@@ -39,12 +39,17 @@ class PrintPage extends StatelessWidget {
                         child: QrImageView(
                           data: shipment.trackingNumber,
                           size: 200,
+                          gapless: false,
                         ),
                       ),
-                      Text(shipment.trackingNumber,
-                          style: const TextStyle(fontWeight: FontWeight.bold),),
-                      Text(shipment.date,
-                          style: Theme.of(context).textTheme.bodyMedium,),
+                      Text(
+                        shipment.trackingNumber,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        shipment.date,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -68,7 +73,7 @@ class PrintPage extends StatelessWidget {
                                 ? null
                                 : () async => context
                                     .read<PrintCubit>()
-                                    .printQR(shipment),
+                                    .printLabelTSPL(shipment.trackingNumber),
                             icon: Icon(
                               Icons.print,
                               color: state.selectedDevice == null
@@ -78,9 +83,10 @@ class PrintPage extends StatelessWidget {
                             label: Text(
                               'Print Barcode',
                               style: TextStyle(
-                                  color: state.selectedDevice == null
-                                      ? Colors.grey
-                                      : const Color.fromRGBO(29, 79, 215, 1),),
+                                color: state.selectedDevice == null
+                                    ? Colors.grey
+                                    : const Color.fromRGBO(29, 79, 215, 1),
+                              ),
                             ),
                           ),
                         ],
@@ -90,8 +96,10 @@ class PrintPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Connected Printer',
-                    style: Theme.of(context).textTheme.bodyMedium,),
+                Text(
+                  'Connected Printer',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
                 BlocBuilder<PrintCubit, PrintState>(
                   builder: (context, state) {
                     if (state is PrintConnected) {
@@ -133,8 +141,10 @@ class PrintPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Available printers',
-                        style: Theme.of(context).textTheme.bodyMedium,),
+                    Text(
+                      'Available printers',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                     ElevatedButton.icon(
                       onPressed: () async =>
                           context.read<PrintCubit>().getPairedDevices(),
@@ -164,9 +174,12 @@ class PrintPage extends StatelessWidget {
                             onPressed: () async => context
                                 .read<PrintCubit>()
                                 .connectToDevice(device),
-                            child: const Text('Connect',
-                                style: TextStyle(
-                                    color: Color.fromRGBO(29, 79, 215, 1),),),
+                            child: const Text(
+                              'Connect',
+                              style: TextStyle(
+                                color: Color.fromRGBO(29, 79, 215, 1),
+                              ),
+                            ),
                           ),
                         ),
                       );

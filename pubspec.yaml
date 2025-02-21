@@ -5,6 +5,8 @@ version: 0.1.0
 
 environment:
   sdk: ^3.6.1
+workspace: 
+  - pkgs/bluetooth_classic
 
 dependencies:
   auto_route: ^8.0.3
@@ -23,6 +25,9 @@ dependencies:
   hive_flutter: ^1.1.0
   image: ^4.5.2
   meta: ^1.15.0
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  qr: ^3.0.2
   qr_flutter: ^4.1.0
   shared_preferences: ^2.5.2
 
