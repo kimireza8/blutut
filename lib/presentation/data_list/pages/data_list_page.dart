@@ -342,7 +342,7 @@ class _DataListPageState extends State<DataListPage> {
                   children: [
                     const Text('Penerima'),
                     Text(
-                      receipt.customer,
+                      receipt.consigneeName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                       ),

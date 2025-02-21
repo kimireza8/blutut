@@ -67,7 +67,7 @@ class _InputPageState extends State<InputPage> {
       date: selectedDateSend != null ? "${selectedDateSend!.toIso8601String().split('T')[0]}T00:00:00" : '',
 incomingDate: selectedDateReceive != null ? "${selectedDateReceive!.toIso8601String().split('T')[0]}T00:00:00" : '',
 
-      customer: relationAs ?? '',
+      customer: selectedRelation ?? '',
       customerRole: relationAs ?? '',
       shipperName: senderController.text,
       shipperAddress: senderAddressController.text,
@@ -82,6 +82,7 @@ incomingDate: selectedDateReceive != null ? "${selectedDateReceive!.toIso8601Str
       route: selectedRoute ?? '',
       totalCollies: colliController.text,
     );
+
     context.read<ReceiptBloc>().add(CreateReceipt(serviceLocator<SharedPreferencesService>().getCookie() ?? '', receipt));
     context.router.pop();
   }
