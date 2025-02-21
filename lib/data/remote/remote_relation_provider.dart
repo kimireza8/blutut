@@ -91,6 +91,7 @@ class RemoteRelationProvider {
           'oprcustomer_address',
         ]),
         'advsearch': null,
+        'filter': 'testing',
         'prefilter': null,
         'sorter': jsonEncode([]),
         'grouper': jsonEncode([]),

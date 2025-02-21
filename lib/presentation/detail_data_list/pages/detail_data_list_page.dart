@@ -7,31 +7,44 @@ import '../../../core/router/app_router.gr.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/detail_shipment_entity.dart';
+import '../../../domain/entities/shipment_entity.dart';
 import '../cubit/detail_data_list_cubit.dart';
 
 @RoutePage()
 class DetailDataListPage extends StatefulWidget {
   const DetailDataListPage({
-    @PathParam('shipmentId') required this.shipmentId,
     super.key,
+    required this.shipment,
   });
 
-  final String shipmentId;
+  final ShipmentEntity shipment;
 
   @override
   State createState() => _DetailDataListPageState();
 }
 
 class _DetailDataListPageState extends State<DetailDataListPage> {
+  String? source;
+  String? destination;
   @override
   void initState() {
     super.initState();
+    _updateRoute(widget.shipment.route);
     String cookie =
         serviceLocator<SharedPreferencesService>().getCookie() ?? '';
     BlocProvider.of<DetailDataListCubit>(context).onFetchDetailDataList(
       cookie,
-      widget.shipmentId,
+      widget.shipment.id,
     );
+  }
+
+  void _updateRoute(String? route) {
+    if (route != null) {
+      List<String> parts = route.split(' - ');
+
+      source = parts.isNotEmpty ? parts[0] : '';
+      destination = parts.length > 1 ? parts[1] : '';
+    }
   }
 
   @override
@@ -44,6 +57,7 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
             } else if (state is DetailDataListLoaded) {
               DetailShipmentEntity detailShipmentEntity =
                   state.detailShipmentEntity;
+
               return SafeArea(
                 child: Column(
                   children: [
@@ -242,24 +256,24 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                             ],
                                           ),
                                         ),
-                                        const Expanded(
+                                        Expanded(
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'Rute Pengiriman',
                                                 style: TextStyle(
                                                   fontSize: 14,
                                                   color: Colors.grey,
                                                 ),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 height: 10,
                                               ),
                                               Row(
                                                 children: [
-                                                  Padding(
+                                                  const Padding(
                                                     padding:
                                                         EdgeInsets.symmetric(
                                                       horizontal: 8,
@@ -284,15 +298,17 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                                     children: [
                                                       Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.circle,
                                                             color: Colors.blue,
                                                             size: 12,
                                                           ),
-                                                          SizedBox(width: 4),
+                                                          const SizedBox(
+                                                              width: 4),
                                                           Text(
-                                                            'Surabaya',
-                                                            style: TextStyle(
+                                                            source ?? ' ',
+                                                            style:
+                                                                const TextStyle(
                                                               fontSize: 16,
                                                               fontWeight:
                                                                   FontWeight
@@ -301,20 +317,22 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         height: 15,
                                                       ),
                                                       Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons.place,
                                                             color: Colors.red,
                                                             size: 12,
                                                           ),
-                                                          SizedBox(width: 4),
+                                                          const SizedBox(
+                                                              width: 4),
                                                           Text(
-                                                            'Sragen',
-                                                            style: TextStyle(
+                                                            destination ?? '',
+                                                            style:
+                                                                const TextStyle(
                                                               fontSize: 16,
                                                               fontWeight:
                                                                   FontWeight
@@ -399,9 +417,8 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        // context.router.replace(PrintRoute(shipment: detailShipmentEntity));
-                                        // Sementara aku comment, karena PrintPage cuma bisa nerima shipmentEntity,
-                                        // sedangkan di page ini cuma ada detailShipmentEntity.
+                                        context.router.replace(PrintRoute(
+                                            shipment: widget.shipment));
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color.fromRGBO(
@@ -412,7 +429,7 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                         ),
                                         foregroundColor: Colors.white,
                                       ),
-                                      child: const Text('Get Barcode'),
+                                      child: const Text('Print'),
                                     ),
                                   ),
                                 ],

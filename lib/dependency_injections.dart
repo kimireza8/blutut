@@ -6,7 +6,9 @@ import 'core/services/auth_interceptor.dart';
 import 'core/services/hive_service.dart';
 import 'core/services/shared_preferences_service.dart';
 import 'data/remote/remote_auth_provider.dart';
+import 'data/remote/remote_city_provider.dart';
 import 'data/remote/remote_oprroute_provider.dart';
+import 'data/remote/remote_organization_provider.dart';
 import 'data/remote/remote_receipt_provider.dart';
 import 'data/remote/remote_relation_provider.dart';
 import 'data/remote/remote_user_provider.dart';
@@ -18,9 +20,11 @@ import 'domain/repositories/auth_repository.dart';
 import 'domain/repositories/data_repository.dart';
 import 'domain/repositories/receipt_repository.dart';
 import 'domain/repositories/user_repository.dart';
+import 'domain/usecases/city_fetch_usecase.dart';
 import 'domain/usecases/login_usecase.dart';
 import 'domain/usecases/logout_usecase.dart';
 import 'domain/usecases/oprroute_fetch_usecase.dart';
+import 'domain/usecases/organization_fetch_usecase.dart';
 import 'domain/usecases/receipt_detail_usecase.dart';
 import 'domain/usecases/receipt_fetch_usecase.dart';
 import 'domain/usecases/relation_fetch_usecase.dart';
@@ -76,6 +80,12 @@ void _registerRemoteProviders() {
     )
     ..registerLazySingleton<RemoteOprRouteProvider>(
       () => RemoteOprRouteProvider(dio: serviceLocator<Dio>()),
+    )
+    ..registerLazySingleton<RemoteCityProvider>(
+      () => RemoteCityProvider(dio: serviceLocator<Dio>()),
+    )
+    ..registerLazySingleton<RemoteOrganizationProvider>(
+      () => RemoteOrganizationProvider(dio: serviceLocator<Dio>()),
     );
 }
 
@@ -100,6 +110,9 @@ void _registerRepositories() {
       () => DataRepositoryImpl(
         remoteRelationProvide: serviceLocator<RemoteRelationProvider>(),
         remoteRouteProvider: serviceLocator<RemoteOprRouteProvider>(),
+        remoteOrganizationProvider:
+            serviceLocator<RemoteOrganizationProvider>(),
+        remoteCityProvider: serviceLocator<RemoteCityProvider>(),
       ),
     );
 }
@@ -132,6 +145,16 @@ void _registerUseCases() {
     )
     ..registerFactory<RelationFetchUsecase>(
       () => RelationFetchUsecase(
+        dataRepository: serviceLocator<DataRepository>(),
+      ),
+    )
+    ..registerFactory<CityFetchUsecase>(
+      () => CityFetchUsecase(
+        dataRepository: serviceLocator<DataRepository>(),
+      ),
+    )
+    ..registerFactory<OrganizationFetchUsecase>(
+      () => OrganizationFetchUsecase(
         dataRepository: serviceLocator<DataRepository>(),
       ),
     );
@@ -168,6 +191,8 @@ void _registerCubits() {
       () => DataProviderCubit(
         relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
         oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>(),
+        organizationFetchUsecase: serviceLocator<OrganizationFetchUsecase>(),
+        cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
       ),
     );
 }

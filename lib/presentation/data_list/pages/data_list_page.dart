@@ -136,7 +136,7 @@ class _DataListPageState extends State<DataListPage> {
                           return InkWell(
                             onTap: () async {
                               await context.router.push(
-                                DetailDataListRoute(shipmentId: receipt.id),
+                                DetailDataListRoute(shipment: receipt),
                               );
                             },
                             child: Card(

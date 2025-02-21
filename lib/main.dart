@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/router/app_router.dart';
 import 'core/services/hive_service.dart';
 import 'dependency_injections.dart';
+import 'domain/usecases/city_fetch_usecase.dart';
 import 'domain/usecases/oprroute_fetch_usecase.dart';
+import 'domain/usecases/organization_fetch_usecase.dart';
 import 'domain/usecases/relation_fetch_usecase.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/data_list/bloc/receipt_bloc.dart';
@@ -55,6 +57,9 @@ class MyApp extends StatelessWidget {
           create: (context) => DataProviderCubit(
             relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
             oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>(),
+            organizationFetchUsecase:
+                serviceLocator<OrganizationFetchUsecase>(),
+            cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
           ),
         ),
       ];

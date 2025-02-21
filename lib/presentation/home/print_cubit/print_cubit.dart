@@ -14,7 +14,6 @@ import '../../../domain/entities/shipment_entity.dart';
 part 'print_state.dart';
 
 class PrintCubit extends Cubit<PrintState> {
-
   PrintCubit() : super(const PrintInitial());
   final BluetoothClassic _bluetoothClassicPlugin = BluetoothClassic();
 
@@ -30,38 +29,46 @@ class PrintCubit extends Cubit<PrintState> {
   Future<void> getPairedDevices() async {
     emit(PrintLoading(state));
     List<Device> devices = await _bluetoothClassicPlugin.getPairedDevices();
-    emit(PrintLoaded(
-      pairedDevices: devices,
-      discoveredDevices: state.discoveredDevices,
-      selectedDevice: state.selectedDevice,
-      scanning: state.scanning,
-    ),);
+    emit(
+      PrintLoaded(
+        pairedDevices: devices,
+        discoveredDevices: state.discoveredDevices,
+        selectedDevice: state.selectedDevice,
+        scanning: state.scanning,
+      ),
+    );
   }
 
   Future<void> scanDevices() async {
     if (state.scanning) {
       await _bluetoothClassicPlugin.stopScan();
-      emit(PrintLoaded(
-        pairedDevices: state.pairedDevices,
-        discoveredDevices: state.discoveredDevices,
-        selectedDevice: state.selectedDevice,
-      ),);
+      emit(
+        PrintLoaded(
+          pairedDevices: state.pairedDevices,
+          discoveredDevices: state.discoveredDevices,
+          selectedDevice: state.selectedDevice,
+        ),
+      );
     } else {
-      emit(PrintLoaded(
-        pairedDevices: state.pairedDevices,
-        selectedDevice: state.selectedDevice,
-        scanning: true,
-      ),);
+      emit(
+        PrintLoaded(
+          pairedDevices: state.pairedDevices,
+          selectedDevice: state.selectedDevice,
+          scanning: true,
+        ),
+      );
 
       await _bluetoothClassicPlugin.startScan();
       _bluetoothClassicPlugin.onDeviceDiscovered().listen((event) {
         if (!state.discoveredDevices.any((d) => d.address == event.address)) {
-          emit(PrintLoaded(
-            pairedDevices: state.pairedDevices,
-            discoveredDevices: List.from(state.discoveredDevices)..add(event),
-            selectedDevice: state.selectedDevice,
-            scanning: state.scanning,
-          ),);
+          emit(
+            PrintLoaded(
+              pairedDevices: state.pairedDevices,
+              discoveredDevices: List.from(state.discoveredDevices)..add(event),
+              selectedDevice: state.selectedDevice,
+              scanning: state.scanning,
+            ),
+          );
         }
       });
     }
@@ -81,11 +88,13 @@ class PrintCubit extends Cubit<PrintState> {
 
   Future<void> disconnectDevice() async {
     await _bluetoothClassicPlugin.disconnect();
-    emit(PrintLoaded(
-      pairedDevices: state.pairedDevices,
-      discoveredDevices: state.discoveredDevices,
-      scanning: state.scanning,
-    ),);
+    emit(
+      PrintLoaded(
+        pairedDevices: state.pairedDevices,
+        discoveredDevices: state.discoveredDevices,
+        scanning: state.scanning,
+      ),
+    );
   }
 
   Future<void> printQR(ShipmentEntity shipment) async {

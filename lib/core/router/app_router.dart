@@ -18,7 +18,7 @@ class AppRouter extends $AppRouter {
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
-        page: PrintRoute.page,
+          page: PrintRoute.page,
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
@@ -28,7 +28,7 @@ class AppRouter extends $AppRouter {
         AutoRoute(
           page: DetailDataListRoute.page,
           guards: [AuthenticatedGuard()],
-          path: '/detail/:shipmentId',
+          path: '/detail/:shipment',
         ),
       ];
 }

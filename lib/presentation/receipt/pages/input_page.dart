@@ -141,6 +141,8 @@ class _InputPageState extends State<InputPage> {
                             'Nama Relasi',
                             state.relation.map((e) => e.name).toList(),
                           ),
+                          _buildDropdownField('Relasi Sebagai',
+                              ['Penerima', 'Pengirim'], _updateRoute),
                           _buildDateField(context, 'Tanggal'),
                           _buildTextField('Total Colli', colliController),
                           _buildTwoColumnField(
