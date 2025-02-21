@@ -5,11 +5,6 @@ import 'package:bloc/bloc.dart';
 import 'package:bluetooth_classic/bluetooth_classic.dart';
 import 'package:bluetooth_classic/models/device.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
-import 'package:image/image.dart' as img;
-import 'package:qr_flutter/qr_flutter.dart';
-
-import '../../../domain/entities/shipment_entity.dart';
 
 part 'print_state.dart';
 
@@ -97,42 +92,23 @@ class PrintCubit extends Cubit<PrintState> {
     );
   }
 
-  Future<void> printQR(ShipmentEntity shipment) async {
+  Future<void> printLabelTSPL(String trackingNumber) async {
     try {
-      Uint8List qrCode = await _generateQrEscPos(shipment.trackingNumber);
-      await _bluetoothClassicPlugin.write(qrCode);
-      emit(const PrintSuccess('QR Code sent to printer'));
+      String tsplCommand = '''
+    SIZE 78 mm, 100 mm
+    GAP 2 mm, 0 mm
+    DIRECTION 1
+    CLS
+    QRCODE 150,200,L,13,A,0,"$trackingNumber"
+    TEXT 80,550,"3",0,1,1,"$trackingNumber"
+    PRINT 1,1
+    ''';
+
+      await _bluetoothClassicPlugin
+          .write(Uint8List.fromList(tsplCommand.codeUnits));
+      emit(const PrintSuccess('TSPL QR Code sent'));
     } catch (e) {
       emit(PrintError('Print failed: $e'));
     }
-  }
-
-  Future<Uint8List> _generateQrEscPos(String trackingNumber) async {
-    CapabilityProfile profile = await CapabilityProfile.load();
-    var generator = Generator(PaperSize.mm58, profile);
-
-    List<int> bytes = [];
-
-    bytes += generator.text(
-      'Tracking Number:',
-      styles: const PosStyles(align: PosAlign.center),
-    );
-    bytes += generator.text(
-      trackingNumber,
-      styles: const PosStyles(align: PosAlign.center, bold: true),
-    );
-
-    ByteData? qrImage = await QrPainter(
-      data: trackingNumber,
-      version: QrVersions.auto,
-    ).toImageData(200);
-
-    img.Image? imgData = img.decodeImage(qrImage!.buffer.asUint8List());
-    bytes += generator.image(imgData!);
-
-    bytes += generator.feed(2);
-    bytes += generator.cut();
-
-    return Uint8List.fromList(bytes);
   }
 }

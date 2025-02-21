@@ -39,6 +39,7 @@ class PrintPage extends StatelessWidget {
                         child: QrImageView(
                           data: shipment.trackingNumber,
                           size: 200,
+                          gapless: false,
                         ),
                       ),
                       Text(
@@ -72,7 +73,7 @@ class PrintPage extends StatelessWidget {
                                 ? null
                                 : () async => context
                                     .read<PrintCubit>()
-                                    .printQR(shipment),
+                                    .printLabelTSPL(shipment.trackingNumber),
                             icon: Icon(
                               Icons.print,
                               color: state.selectedDevice == null

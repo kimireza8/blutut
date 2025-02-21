@@ -1,6 +1,10 @@
 # Daftar TODO Tim
 
 ## Tugas yang Belum Dibagikan
+- [ ] Membuat provider, repo, model, entity, untuk data kota tujuan
+- [ ] Membuat provider, repo, model, entity, untuk data kantor cabang
+- [ ] Membuat provider, repo, model, entity, untuk data pelayanan
+- [ ] Membuat widget dropdown yang bisa search juga
 
 ## Tugas yang Sudah Dibagikan
 
