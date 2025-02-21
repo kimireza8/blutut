@@ -13,8 +13,8 @@ import '../cubit/detail_data_list_cubit.dart';
 @RoutePage()
 class DetailDataListPage extends StatefulWidget {
   const DetailDataListPage({
-    super.key,
     required this.shipment,
+    super.key,
   });
 
   final ShipmentEntity shipment;
@@ -304,7 +304,8 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                                             size: 12,
                                                           ),
                                                           const SizedBox(
-                                                              width: 4),
+                                                            width: 4,
+                                                          ),
                                                           Text(
                                                             source ?? ' ',
                                                             style:
@@ -328,7 +329,8 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                                             size: 12,
                                                           ),
                                                           const SizedBox(
-                                                              width: 4),
+                                                            width: 4,
+                                                          ),
                                                           Text(
                                                             destination ?? '',
                                                             style:
@@ -417,8 +419,11 @@ class _DetailDataListPageState extends State<DetailDataListPage> {
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: () {
-                                        context.router.replace(PrintRoute(
-                                            shipment: widget.shipment));
+                                        context.router.replace(
+                                          PrintRoute(
+                                            shipment: widget.shipment,
+                                          ),
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color.fromRGBO(

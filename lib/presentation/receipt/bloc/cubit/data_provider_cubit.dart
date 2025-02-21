@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../domain/entities/city_entity.dart';
+import '../../../../domain/entities/consignee_city_entity.dart';
 import '../../../../domain/entities/organization_entity.dart';
 import '../../../../domain/entities/relation_entity.dart';
 import '../../../../domain/entities/route_entity.dart';

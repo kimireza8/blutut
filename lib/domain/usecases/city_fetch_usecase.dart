@@ -1,13 +1,12 @@
-import '../entities/city_entity.dart';
+import '../entities/consignee_city_entity.dart';
 import '../repositories/data_repository.dart';
 
 class CityFetchUsecase {
+  CityFetchUsecase({required this.dataRepository});
   final DataRepository dataRepository;
 
-  CityFetchUsecase({required this.dataRepository});
-
-  Future<List<CityEntity>> call() async {
-    List<CityEntity> cities = await dataRepository.getCityData();
+  Future<List<ConsigneeCityEntity>> call() async {
+    List<ConsigneeCityEntity> cities = await dataRepository.getConsigneeCityData();
     return cities;
   }
 }

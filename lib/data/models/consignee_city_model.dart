@@ -1,6 +1,6 @@
-import '../../domain/entities/city_entity.dart';
+import '../../domain/entities/consignee_city_entity.dart';
 
-class ConsigneeCityModel extends CityEntity {
+class ConsigneeCityModel extends ConsigneeCityEntity {
   ConsigneeCityModel({
     required String id,
     required String name,

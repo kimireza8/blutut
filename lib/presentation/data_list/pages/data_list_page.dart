@@ -44,7 +44,9 @@ class _DataListPageState extends State<DataListPage> {
   }
 
   void _fetchReceipts({String? searchQuery, bool isRefresh = false}) {
-    if (_isFetching || _isLastPage) return;
+    if (_isFetching || _isLastPage) {
+      return;
+    }
 
     if (searchQuery != null && searchQuery != _searchQuery) {
       _debounce?.cancel();
@@ -73,7 +75,9 @@ class _DataListPageState extends State<DataListPage> {
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients || _isFetching || _isLastPage) return;
+    if (!_scrollController.hasClients || _isFetching || _isLastPage) {
+      return;
+    }
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
       setState(() {
@@ -130,7 +134,8 @@ class _DataListPageState extends State<DataListPage> {
                         itemBuilder: (context, index) {
                           if (index >= _allReceipts.length) {
                             return const Center(
-                                child: CircularProgressIndicator());
+                              child: CircularProgressIndicator(),
+                            );
                           }
                           ShipmentEntity receipt = _allReceipts[index];
                           return InkWell(
