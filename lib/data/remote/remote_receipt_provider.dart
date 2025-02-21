@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 
 import '../../core/constants/constant.dart';
+import '../../domain/entities/receipt_entity.dart';
 import '../models/detail_shipment_model.dart';
 import '../models/shipment_model.dart';
 
@@ -181,4 +182,53 @@ class RemoteReceiptProvider {
     }
     return requestData;
   }
+
+  Future<void> createReceipt(String cookie, ReceiptEntity receipt) async {
+  await _executeReceiptRequest<void>(
+    () async {
+      int timestamp = DateTime.now().millisecondsSinceEpoch;
+      Map<String, String> headers = {
+        'Cookie': 'siklonsession=$cookie',
+        ..._defaultHeaders,
+      };
+
+      Map<String, dynamic> requestData = {
+        '_json': jsonEncode({
+          'oprincomingreceipt_branch': receipt.branch,
+          'oprincomingreceipt_date': receipt.date,
+          'oprincomingreceipt_incomingdate': receipt.incomingDate,
+          'oprincomingreceipt_oprcustomer': receipt.customer,
+          'oprincomingreceipt_oprcustomerrole': receipt.customerRole,
+          'oprincomingreceipt_shippername': receipt.shipperName,
+          'oprincomingreceipt_shipperaddress': receipt.shipperAddress,
+          'oprincomingreceipt_shipperphone': receipt.shipperPhone,
+          'oprincomingreceipt_consigneename': receipt.consigneeName,
+          'oprincomingreceipt_consigneeaddress': receipt.consigneeAddress,
+          'oprincomingreceipt_consigneecity': receipt.consigneeCity,
+          'oprincomingreceipt_consigneephone': receipt.consigneePhone,
+          'oprincomingreceipt_receiptnumber': receipt.receiptNumber,
+          'oprincomingreceipt_passdocument': receipt.passDocument,
+          'oprincomingreceipt_oprkindofservice': receipt.kindOfService,
+          'oprincomingreceipt_oprroute': receipt.route,
+          'oprincomingreceipt_totalcollies': receipt.totalCollies,
+        }),
+        
+      };
+
+      Response response = await _dio.post(
+        'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/insert.mod?_dc=$timestamp',
+        data: requestData,
+        options: Options(headers: headers),
+      );
+
+      if (!_isSuccessResponse(response)) {
+        throw Exception('Failed to create receipt: ${response.statusCode}');
+      }
+
+      log('Receipt created successfully: ${response.data}');
+    },
+    'create receipt',
+  );
+}
+
 }

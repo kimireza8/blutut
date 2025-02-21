@@ -42,6 +42,8 @@ class RemoteKindofServiceProvider {
             );
           }
 
+          print(response);
+
           List<dynamic> rows = responseData['rows'] as List? ?? [];
           return rows
               .map(

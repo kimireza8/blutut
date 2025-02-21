@@ -22,10 +22,12 @@ import 'domain/repositories/data_repository.dart';
 import 'domain/repositories/receipt_repository.dart';
 import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/city_fetch_usecase.dart';
+import 'domain/usecases/kind_of_service_usecase.dart';
 import 'domain/usecases/login_usecase.dart';
 import 'domain/usecases/logout_usecase.dart';
 import 'domain/usecases/oprroute_fetch_usecase.dart';
 import 'domain/usecases/organization_fetch_usecase.dart';
+import 'domain/usecases/receipt_create_usecase.dart';
 import 'domain/usecases/receipt_detail_usecase.dart';
 import 'domain/usecases/receipt_fetch_usecase.dart';
 import 'domain/usecases/relation_fetch_usecase.dart';
@@ -163,7 +165,17 @@ void _registerUseCases() {
       () => OrganizationFetchUsecase(
         dataRepository: serviceLocator<DataRepository>(),
       ),
-    );
+    )
+    ..registerFactory<KindofServiceUsecase>(  
+      () => KindofServiceUsecase(
+        dataRepository: serviceLocator<DataRepository>(),
+      ),
+    )
+    ..registerFactory<ReceiptCreateUsecase>(
+      () => ReceiptCreateUsecase(
+        receiptRepository: serviceLocator<ReceiptRepository>(),
+      ),
+      );
 }
 
 void _registerCubits() {
@@ -179,6 +191,7 @@ void _registerCubits() {
       () => ReceiptBloc(
         receiptFetchUsecase: serviceLocator<ReceiptFetchUsecase>(),
         hiveService: serviceLocator<HiveService>(),
+        receiptCreateUsecase: serviceLocator<ReceiptCreateUsecase>(),
       ),
     )
     ..registerFactory(
@@ -199,6 +212,7 @@ void _registerCubits() {
         oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>(),
         organizationFetchUsecase: serviceLocator<OrganizationFetchUsecase>(),
         cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
+        kindOfServiceUsecase: serviceLocator<KindofServiceUsecase>(),
       ),
     );
 }

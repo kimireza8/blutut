@@ -5,6 +5,7 @@ import 'core/router/app_router.dart';
 import 'core/services/hive_service.dart';
 import 'dependency_injections.dart';
 import 'domain/usecases/city_fetch_usecase.dart';
+import 'domain/usecases/kind_of_service_usecase.dart';
 import 'domain/usecases/oprroute_fetch_usecase.dart';
 import 'domain/usecases/organization_fetch_usecase.dart';
 import 'domain/usecases/relation_fetch_usecase.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
             organizationFetchUsecase:
                 serviceLocator<OrganizationFetchUsecase>(),
             cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
+            kindOfServiceUsecase: serviceLocator<KindofServiceUsecase>(),
           ),
         ),
       ];

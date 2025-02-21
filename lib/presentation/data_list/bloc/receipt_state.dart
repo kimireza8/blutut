@@ -12,6 +12,7 @@ class ReceiptInitial extends ReceiptState {}
 
 class ReceiptLoading extends ReceiptState {}
 
+class ReceiptSuccess extends ReceiptState {}
 class ReceiptLoaded extends ReceiptState {
 
   const ReceiptLoaded(this.receipts);

@@ -1,3 +1,5 @@
+
+import '../../domain/entities/receipt_entity.dart';
 import '../../domain/repositories/receipt_repository.dart';
 import '../models/detail_shipment_model.dart';
 import '../models/shipment_model.dart';
@@ -27,5 +29,9 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
     DetailShipmentModel response =
         await _remoteReceiptProvider.getDetailprOutgoingReceipts(cookie, id);
     return response;
+  }
+  @override
+  Future<void> createReceipt(String cookie, ReceiptEntity receipt) async {
+    await _remoteReceiptProvider.createReceipt(cookie, receipt);
   }
 }

@@ -1,9 +1,15 @@
-import 'dart:developer';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/services/shared_preferences_service.dart';
+import '../../../dependency_injections.dart';
+import '../../../domain/entities/consignee_city_entity.dart';
+import '../../../domain/entities/kind_of_service_entity.dart';
+import '../../../domain/entities/organization_entity.dart';
+import '../../../domain/entities/receipt_entity.dart';
+import '../../../domain/entities/relation_entity.dart';
+import '../../../domain/entities/route_entity.dart';
+import '../../data_list/bloc/receipt_bloc.dart';
 import '../bloc/cubit/data_provider_cubit.dart';
 import 'preview_input.dart';
 
@@ -17,16 +23,24 @@ class InputPage extends StatefulWidget {
 
 class _InputPageState extends State<InputPage> {
   final _formKey = GlobalKey<FormState>();
-  DateTime? selectedDate;
+  String? selectedBranchOffice;
+  DateTime? selectedDateSend;
+  DateTime? selectedDateReceive;
+  String? relationAs;
+  String? selectedCity;
   String? selectedRoute;
-  String? origin;
-  String? destination;
   String? selectedRelation;
+  String? selectedKindofService;
   final TextEditingController colliController = TextEditingController();
   final TextEditingController senderController = TextEditingController();
   final TextEditingController receiverController = TextEditingController();
   final TextEditingController receiptNumberController = TextEditingController();
   final TextEditingController deliveryNoteController = TextEditingController();
+  final TextEditingController senderAddressController = TextEditingController();
+  final TextEditingController receiverAddressController =
+      TextEditingController();
+  final TextEditingController senderHpController = TextEditingController();
+  final TextEditingController receiverHpController = TextEditingController();
 
   @override
   void initState() {
@@ -44,30 +58,57 @@ class _InputPageState extends State<InputPage> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
+  void _submitForm() {
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
 
-  void _updateRoute(String? route) {
-    if (route != null) {
-      List<String> parts = route.split(' - ');
-      setState(() {
-        selectedRoute = route;
-        origin = parts.isNotEmpty ? parts[0] : '';
-        destination = parts.length > 1 ? parts[1] : '';
-      });
-    }
+    final ReceiptEntity receipt = ReceiptEntity(
+      branch: selectedBranchOffice ?? '',
+      date: selectedDateSend != null ? "${selectedDateSend!.toIso8601String().split('T')[0]}T00:00:00" : '',
+incomingDate: selectedDateReceive != null ? "${selectedDateReceive!.toIso8601String().split('T')[0]}T00:00:00" : '',
+
+      customer: relationAs ?? '',
+      customerRole: relationAs ?? '',
+      shipperName: senderController.text,
+      shipperAddress: senderAddressController.text,
+      shipperPhone: senderHpController.text,
+      consigneeName: receiverController.text,
+      consigneeAddress: receiverAddressController.text,
+      consigneeCity: selectedCity ?? '',
+      consigneePhone: receiverHpController.text,
+      receiptNumber: receiptNumberController.text,
+      passDocument: deliveryNoteController.text,
+      kindOfService: selectedKindofService ?? '',
+      route: selectedRoute ?? '',
+      totalCollies: colliController.text,
+    );
+    context.read<ReceiptBloc>().add(CreateReceipt(serviceLocator<SharedPreferencesService>().getCookie() ?? '', receipt));
+    context.router.pop();
   }
+}
+
+
+  Future<void> _selectDate(BuildContext context, bool isSendDate) async {
+  DateTime? picked = await showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(2000),
+    lastDate: DateTime(2101),
+  );
+  if (picked != null) {
+    setState(() {
+      if (isSendDate) {
+        selectedDateSend = picked;
+      } else {
+        selectedDateReceive = picked;
+      }
+    });
+  }
+}
+
+
+  void _selectKindofService(String? kindofService) =>
+      setState(() => selectedKindofService = kindofService);
 
   void _clearFields() {
     setState(() {
@@ -76,177 +117,211 @@ class _InputPageState extends State<InputPage> {
       receiverController.clear();
       receiptNumberController.clear();
       deliveryNoteController.clear();
-      selectedDate = null;
+ 
+      selectedCity = null;
       selectedRoute = null;
-      origin = null;
-      destination = null;
+      selectedRelation = null;
+      selectedKindofService = null;
     });
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        body: Column(
-          children: [
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(29, 79, 215, 1),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Form',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                        Text(
-                          'Tanda Terima Barang',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(
-                      Icons.article,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ],
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-              ),
-            ),
-            BlocBuilder<DataProviderCubit, DataProviderState>(
-              builder: (context, state) {
-                if (state is DataProviderLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is DataProviderLoaded) {
-                  return Form(
-                    key: _formKey,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHeader('Kantor Cabang', 'Surabaya', Icons.home),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          _buildRelasiDropdown(
-                            'Nama Relasi',
-                            state.relation.map((e) => e.name).toList(),
-                          ),
-                          _buildDropdown(
-                              'Relasi Sebagai', ['Penerima', 'Pengirim']),
-                          _buildDateField(context, 'Tanggal'),
-                          _buildTextField('Total Colli', colliController),
-                          _buildTwoColumnField(
-                            'Pengirim',
-                            'Penerima',
-                            senderController,
-                            receiverController,
-                          ),
-                          _buildRuteDropdown(state),
-                          _buildRouteIcon(),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          _buildDropdown('Kota Tujuan',
-                              state.city.map((e) => e.name).toList()),
-                          _buildTextField(
-                            'Nomor Resi',
-                            receiptNumberController,
-                          ),
-                          _buildTextField(
-                            'Nomor Surat Jalan',
-                            deliveryNoteController,
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(29, 79, 215, 1),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildTextButton('Clear', _clearFields),
-                              const Spacer(),
-                              _buildOutlinedButton('Cancel', () {}),
-                              const SizedBox(width: 8),
-                              _buildElevatedButton(
-                                  'Next', const Color.fromRGBO(29, 79, 215, 1),
-                                  () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const PreviewInputScreen(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Form',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
                                   ),
-                                );
-                              }),
+                                  Text(
+                                    'Tanda Terima Barang',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Icon(
+                                Icons.article,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                } else {
-                  return const Center(child: Text('Gagal memuat data'));
-                }
-              },
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildRelasiDropdown(String label, List<String> options) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          items: options
-              .map(
-                (option) =>
-                    DropdownMenuItem(value: option, child: Text(option)),
-              )
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              selectedRelation = value;
-            });
-          },
-          value: selectedRelation,
-        ),
-      );
-
-  Widget _buildRuteDropdown(DataProviderLoaded state) => _buildDropdownField(
-        'Rute Pengiriman',
-        state.route.map((e) => e.routeName).toList(),
-        _updateRoute,
-      );
-
-  Widget _buildHeader(String label, String value, IconData icon) => Row(
-        children: [
-          Icon(icon, size: 24, color: Colors.black54),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(fontSize: 12)),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                      Expanded(
+                        child:
+                            BlocBuilder<DataProviderCubit, DataProviderState>(
+                          builder: (context, state) {
+                            if (state is DataProviderLoading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (state is DataProviderLoaded) {
+                              return Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildDropdownBranchOffice(
+                                        'Kantor Cabang',
+                                        state.organization,
+                                        selectedBranchOffice,
+                                        (value) {
+                                          setState(() {
+                                            selectedBranchOffice = value;
+                                          });
+                                        },
+                                      ),
+                                      _buildDateField(context, 'Tanggal Kirim', selectedDateSend, true),
+                                      _buildDateField(
+                                        context,
+                                        'Tanggal Diterima', selectedDateReceive, false
+                                      ),
+                                      _buildDropdownRelasi(
+                                        'Nama Relasi',
+                                        state.relation,
+                                        selectedRelation,
+                                        (value) {
+                                          setState(() {
+                                            selectedRelation = value;
+                                          });
+                                        },
+                                      ),
+                                      _buildDropdown('Relasi Sebagai', [
+                                        ["1", "Pengirim"],
+                                        ["2", "Penerima"]
+                                      ]),
+                                      _buildTwoColumnField(
+                                        'Pengirim',
+                                        'Penerima',
+                                        senderController,
+                                        receiverController,
+                                      ),
+                                      _buildTwoColumnField(
+                                        'Alamat Pengirim',
+                                        'AlamatPenerima',
+                                        senderController,
+                                        receiverController,
+                                      ),
+                                      _buildTwoColumnField(
+                                        'No Hp Pengirim',
+                                        'No Hp Penerima',
+                                        senderController,
+                                        receiverController,
+                                      ),
+                                      _buildDropdownKotaTujuan(
+                                        'Kota Tujuan',
+                                        state.city,
+                                        selectedCity,
+                                        (value) {
+                                          setState(() {
+                                            selectedCity = value;
+                                          });
+                                        },
+                                      ),
+                                      _buildTextField(
+                                        'Nomor Resi',
+                                        receiptNumberController,
+                                      ),
+                                      _buildTextField(
+                                        'Nomor Surat Jalan',
+                                        deliveryNoteController,
+                                      ),
+                                      _buildDropdownKindofService(
+                                        'Jenis Pelayanan',
+                                        state.kindOfService,
+                                        selectedKindofService,
+                                        (value) {
+                                          setState(() {
+                                            selectedKindofService = value;
+                                          });
+                                        },
+                                      ),
+                                      _buildDropdownRute(
+                                        'Rute Pengiriman',
+                                        state.route,
+                                        selectedRoute,
+                                        (value) {
+                                          setState(() {
+                                            selectedRoute = value;
+                                          });
+                                        },
+                                      ),
+                                      _buildTextField(
+                                        'Total Colli',
+                                        colliController,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      Row(
+                                        children: [
+                                          _buildTextButton(
+                                            'Clear',
+                                            _clearFields,
+                                          ),
+                                          const Spacer(),
+                                          _buildOutlinedButton('Cancel', () {}),
+                                          const SizedBox(width: 8),
+                                          _buildElevatedButton(
+                                              'Next',
+                                              const Color.fromRGBO(
+                                                29,
+                                                79,
+                                                215,
+                                                1,
+                                              ), _submitForm),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const Center(
+                                child: Text('Gagal memuat data'),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
-        ],
+        ),
       );
 
   Widget _buildTextField(String label, TextEditingController controller) =>
@@ -286,30 +361,9 @@ class _InputPageState extends State<InputPage> {
         ],
       );
 
-  Widget _buildDropdownField(
-    String label,
-    List<String> options,
-    void Function(String?)? onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          items: options
-              .map(
-                (option) =>
-                    DropdownMenuItem(value: option, child: Text(option)),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
   Widget _buildDropdown(
     String label,
-    List<String> options,
+    List<List<dynamic>> options,
   ) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -320,16 +374,16 @@ class _InputPageState extends State<InputPage> {
           ),
           items: options
               .map(
-                (option) =>
-                    DropdownMenuItem(value: option, child: Text(option)),
+                (option) => DropdownMenuItem(
+                    value: option[0], child: Text(option[1].toString())),
               )
               .toList(),
           onChanged: (value) {
             setState(() {
-              selectedRelation = value;
+              relationAs = value.toString();
             });
           },
-          value: selectedRelation,
+          value: relationAs,
         ),
       );
 
@@ -372,52 +426,140 @@ class _InputPageState extends State<InputPage> {
         child: Text(label, style: const TextStyle(color: Colors.white)),
       );
 
-  Widget _buildDateField(BuildContext context, String label) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: GestureDetector(
-          onTap: () => _selectDate(context),
-          child: AbsorbPointer(
-            child: TextFormField(
-              decoration: InputDecoration(
-                labelText: label,
-                suffixIcon: const Icon(Icons.calendar_today),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              controller: TextEditingController(
-                text: selectedDate == null
-                    ? ''
-                    : '${selectedDate!.toLocal()}'.split(' ')[0],
-              ),
+  Widget _buildDateField(BuildContext context, String label, DateTime? selectedDate, bool isSendDate) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: GestureDetector(
+      onTap: () => _selectDate(context, isSendDate),
+      child: AbsorbPointer(
+        child: TextFormField(
+          decoration: InputDecoration(
+            labelText: label,
+            suffixIcon: const Icon(Icons.calendar_today),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
+          ),
+          controller: TextEditingController(
+            text: selectedDate == null ? '' : '${selectedDate.toLocal()}'.split(' ')[0],
           ),
         ),
-      );
+      ),
+    ),
+  );
 
-  Widget _buildRouteIcon() => const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.my_location,
-            size: 20,
-            color: Colors.blue,
+  Widget _buildDropdownKindofService(
+    String label,
+    List<KindOfServiceEntity> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: SizedBox(
-              width: 200,
-              child: DottedLine(
-                lineThickness: 2,
-                dashLength: 6,
-              ),
-            ),
+          value: selectedValue,
+          items: options
+              .map((kindOfService) => DropdownMenuItem<String>(
+                    value: kindOfService.id,
+                    child: Text(kindOfService.name),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      );
+  Widget _buildDropdownRute(
+    String label,
+    List<RouteEntity> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          Icon(
-            Icons.location_on,
-            size: 20,
-            color: Colors.red,
+          value: selectedValue,
+          items: options
+              .map((route) => DropdownMenuItem<String>(
+                    value: route.id,
+                    child: Text(route.routeName),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      );
+  Widget _buildDropdownKotaTujuan(
+    String label,
+    List<ConsigneeCityEntity> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-        ],
+          value: selectedValue,
+          items: options
+              .map((city) => DropdownMenuItem<String>(
+                    value: city.id,
+                    child: Text(city.name),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      );
+  Widget _buildDropdownRelasi(
+    String label,
+    List<RelationEntity> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: selectedValue,
+          items: options
+              .map((relation) => DropdownMenuItem<String>(
+                    value: relation.id,
+                    child: Text(relation.name),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      );
+  Widget _buildDropdownBranchOffice(
+    String label,
+    List<OrganizationEntity> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: selectedValue,
+          items: options
+              .map((office) => DropdownMenuItem<String>(
+                    value: office.id,
+                    child: Text(office.name),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+        ),
       );
 }

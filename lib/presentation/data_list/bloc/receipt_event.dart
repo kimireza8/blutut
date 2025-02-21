@@ -17,3 +17,12 @@ class FetchOprIncomingReceipts extends ReceiptEvent {
   @override
   List<Object> get props => [token, searchQuery ?? '', page];
 }
+
+class CreateReceipt extends ReceiptEvent {
+  const CreateReceipt(this.token, this.receipt);
+  final String token;
+  final ReceiptEntity receipt;
+
+  @override
+  List<Object> get props => [token, receipt];
+}

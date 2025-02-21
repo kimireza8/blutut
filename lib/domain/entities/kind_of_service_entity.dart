@@ -11,5 +11,5 @@ class KindOfServiceEntity {
   final String code;
   final String name;
   final String mode;
-  final bool isActive;
+  final String isActive;
 }

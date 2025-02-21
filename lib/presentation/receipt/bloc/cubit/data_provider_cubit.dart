@@ -2,10 +2,12 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../../domain/entities/consignee_city_entity.dart';
+import '../../../../domain/entities/kind_of_service_entity.dart';
 import '../../../../domain/entities/organization_entity.dart';
 import '../../../../domain/entities/relation_entity.dart';
 import '../../../../domain/entities/route_entity.dart';
 import '../../../../domain/usecases/city_fetch_usecase.dart';
+import '../../../../domain/usecases/kind_of_service_usecase.dart';
 import '../../../../domain/usecases/oprroute_fetch_usecase.dart';
 import '../../../../domain/usecases/organization_fetch_usecase.dart';
 import '../../../../domain/usecases/relation_fetch_usecase.dart';
@@ -18,15 +20,18 @@ class DataProviderCubit extends Cubit<DataProviderState> {
     required OprrouteFetchUsecase oprrouteFetchUsecase,
     required OrganizationFetchUsecase organizationFetchUsecase,
     required CityFetchUsecase cityFetchUsecase,
+    required KindofServiceUsecase kindOfServiceUsecase,
   })  : _relationFetchUsecase = relationFetchUsecase,
         _organizationFetchUsecase = organizationFetchUsecase,
         _cityFetchUsecase = cityFetchUsecase,
         _oprrouteFetchUsecase = oprrouteFetchUsecase,
+        _kindofServiceUsecase = kindOfServiceUsecase,
         super(DataProviderInitial());
   final RelationFetchUsecase _relationFetchUsecase;
   final OprrouteFetchUsecase _oprrouteFetchUsecase;
   final OrganizationFetchUsecase _organizationFetchUsecase;
   final CityFetchUsecase _cityFetchUsecase;
+  final KindofServiceUsecase _kindofServiceUsecase;
 
   Future<void> fetchData() async {
     emit(DataProviderLoading());
@@ -34,11 +39,17 @@ class DataProviderCubit extends Cubit<DataProviderState> {
     List<RouteEntity> route = await _oprrouteFetchUsecase.call();
     List<OrganizationEntity> organization =
         await _organizationFetchUsecase.call();
-    List<CityEntity> city = await _cityFetchUsecase.call();
-    print(city);
-    print(organization);
-    print(relation);
-    print(route);
-    emit(DataProviderLoaded(route, relation, city, organization));
+    List<ConsigneeCityEntity> city = await _cityFetchUsecase.call();
+    List<KindOfServiceEntity> kindOfService =
+        await _kindofServiceUsecase.call();
+    emit(
+      DataProviderLoaded(
+        route,
+        relation,
+        city,
+        organization,
+        kindOfService,
+      ),
+    );
   }
 }

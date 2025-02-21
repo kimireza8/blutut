@@ -11,10 +11,12 @@ class KindOfServiceModel extends KindOfServiceEntity {
 
   factory KindOfServiceModel.fromJson(Map<String, dynamic> json) =>
       KindOfServiceModel(
-        id: json['id'] as String? ?? '',
-        code: json['code'] as String? ?? '',
-        name: json['name'] as String? ?? '',
-        mode: json['mode'] as String? ?? '',
-        isActive: json['isActive'] as bool? ?? false,
+        id: json['oprkindofservice_id'] as String? ?? '',
+        code: json['oprkindofservice_code'] as String? ?? '',
+        name: json['oprkindofservice_name'] as String? ?? '',
+        mode:
+            json['oprkindofservice_oprmodetype__oprmodetype_name'] as String? ??
+                '',
+        isActive: json['oprkindofservice_isactive'] as String? ?? '',
       );
 }

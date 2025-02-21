@@ -1,4 +1,5 @@
 import '../entities/detail_shipment_entity.dart';
+import '../entities/receipt_entity.dart';
 import '../entities/shipment_entity.dart';
 
 abstract class ReceiptRepository {
@@ -11,4 +12,5 @@ abstract class ReceiptRepository {
     String cookie,
     String id,
   );
+  Future<void> createReceipt(String cookie, ReceiptEntity receipt);
 }

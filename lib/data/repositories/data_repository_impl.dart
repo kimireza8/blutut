@@ -1,5 +1,6 @@
 import '../../domain/repositories/data_repository.dart';
 import '../models/consignee_city_model.dart';
+import '../models/kind_of_service_model.dart';
 import '../models/organization_model.dart';
 import '../models/relation_model.dart';
 import '../models/route_model.dart';

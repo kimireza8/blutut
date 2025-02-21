@@ -17,14 +17,22 @@ final class DataProviderLoaded extends DataProviderState {
     this.relation,
     this.city,
     this.organization,
+    this.kindOfService,
   );
   final List<RouteEntity> route;
   final List<RelationEntity> relation;
   final List<ConsigneeCityEntity> city;
   final List<OrganizationEntity> organization;
+  final List<KindOfServiceEntity> kindOfService;
 
   @override
-  List<Object> get props => [route, relation, city, organization];
+  List<Object> get props => [
+        route,
+        relation,
+        city,
+        organization,
+        kindOfService,
+      ];
 }
 
 final class DataProviderError extends DataProviderState {
