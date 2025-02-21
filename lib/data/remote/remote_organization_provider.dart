@@ -8,8 +8,8 @@ import '../../dependency_injections.dart';
 import '../models/organization_model.dart';
 
 class RemoteOrganizationProvider {
-  final Dio _dio;
   const RemoteOrganizationProvider({required Dio dio}) : _dio = dio;
+  final Dio _dio;
 
   Future<List<OrganizationModel>> getOprOrganizations() async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -18,9 +18,11 @@ class RemoteOrganizationProvider {
       Response response = await _dio.post(
         '${Constant.baseUrl}/index.php/organization/index.mod?_dc=$timestamp',
         data: _buildOrganizationListRequestData(),
-        options: Options(headers: {
-          'Cookie': 'siklonsession=$cookie',
-        }),
+        options: Options(
+          headers: {
+            'Cookie': 'siklonsession=$cookie',
+          },
+        ),
       );
       Map<String, dynamic> responseData = _decodeResponseData(response.data);
 

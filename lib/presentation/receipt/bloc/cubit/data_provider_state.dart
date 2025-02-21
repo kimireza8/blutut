@@ -13,10 +13,14 @@ final class DataProviderLoading extends DataProviderState {}
 
 final class DataProviderLoaded extends DataProviderState {
   const DataProviderLoaded(
-      this.route, this.relation, this.city, this.organization);
+    this.route,
+    this.relation,
+    this.city,
+    this.organization,
+  );
   final List<RouteEntity> route;
   final List<RelationEntity> relation;
-  final List<CityEntity> city;
+  final List<ConsigneeCityEntity> city;
   final List<OrganizationEntity> organization;
 
   @override

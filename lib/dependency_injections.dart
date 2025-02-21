@@ -7,6 +7,7 @@ import 'core/services/hive_service.dart';
 import 'core/services/shared_preferences_service.dart';
 import 'data/remote/remote_auth_provider.dart';
 import 'data/remote/remote_city_provider.dart';
+import 'data/remote/remote_kind_of_service_provider.dart';
 import 'data/remote/remote_oprroute_provider.dart';
 import 'data/remote/remote_organization_provider.dart';
 import 'data/remote/remote_receipt_provider.dart';
@@ -86,6 +87,9 @@ void _registerRemoteProviders() {
     )
     ..registerLazySingleton<RemoteOrganizationProvider>(
       () => RemoteOrganizationProvider(dio: serviceLocator<Dio>()),
+    )
+    ..registerLazySingleton<RemoteKindofServiceProvider>(
+      () => RemoteKindofServiceProvider(dio: serviceLocator<Dio>()),
     );
 }
 
@@ -113,6 +117,8 @@ void _registerRepositories() {
         remoteOrganizationProvider:
             serviceLocator<RemoteOrganizationProvider>(),
         remoteCityProvider: serviceLocator<RemoteCityProvider>(),
+        remoteKindofServiceProvider:
+            serviceLocator<RemoteKindofServiceProvider>(),
       ),
     );
 }

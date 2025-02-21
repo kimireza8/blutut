@@ -1,11 +1,11 @@
-import '../../domain/entities/city_entity.dart';
+import '../../domain/entities/consignee_city_entity.dart';
 
-class ConsigneeCityModel extends CityEntity {
+class ConsigneeCityModel extends ConsigneeCityEntity {
   ConsigneeCityModel({
-    required String id,
-    required String name,
-    required String type,
-  }) : super(id: id, name: name, type: type);
+    required super.id,
+    required super.name,
+    required super.type,
+  });
 
   factory ConsigneeCityModel.fromJson(Map<String, dynamic> json) =>
       ConsigneeCityModel(

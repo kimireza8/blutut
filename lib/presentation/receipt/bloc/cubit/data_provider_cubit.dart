@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../domain/entities/city_entity.dart';
+import '../../../../domain/entities/consignee_city_entity.dart';
 import '../../../../domain/entities/organization_entity.dart';
 import '../../../../domain/entities/relation_entity.dart';
 import '../../../../domain/entities/route_entity.dart';
@@ -34,7 +34,7 @@ class DataProviderCubit extends Cubit<DataProviderState> {
     List<RouteEntity> route = await _oprrouteFetchUsecase.call();
     List<OrganizationEntity> organization =
         await _organizationFetchUsecase.call();
-    List<CityEntity> city = await _cityFetchUsecase.call();
+    List<ConsigneeCityEntity> city = await _cityFetchUsecase.call();
     emit(DataProviderLoaded(route, relation, city, organization));
   }
 }

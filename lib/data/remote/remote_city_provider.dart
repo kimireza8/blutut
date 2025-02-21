@@ -5,11 +5,11 @@ import 'package:dio/dio.dart';
 import '../../core/constants/constant.dart';
 import '../../core/services/shared_preferences_service.dart';
 import '../../dependency_injections.dart';
-import '../models/city_model.dart';
+import '../models/consignee_city_model.dart';
 
 class RemoteCityProvider {
-  final Dio _dio;
   const RemoteCityProvider({required Dio dio}) : _dio = dio;
+  final Dio _dio;
 
   Future<List<ConsigneeCityModel>> getConsigneeCities() async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -18,9 +18,11 @@ class RemoteCityProvider {
       Response response = await _dio.post(
         '${Constant.baseUrl}/index.php/city/index.mod?_dc=$timestamp',
         data: _buildCityListRequestData(),
-        options: Options(headers: {
-          'Cookie': 'siklonsession=$cookie',
-        }),
+        options: Options(
+          headers: {
+            'Cookie': 'siklonsession=$cookie',
+          },
+        ),
       );
       Map<String, dynamic> responseData = _decodeResponseData(response.data);
 
