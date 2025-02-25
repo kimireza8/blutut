@@ -2,8 +2,6 @@
 
 ## Tugas yang Belum Dibagikan
 
-- [ ] Membuat widget dropdown yang bisa search juga
-
 ## Tugas yang Sudah Dibagikan
 
 ### **Andrey**
@@ -22,6 +20,8 @@
 - [x] Membuat provider, repo, model, entity, untuk data pelayanan (Done)
 - [x] Refactor cubit & halaman receipt detail. (Done)
 - [x] Refactor cubit & widget profile. (Done)
+- [ ] Membuat halaman edit. (Ongoing)
+- [ ] Memperbaiki bug di halaman print, di mana setelah print langsung terputus dengan printer. (Ongoing)
 
 ### **Kimi**
 
@@ -37,7 +37,9 @@
 - [x] Consume Input API di halaman input. (Done)
 - [x] Refactor cubit & halaman receipt. (Done)
 - [x] Refactor cubit & halaman input. (Ongoing)
-- [ ] Refactor cubit & halaman print. (Ongoing)
+- [x] Refactor cubit & halaman print. (Ongoing)
+- [x] Membuat halaman print sekali print langsung 2 lembar. (Done)
+- [ ] Membuat widget dropdown yang bisa search juga
 
 ## Tugas Tim
 
@@ -52,7 +54,7 @@
 
 ### Printer Bluetooth
 
-- [ ] Riset dan identifikasi printer Bluetooth yang kompatibel untuk aplikasi. (Ongoing)
+- [x] Riset dan identifikasi printer Bluetooth yang kompatibel untuk aplikasi. (Done)
 
 ### Refactoring
 
@@ -60,3 +62,7 @@
 - [ ] Refactor error handling untuk setiap panggilan API. (Ongoing)
 - [ ] Refactor cubit & state. (Ongoing)
 - [ ] Refactor logika consume state management. (Ongoing)
+
+### Performance
+
+- [ ] Test performa aplikasi di hp jadul. (Ongoing)
