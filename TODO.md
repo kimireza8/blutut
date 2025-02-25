@@ -21,6 +21,8 @@
 - [x] Membuat provider, repo, model, entity, untuk data pelayanan (Done)
 - [x] Refactor cubit & halaman receipt detail. (Done)
 - [x] Refactor cubit & widget profile. (Done)
+- [ ] Membuat halaman edit. (Ongoing)
+- [ ] Memperbaiki bug di halaman print, di mana setelah print langsung terputus dengan printer. (Ongoing)
 
 ### **Kimi**
 
@@ -37,6 +39,7 @@
 - [x] Refactor cubit & halaman receipt. (Done)
 - [ ] Refactor cubit & halaman input. (Ongoing)
 - [ ] Refactor cubit & halaman print. (Ongoing)
+- [ ] Membuat halaman print sekali print langsung 2 lembar. (Ongoing)
 
 ## Tugas Tim
 
@@ -51,7 +54,7 @@
 
 ### Printer Bluetooth
 
-- [ ] Riset dan identifikasi printer Bluetooth yang kompatibel untuk aplikasi. (Ongoing)
+- [x] Riset dan identifikasi printer Bluetooth yang kompatibel untuk aplikasi. (Done)
 
 ### Refactoring
 
@@ -59,3 +62,6 @@
 - [ ] Refactor error handling untuk setiap panggilan API. (Ongoing)
 - [ ] Refactor cubit & state. (Ongoing)
 - [ ] Refactor logika consume state management. (Ongoing)
+
+### Performance
+- [ ] Test performa aplikasi di hp jadul. (Ongoing)
