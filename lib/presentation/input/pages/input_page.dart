@@ -12,6 +12,7 @@ import '../../../domain/entities/input_data/route_entity.dart';
 import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../receipt/bloc/receipt_bloc.dart';
 import '../cubit/input_cubit.dart';
+import 'custom_dialog_dropdown.dart';
 
 @RoutePage()
 class InputPage extends StatefulWidget {
@@ -110,6 +111,7 @@ class _InputPageState extends State<InputPage> {
 
   void _clearFields() {
     setState(() {
+      print('clear $selectedRoute');
       colliController.clear();
       senderController.clear();
       receiverController.clear();
@@ -216,15 +218,16 @@ class _InputPageState extends State<InputPage> {
                                           selectedDateReceive,
                                           false,
                                         ),
-                                        _buildDropdownRelasi(
+                                        _buildDropdownCustom<RelationEntity>(
                                           'Nama Relasi',
                                           state.relation,
                                           selectedRelation,
-                                          (value) {
-                                            setState(() {
-                                              selectedRelation = value;
-                                            });
-                                          },
+                                          (value) => setState(
+                                              () => selectedRelation = value),
+                                          (relation) => relation.name,
+                                          (relation) => relation.id,
+                                          Icons.people,
+                                          context,
                                         ),
                                         _buildDropdown('Relasi Sebagai', [
                                           ['1', 'Pengirim'],
@@ -248,15 +251,17 @@ class _InputPageState extends State<InputPage> {
                                           senderController,
                                           receiverController,
                                         ),
-                                        _buildDropdownKotaTujuan(
+                                        _buildDropdownCustom<
+                                            ConsigneeCityEntity>(
                                           'Kota Tujuan',
                                           state.city,
                                           selectedCity,
-                                          (value) {
-                                            setState(() {
-                                              selectedCity = value;
-                                            });
-                                          },
+                                          (value) => setState(
+                                              () => selectedCity = value),
+                                          (city) => city.name,
+                                          (city) => city.id,
+                                          Icons.location_on,
+                                          context,
                                         ),
                                         _buildTextField(
                                           'Nomor Resi',
@@ -266,25 +271,28 @@ class _InputPageState extends State<InputPage> {
                                           'Nomor Surat Jalan',
                                           deliveryNoteController,
                                         ),
-                                        _buildDropdownKindofService(
+                                        _buildDropdownCustom<
+                                            KindOfServiceEntity>(
                                           'Jenis Pelayanan',
                                           state.kindOfService,
                                           selectedKindofService,
-                                          (value) {
-                                            setState(() {
-                                              selectedKindofService = value;
-                                            });
-                                          },
+                                          (value) => setState(() =>
+                                              selectedKindofService = value),
+                                          (kindOfService) => kindOfService.name,
+                                          (kindOfService) => kindOfService.id,
+                                          Icons.room_service,
+                                          context,
                                         ),
-                                        _buildDropdownRute(
+                                        _buildDropdownCustom<RouteEntity>(
                                           'Rute Pengiriman',
                                           state.route,
                                           selectedRoute,
-                                          (value) {
-                                            setState(() {
-                                              selectedRoute = value;
-                                            });
-                                          },
+                                          (value) => setState(
+                                              () => selectedRoute = value),
+                                          (route) => route.routeName,
+                                          (route) => route.id,
+                                          Icons.route,
+                                          context,
                                         ),
                                         _buildTextField(
                                           'Total Colli',
@@ -332,6 +340,54 @@ class _InputPageState extends State<InputPage> {
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      );
+  Widget _buildDropdownCustom<T>(
+    String label,
+    List<T> options,
+    String? selectedValue,
+    Function(String?) onChanged,
+    String Function(T) getLabel,
+    String Function(T) getValue,
+    IconData icon,
+    BuildContext context,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: GestureDetector(
+          onTap: () async {
+            await showDialog(
+              context: context,
+              builder: (context) => CustomDropdownDialog<T>(
+                title: label,
+                options: options,
+                selectedValue: selectedValue,
+                getLabel: getLabel,
+                getValue: getValue,
+                onChanged: onChanged,
+                icon: icon,
+              ),
+            );
+          },
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelText: label,
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  selectedValue != null && options.isNotEmpty
+                      ? getLabel(options
+                          .firstWhere((e) => getValue(e) == selectedValue))
+                      : "Pilih $label",
+                ),
+                const Icon(Icons.arrow_drop_down),
+              ],
             ),
           ),
         ),
@@ -470,106 +526,6 @@ class _InputPageState extends State<InputPage> {
         ),
       );
 
-  Widget _buildDropdownKindofService(
-    String label,
-    List<KindOfServiceEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (kindOfService) => DropdownMenuItem<String>(
-                  value: kindOfService.id,
-                  child: Text(kindOfService.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownRute(
-    String label,
-    List<RouteEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (route) => DropdownMenuItem<String>(
-                  value: route.id,
-                  child: Text(route.routeName),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownKotaTujuan(
-    String label,
-    List<ConsigneeCityEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (city) => DropdownMenuItem<String>(
-                  value: city.id,
-                  child: Text(city.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownRelasi(
-    String label,
-    List<RelationEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (relation) => DropdownMenuItem<String>(
-                  value: relation.id,
-                  child: Text(relation.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
   Widget _buildDropdownBranchOffice(
     String label,
     List<OrganizationEntity> options,

@@ -96,6 +96,5 @@ class RemoteKindofServiceProvider {
         'flyoversearch': jsonEncode([]),
         'page': '1',
         'start': '0',
-        'limit': '10',
       };
 }

@@ -92,13 +92,11 @@ class RemoteRelationProvider {
           'oprcustomer_address',
         ]),
         'advsearch': null,
-        'filter': 'tes',
         'prefilter': null,
         'sorter': jsonEncode([]),
         'grouper': jsonEncode([]),
         'flyoversearch': jsonEncode([]),
         'page': '1',
         'start': '0',
-        'limit': '10',
       };
 }
