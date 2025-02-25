@@ -32,6 +32,7 @@ class _InputPageState extends State<InputPage> {
   String? selectedRoute;
   String? selectedRelation;
   String? selectedKindofService;
+  String? selectedServiceType;
   final TextEditingController colliController = TextEditingController();
   final TextEditingController senderController = TextEditingController();
   final TextEditingController receiverController = TextEditingController();
@@ -276,8 +277,16 @@ class _InputPageState extends State<InputPage> {
                                           'Jenis Pelayanan',
                                           state.kindOfService,
                                           selectedKindofService,
-                                          (value) => setState(() =>
-                                              selectedKindofService = value),
+                                          (value) {
+                                            setState(() {
+                                              selectedKindofService = value;
+                                              selectedServiceType = state
+                                                  .kindOfService[
+                                                      int.parse(value!)]
+                                                  .name;
+                                              selectedRoute = null;
+                                            });
+                                          },
                                           (kindOfService) => kindOfService.name,
                                           (kindOfService) => kindOfService.id,
                                           Icons.room_service,
@@ -285,7 +294,13 @@ class _InputPageState extends State<InputPage> {
                                         ),
                                         _buildDropdownCustom<RouteEntity>(
                                           'Rute Pengiriman',
-                                          state.route,
+                                          state.route
+                                              .where((route) =>
+                                                  selectedKindofService ==
+                                                      null ||
+                                                  route.serviceType ==
+                                                      selectedServiceType)
+                                              .toList(),
                                           selectedRoute,
                                           (value) => setState(
                                               () => selectedRoute = value),

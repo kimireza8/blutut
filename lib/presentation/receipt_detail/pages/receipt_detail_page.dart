@@ -184,7 +184,7 @@ class _Header extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Preview',
+                    'Detail Receipt',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,

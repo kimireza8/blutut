@@ -39,7 +39,7 @@
 - [x] Refactor cubit & halaman input. (Ongoing)
 - [x] Refactor cubit & halaman print. (Ongoing)
 - [x] Membuat halaman print sekali print langsung 2 lembar. (Done)
-- [ ] Membuat widget dropdown yang bisa search juga
+- [x] Membuat widget dropdown yang bisa search juga
 
 ## Tugas Tim
 

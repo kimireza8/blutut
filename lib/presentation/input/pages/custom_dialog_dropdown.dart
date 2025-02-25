@@ -131,7 +131,7 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                     ),
                     onPressed: () => Navigator.pop(context),
                     child:
-                        Text("Kembali", style: TextStyle(color: primaryColor)),
+                        Text('Kembali', style: TextStyle(color: primaryColor)),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -148,7 +148,7 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                             Navigator.pop(context);
                           }
                         : null,
-                    child: const Text("Pilih Rute",
+                    child: const Text('Pilih',
                         style: TextStyle(color: Colors.white)),
                   ),
                 ],
