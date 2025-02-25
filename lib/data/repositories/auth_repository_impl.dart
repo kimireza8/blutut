@@ -1,6 +1,6 @@
 import '../../domain/repositories/auth_repository.dart';
-import '../models/login_request_model.dart';
-import '../remote/remote_auth_provider.dart';
+import '../models/auth/login_request_model.dart';
+import '../remote/auth/remote_auth_provider.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required RemoteAuthProvider remoteAuthProvider})

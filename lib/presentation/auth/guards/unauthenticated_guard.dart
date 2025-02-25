@@ -14,7 +14,7 @@ class UnAuthenticatedGuard extends AutoRouteGuard {
         serviceLocator<SharedPreferencesService>();
     String? cookie = sharedPreferencesService.getCookie();
     if (cookie != null) {
-      await router.replace(const DataListRoute());
+      await router.replace(const ReceiptRoute());
     } else {
       resolver.next();
     }

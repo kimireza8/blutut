@@ -1,7 +1,7 @@
-import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/user/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../models/user_model.dart';
-import '../remote/remote_user_provider.dart';
+import '../models/user/user_model.dart';
+import '../remote/user/remote_user_provider.dart';
 
 class UserRepositoryImpl implements UserRepository {
   const UserRepositoryImpl({required RemoteUserProvider remoteUserProvider})

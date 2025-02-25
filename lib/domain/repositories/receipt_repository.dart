@@ -1,16 +1,16 @@
-import '../entities/detail_shipment_entity.dart';
-import '../entities/receipt_entity.dart';
-import '../entities/shipment_entity.dart';
+import '../entities/receipt/receipt_detail_entity.dart';
+import '../entities/receipt/receipt_input_entity.dart';
+import '../entities/receipt/receipt_entity.dart';
 
 abstract class ReceiptRepository {
-  Future<List<ShipmentEntity>> getOprIncomingReceipts(
+  Future<List<ReceiptEntity>> getOprIncomingReceipts(
     String cookie, {
     String? searchQuery,
     int? page,
   });
-  Future<DetailShipmentEntity> getDetailOprOutgoingReceipts(
+  Future<ReceiptDetailEntity> getDetailOprOutgoingReceipts(
     String cookie,
     String id,
   );
-  Future<void> createReceipt(String cookie, ReceiptEntity receipt);
+  Future<void> createReceipt(String cookie, ReceiptInputEntity receipt);
 }

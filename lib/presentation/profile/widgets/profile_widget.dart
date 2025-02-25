@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/router/app_router.gr.dart';
-import '../../../domain/entities/user_entity.dart';
+import '../../../domain/entities/user/user_entity.dart';
 import '../../auth/cubit/auth_cubit.dart';
 import '../cubit/profile_cubit.dart';
 
@@ -132,12 +132,18 @@ class ProfileBottomSheet extends StatelessWidget {
 }
 
 Future<void> showProfileBottomSheet(BuildContext context) async {
-  await BlocProvider.of<ProfileCubit>(context).fetchUserData();
+  var profileCubit = ProfileCubit.create();
+  await profileCubit.fetchUserData();
 
   await showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (context) => const ProfileBottomSheet(),
+    builder: (context) => BlocProvider.value(
+      value: profileCubit,
+      child: const ProfileBottomSheet(),
+    ),
   );
+
+  await profileCubit.close();
 }

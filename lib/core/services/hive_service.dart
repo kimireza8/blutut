@@ -1,36 +1,36 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../domain/entities/relation_entity.dart';
-import '../../domain/entities/route_entity.dart';
-import '../../domain/entities/shipment_entity.dart';
+import '../../domain/entities/input_data/relation_entity.dart';
+import '../../domain/entities/input_data/route_entity.dart';
+import '../../domain/entities/receipt/receipt_entity.dart';
 
 class HiveService {
   HiveService();
 
-  Box<ShipmentEntity>? _shipmentBox;
+  Box<ReceiptEntity>? _receiptBox;
   Box<RouteEntity>? _routeBox;
   Box<RelationEntity>? _relationBox;
 
   Future<void> init() async {
     await Hive.initFlutter();
     Hive
-      ..registerAdapter(ShipmentEntityAdapter())
+      ..registerAdapter(ReceiptEntityAdapter())
       ..registerAdapter(RouteEntityAdapter())
       ..registerAdapter(RelationEntityAdapter());
-    _shipmentBox = await Hive.openBox<ShipmentEntity>('shipment_box');
+    _receiptBox = await Hive.openBox<ReceiptEntity>('receipt_box');
     _routeBox = await Hive.openBox<RouteEntity>('route_box');
     _relationBox = await Hive.openBox<RelationEntity>('relation_box');
   }
 
-  Box<ShipmentEntity>? get shipmentBox => _shipmentBox;
+  Box<ReceiptEntity>? get receiptBox => _receiptBox;
 
-  Future<void> saveShipments(List<ShipmentEntity> shipments) async {
-    for (ShipmentEntity shipment in shipments) {
-      await _shipmentBox?.put(shipment.id, shipment);
+  Future<void> saveReceipts(List<ReceiptEntity> receipts) async {
+    for (ReceiptEntity receipt in receipts) {
+      await _receiptBox?.put(receipt.id, receipt);
     }
   }
 
-  dynamic getShipment(String key) => _shipmentBox?.get(key);
+  dynamic getReceipt(String key) => _receiptBox?.get(key);
 
   Box<RouteEntity>? get routeBox => _routeBox;
 

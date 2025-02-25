@@ -2,8 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/router/app_router.gr.dart';
+import '../../../core/services/shared_preferences_service.dart';
+import '../../../dependency_injections.dart';
 
-@RoutePage(name: 'SplashRoute')
+@RoutePage()
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 

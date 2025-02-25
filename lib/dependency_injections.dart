@@ -5,115 +5,133 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/services/auth_interceptor.dart';
 import 'core/services/hive_service.dart';
 import 'core/services/shared_preferences_service.dart';
-import 'data/remote/remote_auth_provider.dart';
-import 'data/remote/remote_city_provider.dart';
-import 'data/remote/remote_kind_of_service_provider.dart';
-import 'data/remote/remote_oprroute_provider.dart';
-import 'data/remote/remote_organization_provider.dart';
-import 'data/remote/remote_receipt_provider.dart';
-import 'data/remote/remote_relation_provider.dart';
-import 'data/remote/remote_user_provider.dart';
+import 'data/remote/auth/remote_auth_provider.dart';
+import 'data/remote/input_data/remote_city_provider.dart';
+import 'data/remote/input_data/remote_kind_of_service_provider.dart';
+import 'data/remote/input_data/remote_oprroute_provider.dart';
+import 'data/remote/input_data/remote_organization_provider.dart';
+import 'data/remote/input_data/remote_relation_provider.dart';
+import 'data/remote/receipt/remote_receipt_provider.dart';
+import 'data/remote/user/remote_user_provider.dart';
 import 'data/repositories/auth_repository_impl.dart';
-import 'data/repositories/data_repository_impl.dart';
+import 'data/repositories/input_data_repository_impl.dart';
 import 'data/repositories/receipt_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
 import 'domain/repositories/auth_repository.dart';
-import 'domain/repositories/data_repository.dart';
+import 'domain/repositories/input_data_repository.dart';
 import 'domain/repositories/receipt_repository.dart';
 import 'domain/repositories/user_repository.dart';
-import 'domain/usecases/city_fetch_usecase.dart';
-import 'domain/usecases/kind_of_service_usecase.dart';
-import 'domain/usecases/login_usecase.dart';
-import 'domain/usecases/logout_usecase.dart';
-import 'domain/usecases/oprroute_fetch_usecase.dart';
-import 'domain/usecases/organization_fetch_usecase.dart';
-import 'domain/usecases/receipt_create_usecase.dart';
-import 'domain/usecases/receipt_detail_usecase.dart';
-import 'domain/usecases/receipt_fetch_usecase.dart';
-import 'domain/usecases/relation_fetch_usecase.dart';
-import 'domain/usecases/user_fetch_usecase.dart';
-import 'presentation/auth/cubit/auth_cubit.dart';
-import 'presentation/data_list/bloc/receipt_bloc.dart';
-import 'presentation/detail_data_list/cubit/detail_data_list_cubit.dart';
-import 'presentation/home/print_cubit/print_cubit.dart';
-import 'presentation/profile/cubit/profile_cubit.dart';
-import 'presentation/receipt/bloc/cubit/data_provider_cubit.dart';
+import 'domain/usecases/auth/login_usecase.dart';
+import 'domain/usecases/auth/logout_usecase.dart';
+import 'domain/usecases/input_data/city_fetch_usecase.dart';
+import 'domain/usecases/input_data/kind_of_service_fetch_usecase.dart';
+import 'domain/usecases/input_data/organization_fetch_usecase.dart';
+import 'domain/usecases/input_data/relation_fetch_usecase.dart';
+import 'domain/usecases/input_data/route_fetch_usecase.dart';
+import 'domain/usecases/receipt/receipt_create_usecase.dart';
+import 'domain/usecases/receipt/receipt_detail_usecase.dart';
+import 'domain/usecases/receipt/receipt_fetch_usecase.dart';
+import 'domain/usecases/user/user_fetch_usecase.dart';
 
 final serviceLocator = GetIt.instance;
 
-Future<void> initDependency() async {
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+const _apiTimeouts = (
+  connect: Duration(milliseconds: 30000),
+  receive: Duration(milliseconds: 30000),
+);
 
-  _registerServices(sharedPreferences);
-  _registerRemoteProviders();
-  _registerRepositories();
-  _registerUseCases();
-  _registerCubits();
-}
-
-void _registerServices(SharedPreferences sharedPreferences) {
-  serviceLocator
-    ..registerLazySingleton(() => SharedPreferencesService(sharedPreferences))
-    ..registerLazySingleton(HiveService.new)
-    ..registerLazySingleton(AuthInterceptor.new)
-    ..registerLazySingleton(
-      () => Dio()..interceptors.add(serviceLocator<AuthInterceptor>()),
+Future<void> initializeDependencies() async {
+  try {
+    await _initializeNetwork();
+    await _initializeStorage();
+    _initializeProviders();
+    _initializeRepositories();
+    _initializeUsecases();
+  } catch (e) {
+    throw DependencyInitializationException(
+      'Failed to initialize dependencies: $e',
     );
+  }
 }
 
-void _registerRemoteProviders() {
+Future<Dio> _configureApiClient() async => Dio(
+      BaseOptions(
+        connectTimeout: _apiTimeouts.connect,
+        receiveTimeout: _apiTimeouts.receive,
+      ),
+    );
+
+Future<void> _initializeNetwork() async {
+  Dio dio = await _configureApiClient();
+  var authInterceptor = AuthInterceptor();
+  dio.interceptors.add(authInterceptor);
+
   serviceLocator
-    ..registerLazySingleton<RemoteAuthProvider>(
+    ..registerLazySingleton(() => dio)
+    ..registerLazySingleton(() => authInterceptor);
+}
+
+Future<void> _initializeStorage() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  serviceLocator
+    ..registerLazySingleton(() => SharedPreferencesService(prefs))
+    ..registerLazySingleton(HiveService.new);
+}
+
+void _initializeProviders() {
+  serviceLocator
+    ..registerFactory<RemoteAuthProvider>(
       () => RemoteAuthProvider(
         dio: serviceLocator<Dio>(),
         sharedPreferencesService: serviceLocator<SharedPreferencesService>(),
       ),
     )
-    ..registerLazySingleton<RemoteReceiptProvider>(
+    ..registerFactory<RemoteReceiptProvider>(
       () => RemoteReceiptProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<RemoteUserProvider>(
+    ..registerFactory<RemoteUserProvider>(
       () => RemoteUserProvider(
         dio: serviceLocator<Dio>(),
         sharedPreferencesService: serviceLocator<SharedPreferencesService>(),
       ),
     )
-    ..registerLazySingleton<RemoteRelationProvider>(
+    ..registerFactory<RemoteRelationProvider>(
       () => RemoteRelationProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<RemoteOprRouteProvider>(
+    ..registerFactory<RemoteOprRouteProvider>(
       () => RemoteOprRouteProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<RemoteCityProvider>(
+    ..registerFactory<RemoteCityProvider>(
       () => RemoteCityProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<RemoteOrganizationProvider>(
+    ..registerFactory<RemoteOrganizationProvider>(
       () => RemoteOrganizationProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerLazySingleton<RemoteKindofServiceProvider>(
+    ..registerFactory<RemoteKindofServiceProvider>(
       () => RemoteKindofServiceProvider(dio: serviceLocator<Dio>()),
     );
 }
 
-void _registerRepositories() {
+void _initializeRepositories() {
   serviceLocator
-    ..registerFactory<AuthRepository>(
+    ..registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(
         remoteAuthProvider: serviceLocator<RemoteAuthProvider>(),
       ),
     )
-    ..registerFactory<ReceiptRepository>(
+    ..registerLazySingleton<ReceiptRepository>(
       () => ReceiptRepositoryImpl(
         remoteReceiptProvider: serviceLocator<RemoteReceiptProvider>(),
       ),
     )
-    ..registerFactory<UserRepository>(
+    ..registerLazySingleton<UserRepository>(
       () => UserRepositoryImpl(
         remoteUserProvider: serviceLocator<RemoteUserProvider>(),
       ),
     )
-    ..registerFactory<DataRepository>(
-      () => DataRepositoryImpl(
+    ..registerLazySingleton<InputDataRepository>(
+      () => InputDataRepositoryImpl(
         remoteRelationProvide: serviceLocator<RemoteRelationProvider>(),
         remoteRouteProvider: serviceLocator<RemoteOprRouteProvider>(),
         remoteOrganizationProvider:
@@ -125,94 +143,73 @@ void _registerRepositories() {
     );
 }
 
-void _registerUseCases() {
+void _initializeUsecases() {
   serviceLocator
-    ..registerFactory<LoginUsecase>(
-      () => LoginUsecase(serviceLocator<AuthRepository>()),
-    )
-    ..registerFactory<LogoutUsecase>(
-      () => LogoutUsecase(serviceLocator<AuthRepository>()),
-    )
-    ..registerFactory<ReceiptFetchUsecase>(
-      () => ReceiptFetchUsecase(
-        receiptRepository: serviceLocator<ReceiptRepository>(),
+    ..registerLazySingleton<LoginUsecase>(
+      () => LoginUsecase(
+        serviceLocator<AuthRepository>(),
       ),
     )
-    ..registerFactory<ReceiptDetailUsecase>(
+    ..registerLazySingleton<LogoutUsecase>(
+      () => LogoutUsecase(
+        serviceLocator<AuthRepository>(),
+      ),
+    )
+    ..registerLazySingleton<UserFetchUseCase>(
+      () => UserFetchUseCase(
+        serviceLocator<UserRepository>(),
+      ),
+    )
+    ..registerLazySingleton<ReceiptDetailUsecase>(
       () => ReceiptDetailUsecase(
-        receiptRepository: serviceLocator<ReceiptRepository>(),
+        serviceLocator<ReceiptRepository>(),
       ),
     )
-    ..registerFactory<UserFetchUseCase>(
-      () => UserFetchUseCase(serviceLocator<UserRepository>()),
-    )
-    ..registerFactory<OprrouteFetchUsecase>(
-      () => OprrouteFetchUsecase(
-        dataRepository: serviceLocator<DataRepository>(),
-      ),
-    )
-    ..registerFactory<RelationFetchUsecase>(
-      () => RelationFetchUsecase(
-        dataRepository: serviceLocator<DataRepository>(),
-      ),
-    )
-    ..registerFactory<CityFetchUsecase>(
-      () => CityFetchUsecase(
-        dataRepository: serviceLocator<DataRepository>(),
-      ),
-    )
-    ..registerFactory<OrganizationFetchUsecase>(
-      () => OrganizationFetchUsecase(
-        dataRepository: serviceLocator<DataRepository>(),
-      ),
-    )
-    ..registerFactory<KindofServiceUsecase>(  
-      () => KindofServiceUsecase(
-        dataRepository: serviceLocator<DataRepository>(),
-      ),
-    )
-    ..registerFactory<ReceiptCreateUsecase>(
-      () => ReceiptCreateUsecase(
-        receiptRepository: serviceLocator<ReceiptRepository>(),
-      ),
-      );
-}
-
-void _registerCubits() {
-  serviceLocator
-    ..registerFactory(
-      () => AuthCubit(
-        serviceLocator<SharedPreferencesService>(),
-        serviceLocator<LoginUsecase>(),
-        serviceLocator<LogoutUsecase>(),
+    ..registerLazySingleton<ReceiptFetchUsecase>(
+      () => ReceiptFetchUsecase(
+        serviceLocator<ReceiptRepository>(),
       ),
     )
     ..registerLazySingleton(
-      () => ReceiptBloc(
-        receiptFetchUsecase: serviceLocator<ReceiptFetchUsecase>(),
-        hiveService: serviceLocator<HiveService>(),
-        receiptCreateUsecase: serviceLocator<ReceiptCreateUsecase>(),
+      () => ReceiptCreateUsecase(
+        serviceLocator<ReceiptRepository>(),
       ),
     )
-    ..registerFactory(
-      () => ProfileCubit(
-        userFetchDataUsecase: serviceLocator<UserFetchUseCase>(),
+    ..registerLazySingleton(
+      () => CityFetchUsecase(
+        serviceLocator<InputDataRepository>(),
       ),
     )
-    ..registerFactory(
-      () => DetailDataListCubit(
-        serviceLocator<ReceiptDetailUsecase>(),
-        serviceLocator<SharedPreferencesService>(),
+    ..registerLazySingleton(
+      () => RelationFetchUsecase(
+        serviceLocator<InputDataRepository>(),
       ),
     )
-    ..registerFactory(PrintCubit.new)
-    ..registerFactory(
-      () => DataProviderCubit(
-        relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
-        oprrouteFetchUsecase: serviceLocator<OprrouteFetchUsecase>(),
-        organizationFetchUsecase: serviceLocator<OrganizationFetchUsecase>(),
-        cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
-        kindOfServiceUsecase: serviceLocator<KindofServiceUsecase>(),
+    ..registerLazySingleton(
+      () => RouteFetchUsecase(
+        serviceLocator<InputDataRepository>(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => OrganizationFetchUsecase(
+        serviceLocator<InputDataRepository>(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => KindofServiceFetchUsecase(
+        serviceLocator<InputDataRepository>(),
       ),
     );
+}
+
+Future<void> resetDependencies() async {
+  await serviceLocator.reset();
+}
+
+class DependencyInitializationException implements Exception {
+  DependencyInitializationException(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
 }

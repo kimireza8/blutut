@@ -1,9 +1,6 @@
 # Daftar TODO Tim
 
 ## Tugas yang Belum Dibagikan
-- [ ] Membuat provider, repo, model, entity, untuk data kota tujuan
-- [ ] Membuat provider, repo, model, entity, untuk data kantor cabang
-- [ ] Membuat provider, repo, model, entity, untuk data pelayanan
 - [ ] Membuat widget dropdown yang bisa search juga
 
 ## Tugas yang Sudah Dibagikan
@@ -16,11 +13,14 @@
 - [x] Consume endpoint API user info dan logout di halaman profile. (Done)
 - [x] Implementasi halaman profil dengan fungsi logout. (Done)
 - [x] Implementasi halaman detail daftar data untuk informasi pengiriman. (Done)
-- [x] Revisi desain halaman Login. (Ongoing)
-- [x] Membuat Widget Search Bar. (Ongoing)
-- [x] Membuat Consume API untuk Widget Search. (Ongoing)
-- [x] Revisi desain halaman Profile. (Ongoing)
-- [x] Revisi desain halaman Detail Receipt. (Ongoing)
+- [x] Revisi desain halaman Login. (Done)
+- [x] Membuat Widget Search Bar. (Done)
+- [x] Membuat Consume API untuk Widget Search. (Done)
+- [x] Revisi desain halaman Profile. (Done)
+- [x] Revisi desain halaman Detail Receipt. (Done)
+- [x] Membuat provider, repo, model, entity, untuk data pelayanan (Done)
+- [x] Refactor cubit & halaman receipt detail. (Done)
+- [x] Refactor cubit & widget profile. (Done)
 
 ### **Kimi**
 
@@ -29,16 +29,20 @@
 - [x] Consume endpoint API dari halaman master untuk mengambil data pengiriman. (Done)
 - [x] Menghubungkan API dari halaman master ke dalam model. (Done)
 - [x] Implementasi halaman cetak kode QR untuk label pengiriman. (Done)
-- [x] Revisi desain halaman Receipt. (Ongoing)
-- [x] Revisi desain halaman Cetak. (Ongoing)
-- [ ] Validasi data masukan untuk setiap formulir. (Ongoing)
-- [ ] Consume Input API di halaman input. (Ongoing)
+- [x] Revisi desain halaman Receipt. (Done)
+- [x] Revisi desain halaman Cetak. (Done)
+- [x] Membuat provider, repo, model, entity, untuk data kota tujuan. (Done)
+- [x] Membuat provider, repo, model, entity, untuk data kantor cabang. (Done)
+- [x] Consume Input API di halaman input. (Done)
+- [x] Refactor cubit & halaman receipt. (Done)
+- [ ] Refactor cubit & halaman input. (Ongoing)
+- [ ] Refactor cubit & halaman print. (Ongoing)
 
 ## Tugas Tim
 
 ### Routing
 
-- [x] Konfigurasi routing aplikasi. (Ongoing)
+- [ ] Konfigurasi routing aplikasi. (Ongoing)
 
 ### Layer Repository
 

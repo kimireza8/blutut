@@ -17,21 +17,21 @@ class AppRouter extends $AppRouter {
           guards: [UnAuthenticatedGuard()],
         ),
         AutoRoute(
-          page: DataListRoute.page,
+          page: ReceiptRoute.page,
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
-          page: PrintRoute.page,
+          page: ReceiptDetailRoute.page,
           guards: [AuthenticatedGuard()],
+          path: '/detail/:receipt',
         ),
         AutoRoute(
           page: InputRoute.page,
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
-          page: DetailDataListRoute.page,
+          page: PrintRoute.page,
           guards: [AuthenticatedGuard()],
-          path: '/detail/:shipment',
         ),
       ];
 }

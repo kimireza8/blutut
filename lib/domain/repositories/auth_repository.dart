@@ -1,4 +1,4 @@
-import '../../data/models/login_request_model.dart';
+import '../../data/models/auth/login_request_model.dart';
 
 abstract class AuthRepository {
   Future<String> login(LoginRequest loginRequest);

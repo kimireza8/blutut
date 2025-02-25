@@ -1,9 +1,9 @@
 
-import '../../domain/entities/receipt_entity.dart';
+import '../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../domain/repositories/receipt_repository.dart';
-import '../models/detail_shipment_model.dart';
-import '../models/shipment_model.dart';
-import '../remote/remote_receipt_provider.dart';
+import '../models/receipt/receipt_detail_model.dart';
+import '../models/receipt/receipt_model.dart';
+import '../remote/receipt/remote_receipt_provider.dart';
 
 class ReceiptRepositoryImpl implements ReceiptRepository {
   ReceiptRepositoryImpl({required RemoteReceiptProvider remoteReceiptProvider})
@@ -11,27 +11,27 @@ class ReceiptRepositoryImpl implements ReceiptRepository {
   final RemoteReceiptProvider _remoteReceiptProvider;
 
   @override
-  Future<List<ShipmentModel>> getOprIncomingReceipts(
+  Future<List<ReceiptModel>> getOprIncomingReceipts(
     String cookie, {
     String? searchQuery,
     int? page,
   }) async {
-    List<ShipmentModel> response = await _remoteReceiptProvider
+    List<ReceiptModel> response = await _remoteReceiptProvider
         .getOprIncomingReceipts(cookie, searchQuery: searchQuery, page: page);
     return response;
   }
 
   @override
-  Future<DetailShipmentModel> getDetailOprOutgoingReceipts(
+  Future<ReceiptDetailModel> getDetailOprOutgoingReceipts(
     String cookie,
     String id,
   ) async {
-    DetailShipmentModel response =
+    ReceiptDetailModel response =
         await _remoteReceiptProvider.getDetailprOutgoingReceipts(cookie, id);
     return response;
   }
   @override
-  Future<void> createReceipt(String cookie, ReceiptEntity receipt) async {
+  Future<void> createReceipt(String cookie, ReceiptInputEntity receipt) async {
     await _remoteReceiptProvider.createReceipt(cookie, receipt);
   }
 }

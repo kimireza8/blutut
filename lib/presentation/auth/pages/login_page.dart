@@ -2,12 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/constants/constant.dart';
 import '../../../core/router/app_router.gr.dart';
-import '../../../core/services/shared_preferences_service.dart';
-import '../../../dependency_injections.dart';
-import '../../../domain/entities/login_request_entity.dart';
-import '../../data_list/bloc/receipt_bloc.dart';
-import '../../receipt/bloc/cubit/data_provider_cubit.dart';
+import '../../../domain/entities/auth/login_request_entity.dart';
 import '../cubit/auth_cubit.dart';
 
 @RoutePage()
@@ -15,10 +12,10 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -31,38 +28,15 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _login(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      String username = _emailController.text;
-      String password = _passwordController.text;
-
-      await context.read<AuthCubit>().login(
-            LoginRequestEntity(
-              username: username,
-              password: password,
-              rememberMe: 0,
-            ),
-          );
-    }
-  }
-
   @override
   Widget build(BuildContext context) => BlocListener<AuthCubit, AuthState>(
-        listener: (context, state) async {
-          if (state is AuthLoaded) {
-            context.read<ReceiptBloc>().add(
-                  FetchOprIncomingReceipts(
-                    serviceLocator<SharedPreferencesService>()
-                        .getString('cookie')!,
-                  ),
-                );
-            if (context.mounted) {
-              await context.router.replace(const DataListRoute());
-            }
-          } else if (state is AuthError) {
+        listener: (context, state) {
+          if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+              SnackBar(content: Text('Login failed: ${state.message}')),
             );
+          } else if (state is AuthLoaded) {
+            context.router.replace(const ReceiptRoute());
           }
         },
         child: Scaffold(
@@ -80,100 +54,13 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 32),
                     _buildWelcomeText(),
                     const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      style: _inputTextStyle,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your email',
-                        hintStyle: _hintTextStyle,
-                        contentPadding: _inputContentPadding,
-                        enabledBorder: _underlineInputBorder,
-                        focusedBorder: _outlineInputBorder,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildEmailField(),
                     const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      style: _inputTextStyle,
-                      decoration: InputDecoration(
-                        hintText: 'Enter your password',
-                        hintStyle: _hintTextStyle,
-                        contentPadding: _inputContentPadding,
-                        enabledBorder: _underlineInputBorder,
-                        focusedBorder: _outlineInputBorder,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: Colors.grey[400],
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildPasswordField(),
                     const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: const Text(
-                          'Forgot Password',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color.fromRGBO(29, 79, 215, 1),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildForgotPasswordButton(),
                     const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async => _login(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(29, 79, 215, 1),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Login now',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
+                    _buildLoginButton(),
                     const SizedBox(height: 24),
                     _buildDontHaveAccountRow(),
                   ],
@@ -184,30 +71,132 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-  static const TextStyle _inputTextStyle = TextStyle(
-    fontSize: 14,
-    color: Colors.black87,
-  );
+  Widget _buildEmailField() => BlocBuilder<AuthCubit, AuthState>(
+        buildWhen: (previous, current) => current is AuthError,
+        builder: (context, state) => TextFormField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          style: Constant.inputTextStyle,
+          enabled: state is! AuthLoading,
+          decoration: InputDecoration(
+            hintText: 'Enter your email',
+            hintStyle: Constant.hintTextStyle,
+            contentPadding: Constant.inputContentPadding,
+            enabledBorder: Constant.underlineInputBorder,
+            focusedBorder: Constant.outlineInputBorder,
+            errorText: state is AuthError ? state.message : null,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email';
+            }
+            return null;
+          },
+        ),
+      );
 
-  static const TextStyle _hintTextStyle = TextStyle(
-    fontSize: 14,
-    color: Color.fromRGBO(153, 153, 153, 1),
-    fontWeight: FontWeight.w400,
-  );
+  Widget _buildPasswordField() => BlocBuilder<AuthCubit, AuthState>(
+        buildWhen: (previous, current) => current is AuthError,
+        builder: (context, state) => TextFormField(
+          controller: _passwordController,
+          obscureText: _obscurePassword,
+          style: Constant.inputTextStyle,
+          enabled: state is! AuthLoading,
+          decoration: InputDecoration(
+            hintText: 'Enter your password',
+            hintStyle: Constant.hintTextStyle,
+            contentPadding: Constant.inputContentPadding,
+            enabledBorder: Constant.underlineInputBorder,
+            focusedBorder: Constant.outlineInputBorder,
+            errorText: state is AuthError ? state.message : null,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: Colors.grey[400],
+                size: 20,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            return null;
+          },
+        ),
+      );
 
-  static const EdgeInsets _inputContentPadding = EdgeInsets.symmetric(
-    horizontal: 16,
-    vertical: 12,
-  );
+  Widget _buildLoginButton() => BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) => SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: state is AuthLoading
+                ? null
+                : () async {
+                    if (_formKey.currentState!.validate()) {
+                      await context.read<AuthCubit>().login(
+                            LoginRequestEntity(
+                              username: _emailController.text,
+                              password: _passwordController.text,
+                              rememberMe: 0,
+                            ),
+                          );
+                    }
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromRGBO(29, 79, 215, 1),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+              elevation: 0,
+            ),
+            child: state is AuthLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                : const Text(
+                    'Login now',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+          ),
+        ),
+      );
 
-  static final UnderlineInputBorder _underlineInputBorder =
-      UnderlineInputBorder(
-    borderSide: BorderSide(color: Colors.grey[300]!),
-  );
-
-  static final OutlineInputBorder _outlineInputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8),
-  );
+  Widget _buildForgotPasswordButton() => BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) => Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: state is! AuthLoading ? () {} : null,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              'Forgot Password',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color.fromRGBO(29, 79, 215, 1),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      );
 
   Widget _buildLoginLogo() => Column(
         children: [
@@ -248,32 +237,34 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-  Widget _buildDontHaveAccountRow() => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Don't have an account? ",
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: const Text(
-              'Sign up',
+  Widget _buildDontHaveAccountRow() => BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Don't have an account? ",
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF246BFD),
+                color: Colors.grey[600],
               ),
             ),
-          ),
-        ],
+            TextButton(
+              onPressed: state is! AuthLoading ? () {} : null,
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF246BFD),
+                ),
+              ),
+            ),
+          ],
+        ),
       );
 }
