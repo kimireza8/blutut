@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:dio/dio.dart';
 
 import '../../../core/constants/constant.dart';
 import '../../../core/services/shared_preferences_service.dart';
-import '../../models/input_data/relation_model.dart';
 import '../../../dependency_injections.dart';
+import '../../models/input_data/relation_model.dart';
 
 class RemoteRelationProvider {
   const RemoteRelationProvider({required Dio dio}) : _dio = dio;

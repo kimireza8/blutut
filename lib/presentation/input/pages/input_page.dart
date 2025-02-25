@@ -1,14 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/input_data/consignee_city_entity.dart';
 import '../../../domain/entities/input_data/kind_of_service_entity.dart';
 import '../../../domain/entities/input_data/organization_entity.dart';
-import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../../domain/entities/input_data/relation_entity.dart';
 import '../../../domain/entities/input_data/route_entity.dart';
+import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../receipt/bloc/receipt_bloc.dart';
 import '../cubit/input_cubit.dart';
 
@@ -61,7 +62,7 @@ class _InputPageState extends State<InputPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final ReceiptInputEntity receipt = ReceiptInputEntity(
+      var receipt = ReceiptInputEntity(
         branch: selectedBranchOffice ?? '',
         date: selectedDateSend != null
             ? "${selectedDateSend!.toIso8601String().split('T')[0]}T00:00:00"
@@ -85,9 +86,12 @@ class _InputPageState extends State<InputPage> {
         totalCollies: colliController.text,
       );
 
-      context.read<ReceiptBloc>().add(CreateReceipt(
-          serviceLocator<SharedPreferencesService>().getCookie() ?? '',
-          receipt));
+      context.read<ReceiptBloc>().add(
+            CreateReceipt(
+              serviceLocator<SharedPreferencesService>().getCookie() ?? '',
+              receipt,
+            ),
+          );
       context.router.pop();
     }
   }
@@ -203,13 +207,18 @@ class _InputPageState extends State<InputPage> {
                                           });
                                         },
                                       ),
-                                      _buildDateField(context, 'Tanggal Kirim',
-                                          selectedDateSend, true),
                                       _buildDateField(
-                                          context,
-                                          'Tanggal Diterima',
-                                          selectedDateReceive,
-                                          false),
+                                        context,
+                                        'Tanggal Kirim',
+                                        selectedDateSend,
+                                        true,
+                                      ),
+                                      _buildDateField(
+                                        context,
+                                        'Tanggal Diterima',
+                                        selectedDateReceive,
+                                        false,
+                                      ),
                                       _buildDropdownRelasi(
                                         'Nama Relasi',
                                         state.relation,
@@ -221,8 +230,8 @@ class _InputPageState extends State<InputPage> {
                                         },
                                       ),
                                       _buildDropdown('Relasi Sebagai', [
-                                        ["1", "Pengirim"],
-                                        ["2", "Penerima"]
+                                        ['1', 'Pengirim'],
+                                        ['2', 'Penerima'],
                                       ]),
                                       _buildTwoColumnField(
                                         'Pengirim',
@@ -298,14 +307,15 @@ class _InputPageState extends State<InputPage> {
                                           }),
                                           const SizedBox(width: 8),
                                           _buildElevatedButton(
-                                              'Next',
-                                              const Color.fromRGBO(
-                                                29,
-                                                79,
-                                                215,
-                                                1,
-                                              ),
-                                              _submitForm),
+                                            'Next',
+                                            const Color.fromRGBO(
+                                              29,
+                                              79,
+                                              215,
+                                              1,
+                                            ),
+                                            _submitForm,
+                                          ),
                                         ],
                                       ),
                                     ],
@@ -380,7 +390,9 @@ class _InputPageState extends State<InputPage> {
           items: options
               .map(
                 (option) => DropdownMenuItem(
-                    value: option[0], child: Text(option[1].toString())),
+                  value: option[0],
+                  child: Text(option[1].toString()),
+                ),
               )
               .toList(),
           onChanged: (value) {
@@ -431,8 +443,12 @@ class _InputPageState extends State<InputPage> {
         child: Text(label, style: const TextStyle(color: Colors.white)),
       );
 
-  Widget _buildDateField(BuildContext context, String label,
-          DateTime? selectedDate, bool isSendDate) =>
+  Widget _buildDateField(
+    BuildContext context,
+    String label,
+    DateTime? selectedDate,
+    bool isSendDate,
+  ) =>
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: GestureDetector(
@@ -471,10 +487,12 @@ class _InputPageState extends State<InputPage> {
           ),
           value: selectedValue,
           items: options
-              .map((kindOfService) => DropdownMenuItem<String>(
-                    value: kindOfService.id,
-                    child: Text(kindOfService.name),
-                  ))
+              .map(
+                (kindOfService) => DropdownMenuItem<String>(
+                  value: kindOfService.id,
+                  child: Text(kindOfService.name),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),
@@ -494,10 +512,12 @@ class _InputPageState extends State<InputPage> {
           ),
           value: selectedValue,
           items: options
-              .map((route) => DropdownMenuItem<String>(
-                    value: route.id,
-                    child: Text(route.routeName),
-                  ))
+              .map(
+                (route) => DropdownMenuItem<String>(
+                  value: route.id,
+                  child: Text(route.routeName),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),
@@ -517,10 +537,12 @@ class _InputPageState extends State<InputPage> {
           ),
           value: selectedValue,
           items: options
-              .map((city) => DropdownMenuItem<String>(
-                    value: city.id,
-                    child: Text(city.name),
-                  ))
+              .map(
+                (city) => DropdownMenuItem<String>(
+                  value: city.id,
+                  child: Text(city.name),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),
@@ -540,10 +562,12 @@ class _InputPageState extends State<InputPage> {
           ),
           value: selectedValue,
           items: options
-              .map((relation) => DropdownMenuItem<String>(
-                    value: relation.id,
-                    child: Text(relation.name),
-                  ))
+              .map(
+                (relation) => DropdownMenuItem<String>(
+                  value: relation.id,
+                  child: Text(relation.name),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),
@@ -563,10 +587,12 @@ class _InputPageState extends State<InputPage> {
           ),
           value: selectedValue,
           items: options
-              .map((office) => DropdownMenuItem<String>(
-                    value: office.id,
-                    child: Text(office.name),
-                  ))
+              .map(
+                (office) => DropdownMenuItem<String>(
+                  value: office.id,
+                  child: Text(office.name),
+                ),
+              )
               .toList(),
           onChanged: onChanged,
         ),

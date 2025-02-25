@@ -45,8 +45,10 @@ class RemoteOrganizationProvider {
 
           List<dynamic> rows = responseData['rows'] as List? ?? [];
           return rows
-              .map((json) =>
-                  OrganizationModel.fromJson(json as Map<String, dynamic>))
+              .map(
+                (json) =>
+                    OrganizationModel.fromJson(json as Map<String, dynamic>),
+              )
               .toList();
         },
         'fetch opr organizations',

@@ -75,7 +75,7 @@ class InputCubit extends Cubit<InputState> {
       await _receiptCreateUsecase.call(cookie, receipt);
       emit(InputSuccess());
     } catch (e) {
-      emit(InputError(message: 'Error creating receipt: ${e.toString()}'));
+      emit(InputError(message: 'Error creating receipt: $e'));
     }
   }
 }

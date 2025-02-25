@@ -44,8 +44,10 @@ class RemoteCityProvider {
 
           List<dynamic> rows = responseData['rows'] as List? ?? [];
           return rows
-              .map((json) =>
-                  ConsigneeCityModel.fromJson(json as Map<String, dynamic>))
+              .map(
+                (json) =>
+                    ConsigneeCityModel.fromJson(json as Map<String, dynamic>),
+              )
               .toList();
         },
         'fetch consignee cities',
