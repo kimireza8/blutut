@@ -11,7 +11,6 @@ import '../../../domain/entities/input_data/relation_entity.dart';
 import '../../../domain/entities/input_data/route_entity.dart';
 import '../../receipt/bloc/receipt_bloc.dart';
 import '../cubit/input_cubit.dart';
-import 'preview_page.dart';
 
 @RoutePage()
 class InputPage extends StatefulWidget {
@@ -110,9 +109,6 @@ class _InputPageState extends State<InputPage> {
       });
     }
   }
-
-  void _selectKindofService(String? kindofService) =>
-      setState(() => selectedKindofService = kindofService);
 
   void _clearFields() {
     setState(() {

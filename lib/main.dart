@@ -7,7 +7,6 @@ import 'dependency_injections.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
 import 'presentation/input/cubit/input_cubit.dart';
 import 'presentation/print/cubit/print_cubit.dart';
-import 'presentation/profile/cubit/profile_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

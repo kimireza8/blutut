@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../../core/constants/constant.dart';
 import '../../../core/services/shared_preferences_service.dart';
