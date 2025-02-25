@@ -1,6 +1,7 @@
 # Daftar TODO Tim
 
 ## Tugas yang Belum Dibagikan
+
 - [ ] Membuat widget dropdown yang bisa search juga
 
 ## Tugas yang Sudah Dibagikan
@@ -35,7 +36,7 @@
 - [x] Membuat provider, repo, model, entity, untuk data kantor cabang. (Done)
 - [x] Consume Input API di halaman input. (Done)
 - [x] Refactor cubit & halaman receipt. (Done)
-- [ ] Refactor cubit & halaman input. (Ongoing)
+- [x] Refactor cubit & halaman input. (Ongoing)
 - [ ] Refactor cubit & halaman print. (Ongoing)
 
 ## Tugas Tim

@@ -34,11 +34,5 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthCubit>(
           create: (context) => AuthCubit.create(),
         ),
-        BlocProvider<InputCubit>(
-          create: (context) => InputCubit.create(),
-        ),
-        BlocProvider<PrintCubit>(
-          create: (context) => PrintCubit()..initBluetooth(),
-        ),
       ];
 }

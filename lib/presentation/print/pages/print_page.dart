@@ -13,7 +13,7 @@ class PrintPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-        create: (context) => PrintCubit()..initBluetooth(),
+        create: (context) => PrintCubit.create()..initBluetooth(),
         child: Scaffold(
           appBar: AppBar(
             title: const Text('Barcode', style: TextStyle(color: Colors.white)),

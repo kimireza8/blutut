@@ -43,12 +43,6 @@ class _InputPageState extends State<InputPage> {
   final TextEditingController receiverHpController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    context.read<InputCubit>().fetchData();
-  }
-
-  @override
   void dispose() {
     colliController.dispose();
     senderController.dispose();
@@ -130,207 +124,211 @@ class _InputPageState extends State<InputPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: IntrinsicHeight(
-                  child: Column(
-                    children: [
-                      const DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(29, 79, 215, 1),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Form',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
+  Widget build(BuildContext context) => BlocProvider(
+        create: (context) => InputCubit.create()..fetchData(),
+        child: Scaffold(
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(29, 79, 215, 1),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Form',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Tanda Terima Barang',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
+                                    Text(
+                                      'Tanda Terima Barang',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Icon(
-                                Icons.article,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                            ],
+                                  ],
+                                ),
+                                Icon(
+                                  Icons.article,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: BlocBuilder<InputCubit, InputState>(
-                          builder: (context, state) {
-                            if (state is InputLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else if (state is InputLoaded) {
-                              return Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      _buildDropdownBranchOffice(
-                                        'Kantor Cabang',
-                                        state.organization,
-                                        selectedBranchOffice,
-                                        (value) {
-                                          setState(() {
-                                            selectedBranchOffice = value;
-                                          });
-                                        },
-                                      ),
-                                      _buildDateField(
-                                        context,
-                                        'Tanggal Kirim',
-                                        selectedDateSend,
-                                        true,
-                                      ),
-                                      _buildDateField(
-                                        context,
-                                        'Tanggal Diterima',
-                                        selectedDateReceive,
-                                        false,
-                                      ),
-                                      _buildDropdownRelasi(
-                                        'Nama Relasi',
-                                        state.relation,
-                                        selectedRelation,
-                                        (value) {
-                                          setState(() {
-                                            selectedRelation = value;
-                                          });
-                                        },
-                                      ),
-                                      _buildDropdown('Relasi Sebagai', [
-                                        ['1', 'Pengirim'],
-                                        ['2', 'Penerima'],
-                                      ]),
-                                      _buildTwoColumnField(
-                                        'Pengirim',
-                                        'Penerima',
-                                        senderController,
-                                        receiverController,
-                                      ),
-                                      _buildTwoColumnField(
-                                        'Alamat Pengirim',
-                                        'AlamatPenerima',
-                                        senderController,
-                                        receiverController,
-                                      ),
-                                      _buildTwoColumnField(
-                                        'No Hp Pengirim',
-                                        'No Hp Penerima',
-                                        senderController,
-                                        receiverController,
-                                      ),
-                                      _buildDropdownKotaTujuan(
-                                        'Kota Tujuan',
-                                        state.city,
-                                        selectedCity,
-                                        (value) {
-                                          setState(() {
-                                            selectedCity = value;
-                                          });
-                                        },
-                                      ),
-                                      _buildTextField(
-                                        'Nomor Resi',
-                                        receiptNumberController,
-                                      ),
-                                      _buildTextField(
-                                        'Nomor Surat Jalan',
-                                        deliveryNoteController,
-                                      ),
-                                      _buildDropdownKindofService(
-                                        'Jenis Pelayanan',
-                                        state.kindOfService,
-                                        selectedKindofService,
-                                        (value) {
-                                          setState(() {
-                                            selectedKindofService = value;
-                                          });
-                                        },
-                                      ),
-                                      _buildDropdownRute(
-                                        'Rute Pengiriman',
-                                        state.route,
-                                        selectedRoute,
-                                        (value) {
-                                          setState(() {
-                                            selectedRoute = value;
-                                          });
-                                        },
-                                      ),
-                                      _buildTextField(
-                                        'Total Colli',
-                                        colliController,
-                                      ),
-                                      const SizedBox(height: 20),
-                                      Row(
-                                        children: [
-                                          _buildTextButton(
-                                            'Clear',
-                                            _clearFields,
-                                          ),
-                                          const Spacer(),
-                                          _buildOutlinedButton('Cancel',
-                                              () async {
-                                            await context.router.maybePop();
-                                          }),
-                                          const SizedBox(width: 8),
-                                          _buildElevatedButton(
-                                            'Next',
-                                            const Color.fromRGBO(
-                                              29,
-                                              79,
-                                              215,
-                                              1,
+                        Expanded(
+                          child: BlocBuilder<InputCubit, InputState>(
+                            builder: (context, state) {
+                              if (state is InputLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (state is InputLoaded) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Form(
+                                    key: _formKey,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildDropdownBranchOffice(
+                                          'Kantor Cabang',
+                                          state.organization,
+                                          selectedBranchOffice,
+                                          (value) {
+                                            setState(() {
+                                              selectedBranchOffice = value;
+                                            });
+                                          },
+                                        ),
+                                        _buildDateField(
+                                          context,
+                                          'Tanggal Kirim',
+                                          selectedDateSend,
+                                          true,
+                                        ),
+                                        _buildDateField(
+                                          context,
+                                          'Tanggal Diterima',
+                                          selectedDateReceive,
+                                          false,
+                                        ),
+                                        _buildDropdownRelasi(
+                                          'Nama Relasi',
+                                          state.relation,
+                                          selectedRelation,
+                                          (value) {
+                                            setState(() {
+                                              selectedRelation = value;
+                                            });
+                                          },
+                                        ),
+                                        _buildDropdown('Relasi Sebagai', [
+                                          ['1', 'Pengirim'],
+                                          ['2', 'Penerima'],
+                                        ]),
+                                        _buildTwoColumnField(
+                                          'Pengirim',
+                                          'Penerima',
+                                          senderController,
+                                          receiverController,
+                                        ),
+                                        _buildTwoColumnField(
+                                          'Alamat Pengirim',
+                                          'AlamatPenerima',
+                                          senderController,
+                                          receiverController,
+                                        ),
+                                        _buildTwoColumnField(
+                                          'No Hp Pengirim',
+                                          'No Hp Penerima',
+                                          senderController,
+                                          receiverController,
+                                        ),
+                                        _buildDropdownKotaTujuan(
+                                          'Kota Tujuan',
+                                          state.city,
+                                          selectedCity,
+                                          (value) {
+                                            setState(() {
+                                              selectedCity = value;
+                                            });
+                                          },
+                                        ),
+                                        _buildTextField(
+                                          'Nomor Resi',
+                                          receiptNumberController,
+                                        ),
+                                        _buildTextField(
+                                          'Nomor Surat Jalan',
+                                          deliveryNoteController,
+                                        ),
+                                        _buildDropdownKindofService(
+                                          'Jenis Pelayanan',
+                                          state.kindOfService,
+                                          selectedKindofService,
+                                          (value) {
+                                            setState(() {
+                                              selectedKindofService = value;
+                                            });
+                                          },
+                                        ),
+                                        _buildDropdownRute(
+                                          'Rute Pengiriman',
+                                          state.route,
+                                          selectedRoute,
+                                          (value) {
+                                            setState(() {
+                                              selectedRoute = value;
+                                            });
+                                          },
+                                        ),
+                                        _buildTextField(
+                                          'Total Colli',
+                                          colliController,
+                                        ),
+                                        const SizedBox(height: 20),
+                                        Row(
+                                          children: [
+                                            _buildTextButton(
+                                              'Clear',
+                                              _clearFields,
                                             ),
-                                            _submitForm,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            const Spacer(),
+                                            _buildOutlinedButton('Cancel',
+                                                () async {
+                                              await context.router.maybePop();
+                                            }),
+                                            const SizedBox(width: 8),
+                                            _buildElevatedButton(
+                                              'Next',
+                                              const Color.fromRGBO(
+                                                29,
+                                                79,
+                                                215,
+                                                1,
+                                              ),
+                                              _submitForm,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            } else {
-                              return const Center(
-                                child: Text('Gagal memuat data'),
-                              );
-                            }
-                          },
+                                );
+                              } else {
+                                return const Center(
+                                  child: Text('Gagal memuat data'),
+                                );
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

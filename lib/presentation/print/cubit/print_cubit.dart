@@ -9,8 +9,10 @@ import 'package:equatable/equatable.dart';
 part 'print_state.dart';
 
 class PrintCubit extends Cubit<PrintState> {
-  PrintCubit() : super(const PrintInitial());
+  PrintCubit._() : super(const PrintInitial());
   final BluetoothClassic _bluetoothClassicPlugin = BluetoothClassic();
+
+  factory PrintCubit.create() => PrintCubit._();
 
   Future<void> initBluetooth() async {
     await _bluetoothClassicPlugin.initPermissions();
@@ -95,13 +97,13 @@ class PrintCubit extends Cubit<PrintState> {
   Future<void> printLabelTSPL(String trackingNumber) async {
     try {
       String tsplCommand = '''
-    SIZE 78 mm, 100 mm
+    SIZE 30 mm, 40 mm
     GAP 2 mm, 0 mm
     DIRECTION 1
     CLS
     QRCODE 150,200,L,13,A,0,"$trackingNumber"
     TEXT 80,550,"3",0,1,1,"$trackingNumber"
-    PRINT 1,1
+    PRINT 2,1
     ''';
 
       await _bluetoothClassicPlugin
