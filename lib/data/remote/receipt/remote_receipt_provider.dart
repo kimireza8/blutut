@@ -165,20 +165,23 @@ class RemoteReceiptProvider {
             'oprincomingreceipt_oprkindofservice': receipt.serviceType,
             'oprincomingreceipt_oprroute': receipt.route,
             'oprincomingreceipt_totalcollies': receipt.totalCollies,
+            'oprincomingreceipt_month': receipt.month,
+            'oprincomingreceipt_year': receipt.year,
           }),
+          'primary_key': receipt.id,
         };
 
         Response response = await _dio.post(
-          'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/insert.mod?_dc=$timestamp&primary_key=${receipt.id}',
+          'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/update.mod',
           data: requestData,
           options: Options(headers: headers),
         );
 
         if (!_isSuccessResponse(response)) {
-          throw Exception('Failed to create receipt: ${response.statusCode}');
+          throw Exception('Failed to update receipt: ${response.statusCode}');
         }
       },
-      'create receipt',
+      'update receipt',
     );
   }
 

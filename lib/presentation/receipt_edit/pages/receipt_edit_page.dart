@@ -151,29 +151,35 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
-      // var receiptEdit = ReceiptDetailEntity(
-      //   branch: _formValues.branchOffice ?? '',
-      //   date: _formatDate(_formValues.dateSend),
-      //   incomingDate: _formatDate(_formValues.dateReceive),
-      //   customer: _formValues.relation ?? '',
-      //   customerRole: _formValues.relationAs ?? '',
-      //   shipperName: _formControllers.sender.text,
-      //   shipperAddress: _formControllers.senderAddress.text,
-      //   shipperPhone: _formControllers.senderHp.text,
-      //   consigneeName: _formControllers.receiver.text,
-      //   consigneeAddress: _formControllers.receiverAddress.text,
-      //   consigneeCity: _formValues.city ?? '',
-      //   consigneePhone: _formControllers.receiverHp.text,
-      //   receiptNumber: _formControllers.receiptNumber.text,
-      //   passDocument: _formControllers.deliveryNote.text,
-      //   serviceType: _formValues.serviceType ?? '',
-      //   route: _formValues.route ?? '',
-      //   totalCollies: _formControllers.colli.text,
-      // );
+      var receiptEdit = ReceiptDetailEntity(
+        id: widget.receipt.id,
+        barcode: widget.receipt.barcode,
+        month: widget.receipt.month,
+        number: widget.receipt.number,
+        status: widget.receipt.status,
+        receiveMode: widget.receipt.receiveMode,
+        paymentLocation: widget.receipt.paymentLocation,
+        year: widget.receipt.year,
+        branch: _formValues.branchOffice ?? '',
+        date: _formatDate(_formValues.dateSend),
+        incomingDate: _formatDate(_formValues.dateReceive),
+        customer: _formValues.relation ?? '',
+        customerRole: _formValues.relationAs ?? '',
+        shipperName: _formControllers.sender.text,
+        shipperAddress: _formControllers.senderAddress.text,
+        shipperPhone: _formControllers.senderHp.text,
+        consigneeName: _formControllers.receiver.text,
+        consigneeAddress: _formControllers.receiverAddress.text,
+        consigneeCity: _formValues.city ?? '',
+        consigneePhone: _formControllers.receiverHp.text,
+        receiptNumber: _formControllers.receiptNumber.text,
+        passDocument: _formControllers.deliveryNote.text,
+        serviceType: _formValues.serviceType ?? '',
+        route: _formValues.route ?? '',
+        totalCollies: _formControllers.colli.text,
+      );
 
-      // String cookie =
-      //     serviceLocator<SharedPreferencesService>().getCookie() ?? '';
-      
+      await context.read<ReceiptEditCubit>().updateReceipt(receiptEdit);
       await context.router.maybePop();
     }
   }
@@ -549,7 +555,12 @@ class _ReceiptEditPageState extends State<ReceiptEditPage> {
               children: [
                 Text(
                   _getDisplayTextForDropdown(
-                      selectedValue, options, getLabel, getValue, label,),
+                    selectedValue,
+                    options,
+                    getLabel,
+                    getValue,
+                    label,
+                  ),
                 ),
                 const Icon(Icons.arrow_drop_down),
               ],

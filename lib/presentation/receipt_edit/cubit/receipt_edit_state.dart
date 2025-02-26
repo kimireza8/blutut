@@ -43,3 +43,5 @@ class ReceiptEditError extends ReceiptEditState {
   @override
   List<Object> get props => [message];
 }
+
+final class ReceiptEditSuccess extends ReceiptEditState {}

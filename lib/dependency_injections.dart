@@ -31,6 +31,7 @@ import 'domain/usecases/input_data/service_type_fetch_usecase.dart';
 import 'domain/usecases/receipt/receipt_create_usecase.dart';
 import 'domain/usecases/receipt/receipt_detail_usecase.dart';
 import 'domain/usecases/receipt/receipt_fetch_usecase.dart';
+import 'domain/usecases/receipt/receipt_update_usecase.dart';
 import 'domain/usecases/user/user_fetch_usecase.dart';
 
 final serviceLocator = GetIt.instance;
@@ -171,6 +172,11 @@ void _initializeUsecases() {
     )
     ..registerLazySingleton(
       () => ReceiptCreateUsecase(
+        serviceLocator<ReceiptRepository>(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => ReceiptUpdateUsecase(
         serviceLocator<ReceiptRepository>(),
       ),
     )
