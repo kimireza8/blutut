@@ -439,4 +439,3 @@ class InfoField extends StatelessWidget {
         ],
       );
 }
-

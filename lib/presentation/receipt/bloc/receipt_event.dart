@@ -8,8 +8,11 @@ abstract class ReceiptEvent extends Equatable {
 }
 
 class FetchOperationalIncomingReceipts extends ReceiptEvent {
-
-  const FetchOperationalIncomingReceipts(this.token, {this.searchQuery, this.page = 1});
+  const FetchOperationalIncomingReceipts(
+    this.token, {
+    this.searchQuery,
+    this.page = 1,
+  });
   final String token;
   final String? searchQuery;
   final int page;

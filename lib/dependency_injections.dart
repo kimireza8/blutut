@@ -7,10 +7,10 @@ import 'core/services/hive_service.dart';
 import 'core/services/shared_preferences_service.dart';
 import 'data/remote/auth/remote_auth_provider.dart';
 import 'data/remote/input_data/remote_city_provider.dart';
-import 'data/remote/input_data/remote_service_type_provider.dart';
 import 'data/remote/input_data/remote_oprroute_provider.dart';
 import 'data/remote/input_data/remote_organization_provider.dart';
 import 'data/remote/input_data/remote_relation_provider.dart';
+import 'data/remote/input_data/remote_service_type_provider.dart';
 import 'data/remote/receipt/remote_receipt_provider.dart';
 import 'data/remote/user/remote_user_provider.dart';
 import 'data/repositories/auth_repository_impl.dart';
@@ -24,10 +24,10 @@ import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth/login_usecase.dart';
 import 'domain/usecases/auth/logout_usecase.dart';
 import 'domain/usecases/input_data/city_fetch_usecase.dart';
-import 'domain/usecases/input_data/service_type_fetch_usecase.dart';
 import 'domain/usecases/input_data/organization_fetch_usecase.dart';
 import 'domain/usecases/input_data/relation_fetch_usecase.dart';
 import 'domain/usecases/input_data/route_fetch_usecase.dart';
+import 'domain/usecases/input_data/service_type_fetch_usecase.dart';
 import 'domain/usecases/receipt/receipt_create_usecase.dart';
 import 'domain/usecases/receipt/receipt_detail_usecase.dart';
 import 'domain/usecases/receipt/receipt_fetch_usecase.dart';
@@ -137,8 +137,7 @@ void _initializeRepositories() {
         remoteOrganizationProvider:
             serviceLocator<RemoteOrganizationProvider>(),
         remoteCityProvider: serviceLocator<RemoteCityProvider>(),
-        remoteServiceTypeProvider:
-            serviceLocator<RemoteServiceTypeProvider>(),
+        remoteServiceTypeProvider: serviceLocator<RemoteServiceTypeProvider>(),
       ),
     );
 }

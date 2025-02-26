@@ -13,7 +13,7 @@ class ReceiptDetailInitial extends ReceiptDetailState {}
 class ReceiptDetailLoading extends ReceiptDetailState {}
 
 class ReceiptDetailLoaded extends ReceiptDetailState {
-  const ReceiptDetailLoaded(this.detailReceiptEntity); 
+  const ReceiptDetailLoaded(this.detailReceiptEntity);
   final ReceiptDetailEntity detailReceiptEntity;
 
   @override
@@ -21,26 +21,26 @@ class ReceiptDetailLoaded extends ReceiptDetailState {
 }
 
 class ReceiptDetailDataLoaded extends ReceiptDetailState {
-  const ReceiptDetailDataLoaded(
-    this.route,
-    this.relation,
-    this.city,
-    this.organization,
-    this.serviceType,
-  );
-  final List<RouteEntity> route;
-  final List<RelationEntity> relation;
-  final List<ConsigneeCityEntity> city;
-  final List<OrganizationEntity> organization;
-  final List<ServiceTypeEntity> serviceType;
+  const ReceiptDetailDataLoaded({
+    required this.routes,
+    required this.relations,
+    required this.cities,
+    required this.organizations,
+    required this.serviceTypes,
+  });
+  final List<RouteEntity> routes;
+  final List<RelationEntity> relations;
+  final List<ConsigneeCityEntity> cities;
+  final List<OrganizationEntity> organizations;
+  final List<ServiceTypeEntity> serviceTypes;
 
   @override
   List<Object> get props => [
-        route,
-        relation,
-        city,
-        organization,
-        serviceType,
+        routes,
+        relations,
+        cities,
+        organizations,
+        serviceTypes,
       ];
 }
 

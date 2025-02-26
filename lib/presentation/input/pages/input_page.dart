@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/input_data/consignee_city_entity.dart';
-import '../../../domain/entities/input_data/service_type_entity.dart';
 import '../../../domain/entities/input_data/organization_entity.dart';
 import '../../../domain/entities/input_data/relation_entity.dart';
 import '../../../domain/entities/input_data/route_entity.dart';
+import '../../../domain/entities/input_data/service_type_entity.dart';
 import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../receipt/bloc/receipt_bloc.dart';
 import '../cubit/input_cubit.dart';
@@ -112,7 +112,6 @@ class _InputPageState extends State<InputPage> {
 
   void _clearFields() {
     setState(() {
-      print('clear $selectedRoute');
       colliController.clear();
       senderController.clear();
       receiverController.clear();
@@ -224,7 +223,8 @@ class _InputPageState extends State<InputPage> {
                                           state.relation,
                                           selectedRelation,
                                           (value) => setState(
-                                              () => selectedRelation = value),
+                                            () => selectedRelation = value,
+                                          ),
                                           (relation) => relation.name,
                                           (relation) => relation.id,
                                           Icons.people,
@@ -258,7 +258,8 @@ class _InputPageState extends State<InputPage> {
                                           state.city,
                                           selectedCity,
                                           (value) => setState(
-                                              () => selectedCity = value),
+                                            () => selectedCity = value,
+                                          ),
                                           (city) => city.name,
                                           (city) => city.id,
                                           Icons.location_on,
@@ -272,8 +273,7 @@ class _InputPageState extends State<InputPage> {
                                           'Nomor Surat Jalan',
                                           deliveryNoteController,
                                         ),
-                                        _buildDropdownCustom<
-                                            ServiceTypeEntity>(
+                                        _buildDropdownCustom<ServiceTypeEntity>(
                                           'Jenis Pelayanan',
                                           state.serviceType,
                                           selectedKindofService,
@@ -295,15 +295,18 @@ class _InputPageState extends State<InputPage> {
                                         _buildDropdownCustom<RouteEntity>(
                                           'Rute Pengiriman',
                                           state.route
-                                              .where((route) =>
-                                                  selectedServiceType ==
-                                                      null ||
-                                                  route.serviceType ==
-                                                      selectedServiceType)
+                                              .where(
+                                                (route) =>
+                                                    selectedServiceType ==
+                                                        null ||
+                                                    route.serviceType ==
+                                                        selectedServiceType,
+                                              )
                                               .toList(),
                                           selectedRoute,
                                           (value) => setState(
-                                              () => selectedRoute = value),
+                                            () => selectedRoute = value,
+                                          ),
                                           (route) => route.routeName,
                                           (route) => route.id,
                                           Icons.route,
@@ -397,9 +400,11 @@ class _InputPageState extends State<InputPage> {
               children: [
                 Text(
                   selectedValue != null && options.isNotEmpty
-                      ? getLabel(options
-                          .firstWhere((e) => getValue(e) == selectedValue))
-                      : "Pilih $label",
+                      ? getLabel(
+                          options
+                              .firstWhere((e) => getValue(e) == selectedValue),
+                        )
+                      : 'Pilih $label',
                 ),
                 const Icon(Icons.arrow_drop_down),
               ],

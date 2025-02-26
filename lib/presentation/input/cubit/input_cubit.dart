@@ -3,16 +3,16 @@ import 'package:equatable/equatable.dart';
 
 import '../../../dependency_injections.dart';
 import '../../../domain/entities/input_data/consignee_city_entity.dart';
-import '../../../domain/entities/input_data/service_type_entity.dart';
 import '../../../domain/entities/input_data/organization_entity.dart';
 import '../../../domain/entities/input_data/relation_entity.dart';
 import '../../../domain/entities/input_data/route_entity.dart';
+import '../../../domain/entities/input_data/service_type_entity.dart';
 import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../../domain/usecases/input_data/city_fetch_usecase.dart';
-import '../../../domain/usecases/input_data/service_type_fetch_usecase.dart';
 import '../../../domain/usecases/input_data/organization_fetch_usecase.dart';
 import '../../../domain/usecases/input_data/relation_fetch_usecase.dart';
 import '../../../domain/usecases/input_data/route_fetch_usecase.dart';
+import '../../../domain/usecases/input_data/service_type_fetch_usecase.dart';
 import '../../../domain/usecases/receipt/receipt_create_usecase.dart';
 
 part 'input_state.dart';
@@ -34,13 +34,13 @@ class InputCubit extends Cubit<InputState> {
         super(InputInitial());
 
   factory InputCubit.create() => InputCubit._(
-      relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
-      oprrouteFetchUsecase: serviceLocator<RouteFetchUsecase>(),
-      organizationFetchUsecase: serviceLocator<OrganizationFetchUsecase>(),
-      cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
-      serviceTypeUsecase: serviceLocator<ServiceTypeFetchUsecase>(),
-      receiptCreateUsecase: serviceLocator<ReceiptCreateUsecase>(),
-    );
+        relationFetchUsecase: serviceLocator<RelationFetchUsecase>(),
+        oprrouteFetchUsecase: serviceLocator<RouteFetchUsecase>(),
+        organizationFetchUsecase: serviceLocator<OrganizationFetchUsecase>(),
+        cityFetchUsecase: serviceLocator<CityFetchUsecase>(),
+        serviceTypeUsecase: serviceLocator<ServiceTypeFetchUsecase>(),
+        receiptCreateUsecase: serviceLocator<ReceiptCreateUsecase>(),
+      );
 
   final RelationFetchUsecase _relationFetchUsecase;
   final RouteFetchUsecase _oprrouteFetchUsecase;
@@ -56,8 +56,7 @@ class InputCubit extends Cubit<InputState> {
     List<OrganizationEntity> organization =
         await _organizationFetchUsecase.call();
     List<ConsigneeCityEntity> city = await _cityFetchUsecase.call();
-    List<ServiceTypeEntity> serviceType =
-        await _serviceTypeUsecase.call();
+    List<ServiceTypeEntity> serviceType = await _serviceTypeUsecase.call();
     emit(
       InputLoaded(
         route,

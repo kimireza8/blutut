@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomDropdownDialog<T> extends StatefulWidget {
+  const CustomDropdownDialog({
+    required this.title,
+    required this.icon,
+    required this.options,
+    required this.getLabel,
+    required this.getValue,
+    required this.onChanged,
+    super.key,
+    this.selectedValue,
+  });
   final String title;
   final IconData icon;
   final List<T> options;
@@ -8,17 +18,6 @@ class CustomDropdownDialog<T> extends StatefulWidget {
   final String Function(T) getLabel;
   final String Function(T) getValue;
   final Function(String?) onChanged;
-
-  const CustomDropdownDialog({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.options,
-    this.selectedValue,
-    required this.getLabel,
-    required this.getValue,
-    required this.onChanged,
-  });
 
   @override
   State<CustomDropdownDialog<T>> createState() =>
@@ -52,9 +51,13 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                 children: [
                   Icon(widget.icon, size: 24, color: Colors.black87),
                   const SizedBox(width: 8),
-                  Text(widget.title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -73,10 +76,12 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                 onChanged: (query) {
                   setState(() {
                     filteredOptions = widget.options
-                        .where((item) => widget
-                            .getLabel(item)
-                            .toLowerCase()
-                            .contains(query.toLowerCase()))
+                        .where(
+                          (item) => widget
+                              .getLabel(item)
+                              .toLowerCase()
+                              .contains(query.toLowerCase()),
+                        )
                         .toList();
                   });
                 },
@@ -87,7 +92,7 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                 child: ListView.builder(
                   itemCount: filteredOptions.length,
                   itemBuilder: (context, index) {
-                    bool isSelected =
+                    var isSelected =
                         selectedItem == widget.getValue(filteredOptions[index]);
                     return GestureDetector(
                       onTap: () {
@@ -96,7 +101,7 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                               widget.getValue(filteredOptions[index]);
                         });
                       },
-                      child: Container(
+                      child: ColoredBox(
                         color: isSelected
                             ? primaryColor.withOpacity(0.2)
                             : Colors.transparent,
@@ -127,7 +132,9 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                         side: BorderSide(color: primaryColor),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                     onPressed: () => Navigator.pop(context),
                     child:
@@ -140,7 +147,9 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                     onPressed: selectedItem != null
                         ? () {
@@ -148,8 +157,10 @@ class _CustomDropdownDialogState<T> extends State<CustomDropdownDialog<T>> {
                             Navigator.pop(context);
                           }
                         : null,
-                    child: const Text('Pilih',
-                        style: TextStyle(color: Colors.white)),
+                    child: const Text(
+                      'Pilih',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),

@@ -1,4 +1,3 @@
-
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,132 +25,77 @@ class EditReceiptDetailPage extends StatefulWidget {
   final ReceiptEntity receipt;
 
   @override
-  _EditReceiptDetailPageState createState() => _EditReceiptDetailPageState();
+  State<EditReceiptDetailPage> createState() => _EditReceiptDetailPageState();
 }
 
 class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
   final _formKey = GlobalKey<FormState>();
-  String? selectedBranchOffice;
-  DateTime? selectedDateSend;
-  DateTime? selectedDateReceive;
-  String? relationAs;
-  String? selectedCity;
-  String? selectedRoute;
-  String? selectedRelation;
-  String? selectedServiceType;
-  final TextEditingController colliController = TextEditingController();
-  final TextEditingController senderController = TextEditingController();
-  final TextEditingController receiverController = TextEditingController();
-  final TextEditingController receiptNumberController = TextEditingController();
-  final TextEditingController deliveryNoteController = TextEditingController();
-  final TextEditingController senderAddressController = TextEditingController();
-  final TextEditingController receiverAddressController =
-      TextEditingController();
-  final TextEditingController senderHpController = TextEditingController();
-  final TextEditingController receiverHpController = TextEditingController();
+  final _formControllers = ReceiptFormControllers();
+  final _formValues = ReceiptFormValues();
 
   @override
   void initState() {
     super.initState();
-    context.read<ReceiptDetailCubit>().fetchData();
-    context.read<ReceiptDetailCubit>().fetchReceiptDetail(widget.receipt.id);
+    _fetchData();
+  }
+
+  void _fetchData() {
+    ReceiptDetailCubit cubit = context.read<ReceiptDetailCubit>();
+    cubit.fetchReferenceData();
+    cubit.fetchReceiptDetail(widget.receipt.id);
   }
 
   @override
   void dispose() {
-    colliController.dispose();
-    senderController.dispose();
-    receiverController.dispose();
-    receiptNumberController.dispose();
-    deliveryNoteController.dispose();
+    _formControllers.dispose();
     super.dispose();
   }
 
   void _initializeFormValues(ReceiptDetailLoaded state) {
     ReceiptDetailEntity receipt = state.detailReceiptEntity;
 
-    // Initialize text fields
-    receiptNumberController.text = receipt.receiptNumber;
-    deliveryNoteController.text = receipt.passDocument;
-    colliController.text = receipt.totalCollies;
-    senderController.text = receipt.shipperName;
-    receiverController.text = receipt.consigneeName;
-    senderAddressController.text = receipt.shipperAddress;
-    receiverAddressController.text = receipt.consigneeAddress;
-    senderHpController.text = receipt.shipperPhone ?? '';
-    receiverHpController.text = receipt.consigneePhone;
+    _formControllers.setValues(
+      receiptNumber: receipt.receiptNumber,
+      passDocument: receipt.passDocument,
+      totalCollies: receipt.totalCollies,
+      shipperName: receipt.shipperName,
+      consigneeName: receipt.consigneeName,
+      shipperAddress: receipt.shipperAddress,
+      consigneeAddress: receipt.consigneeAddress,
+      shipperPhone: receipt.shipperPhone ?? '',
+      consigneePhone: receipt.consigneePhone,
+    );
 
-    // Initialize dropdown selections
     setState(() {
-      selectedBranchOffice = receipt.branch;
-      selectedRelation = receipt.customer;
-      relationAs = receipt.customerRole;
-      selectedCity = receipt.consigneeCity;
-      selectedRoute = receipt.route;
-      selectedServiceType = receipt.serviceType;
-
-      // Parse dates if they exist
-      if (receipt.date.isNotEmpty) {
-        selectedDateSend = DateTime.parse(receipt.date);
-      }
-
-      if (receipt.incomingDate.isNotEmpty) {
-        selectedDateReceive = DateTime.parse(receipt.incomingDate);
-      }
+      _formValues
+        ..branchOffice = receipt.branch
+        ..relation = receipt.customer
+        ..relationAs = receipt.customerRole
+        ..city = receipt.consigneeCity
+        ..route = receipt.route
+        ..serviceType = receipt.serviceType
+        ..dateSend = _parseDate(receipt.date)
+        ..dateReceive = _parseDate(receipt.incomingDate);
     });
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+  DateTime? _parseDate(String dateString) =>
+      dateString.isNotEmpty ? DateTime.parse(dateString) : null;
 
-      var receipt = ReceiptInputEntity(
-        branch: selectedBranchOffice ?? '',
-        date: selectedDateSend != null
-            ? "${selectedDateSend!.toIso8601String().split('T')[0]}T00:00:00"
-            : '',
-        incomingDate: selectedDateReceive != null
-            ? "${selectedDateReceive!.toIso8601String().split('T')[0]}T00:00:00"
-            : '',
-        customer: selectedRelation ?? '',
-        customerRole: relationAs ?? '',
-        shipperName: senderController.text,
-        shipperAddress: senderAddressController.text,
-        shipperPhone: senderHpController.text,
-        consigneeName: receiverController.text,
-        consigneeAddress: receiverAddressController.text,
-        consigneeCity: selectedCity ?? '',
-        consigneePhone: receiverHpController.text,
-        receiptNumber: receiptNumberController.text,
-        passDocument: deliveryNoteController.text,
-        serviceType: selectedServiceType ?? '',
-        route: selectedRoute ?? '',
-        totalCollies: colliController.text,
-      );
-
-      context.read<ReceiptBloc>().add(
-            CreateReceipt(
-              serviceLocator<SharedPreferencesService>().getCookie() ?? '',
-              receipt,
-            ),
-          );
-      context.router.maybePop();
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context, bool isSendDate) async {
+  Future<void> _selectDate(BuildContext context, DateType dateType) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
     if (picked != null) {
       setState(() {
-        if (isSendDate) {
-          selectedDateSend = picked;
+        if (dateType == DateType.send) {
+          _formValues.dateSend = picked;
         } else {
-          selectedDateReceive = picked;
+          _formValues.dateReceive = picked;
         }
       });
     }
@@ -159,18 +103,44 @@ class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
 
   void _clearFields() {
     setState(() {
-      colliController.clear();
-      senderController.clear();
-      receiverController.clear();
-      receiptNumberController.clear();
-      deliveryNoteController.clear();
-
-      selectedCity = null;
-      selectedRoute = null;
-      selectedRelation = null;
-      selectedServiceType = null;
+      _formControllers.clear();
+      _formValues.clearSelections();
     });
   }
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      _formKey.currentState?.save();
+
+      var receiptInput = ReceiptInputEntity(
+        branch: _formValues.branchOffice ?? '',
+        date: _formatDate(_formValues.dateSend),
+        incomingDate: _formatDate(_formValues.dateReceive),
+        customer: _formValues.relation ?? '',
+        customerRole: _formValues.relationAs ?? '',
+        shipperName: _formControllers.sender.text,
+        shipperAddress: _formControllers.senderAddress.text,
+        shipperPhone: _formControllers.senderHp.text,
+        consigneeName: _formControllers.receiver.text,
+        consigneeAddress: _formControllers.receiverAddress.text,
+        consigneeCity: _formValues.city ?? '',
+        consigneePhone: _formControllers.receiverHp.text,
+        receiptNumber: _formControllers.receiptNumber.text,
+        passDocument: _formControllers.deliveryNote.text,
+        serviceType: _formValues.serviceType ?? '',
+        route: _formValues.route ?? '',
+        totalCollies: _formControllers.colli.text,
+      );
+
+      String cookie =
+          serviceLocator<SharedPreferencesService>().getCookie() ?? '';
+      context.read<ReceiptBloc>().add(CreateReceipt(cookie, receiptInput));
+      await context.router.maybePop();
+    }
+  }
+
+  String _formatDate(DateTime? date) =>
+      date != null ? "${date.toIso8601String().split('T')[0]}T00:00:00" : '';
 
   @override
   Widget build(BuildContext context) =>
@@ -187,51 +157,11 @@ class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
-                        const DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(29, 79, 215, 1),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Form',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Tanda Terima Barang',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.article,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        const ReceiptHeaderSection(),
                         Expanded(
                           child: BlocBuilder<ReceiptDetailCubit,
                               ReceiptDetailState>(
@@ -241,139 +171,7 @@ class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
                                   child: CircularProgressIndicator(),
                                 );
                               } else if (state is ReceiptDetailDataLoaded) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildDropdownBranchOffice(
-                                          'Kantor Cabang',
-                                          state.organization,
-                                          selectedBranchOffice,
-                                          (value) {
-                                            setState(() {
-                                              selectedBranchOffice = value;
-                                            });
-                                          },
-                                        ),
-                                        _buildDateField(
-                                          context,
-                                          'Tanggal Kirim',
-                                          selectedDateSend,
-                                          true,
-                                        ),
-                                        _buildDateField(
-                                          context,
-                                          'Tanggal Diterima',
-                                          selectedDateReceive,
-                                          false,
-                                        ),
-                                        _buildDropdownRelasi(
-                                          'Nama Relasi',
-                                          state.relation,
-                                          selectedRelation,
-                                          (value) {
-                                            setState(() {
-                                              selectedRelation = value;
-                                            });
-                                          },
-                                        ),
-                                        _buildDropdown('Relasi Sebagai', [
-                                          ['1', 'Pengirim'],
-                                          ['2', 'Penerima'],
-                                        ]),
-                                        _buildTwoColumnField(
-                                          'Pengirim',
-                                          'Penerima',
-                                          senderController,
-                                          receiverController,
-                                        ),
-                                        _buildTwoColumnField(
-                                          'Alamat Pengirim',
-                                          'Alamat Penerima',
-                                          senderAddressController,
-                                          receiverAddressController,
-                                        ),
-                                        _buildTwoColumnField(
-                                          'No Hp Pengirim',
-                                          'No Hp Penerima',
-                                          senderHpController,
-                                          receiverHpController,
-                                        ),
-                                        _buildDropdownKotaTujuan(
-                                          'Kota Tujuan',
-                                          state.city,
-                                          selectedCity,
-                                          (value) {
-                                            setState(() {
-                                              selectedCity = value;
-                                            });
-                                          },
-                                        ),
-                                        _buildTextField(
-                                          'Nomor Resi',
-                                          receiptNumberController,
-                                        ),
-                                        _buildTextField(
-                                          'Nomor Surat Jalan',
-                                          deliveryNoteController,
-                                        ),
-                                        _buildDropdownServiceType(
-                                          'Jenis Pelayanan',
-                                          state.serviceType,
-                                          selectedServiceType,
-                                          (value) {
-                                            setState(() {
-                                              selectedServiceType = value;
-                                            });
-                                          },
-                                        ),
-                                        _buildDropdownRute(
-                                          'Rute Pengiriman',
-                                          state.route,
-                                          selectedRoute,
-                                          (value) {
-                                            setState(() {
-                                              selectedRoute = value;
-                                            });
-                                          },
-                                        ),
-                                        _buildTextField(
-                                          'Total Colli',
-                                          colliController,
-                                        ),
-                                        const SizedBox(height: 20),
-                                        Row(
-                                          children: [
-                                            _buildTextButton(
-                                              'Clear',
-                                              _clearFields,
-                                            ),
-                                            const Spacer(),
-                                            _buildOutlinedButton('Cancel',
-                                                () async {
-                                              await context.router.maybePop();
-                                            }),
-                                            const SizedBox(width: 8),
-                                            _buildElevatedButton(
-                                              'Next',
-                                              const Color.fromRGBO(
-                                                29,
-                                                79,
-                                                215,
-                                                1,
-                                              ),
-                                              _submitForm,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
+                                return _buildForm(state);
                               } else {
                                 return const Center(
                                   child: Text('Gagal memuat data'),
@@ -392,8 +190,295 @@ class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
         ),
       );
 
-  Widget _buildTextField(String label, TextEditingController controller) =>
-      Padding(
+  Widget _buildForm(ReceiptDetailDataLoaded state) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              FormDropdown<OrganizationEntity>(
+                label: 'Kantor Cabang',
+                items: state.organizations,
+                selectedValue: _formValues.branchOffice,
+                getValue: (office) => office.id,
+                getLabel: (office) => office.name,
+                onChanged: (value) =>
+                    setState(() => _formValues.branchOffice = value),
+              ),
+              FormDateField(
+                label: 'Tanggal Kirim',
+                selectedDate: _formValues.dateSend,
+                onTap: () => _selectDate(context, DateType.send),
+              ),
+              FormDateField(
+                label: 'Tanggal Diterima',
+                selectedDate: _formValues.dateReceive,
+                onTap: () => _selectDate(context, DateType.receive),
+              ),
+              FormDropdown<RelationEntity>(
+                label: 'Nama Relasi',
+                items: state.relations,
+                selectedValue: _formValues.relation,
+                getValue: (relation) => relation.id,
+                getLabel: (relation) => relation.name,
+                onChanged: (value) =>
+                    setState(() => _formValues.relation = value),
+              ),
+              FormDropdown<Map<String, String>>(
+                label: 'Relasi Sebagai',
+                items: const [
+                  {'id': '1', 'name': 'Pengirim'},
+                  {'id': '2', 'name': 'Penerima'},
+                ],
+                selectedValue: _formValues.relationAs,
+                getValue: (option) => option['id']!,
+                getLabel: (option) => option['name']!,
+                onChanged: (value) =>
+                    setState(() => _formValues.relationAs = value),
+              ),
+              FormTwoColumnField(
+                leftLabel: 'Pengirim',
+                rightLabel: 'Penerima',
+                leftController: _formControllers.sender,
+                rightController: _formControllers.receiver,
+              ),
+              FormTwoColumnField(
+                leftLabel: 'Alamat Pengirim',
+                rightLabel: 'Alamat Penerima',
+                leftController: _formControllers.senderAddress,
+                rightController: _formControllers.receiverAddress,
+              ),
+              FormTwoColumnField(
+                leftLabel: 'No Hp Pengirim',
+                rightLabel: 'No Hp Penerima',
+                leftController: _formControllers.senderHp,
+                rightController: _formControllers.receiverHp,
+              ),
+              FormDropdown<ConsigneeCityEntity>(
+                label: 'Kota Tujuan',
+                items: state.cities,
+                selectedValue: _formValues.city,
+                getValue: (city) => city.id,
+                getLabel: (city) => city.name,
+                onChanged: (value) => setState(() => _formValues.city = value),
+              ),
+              FormTextField(
+                label: 'Nomor Resi',
+                controller: _formControllers.receiptNumber,
+              ),
+              FormTextField(
+                label: 'Nomor Surat Jalan',
+                controller: _formControllers.deliveryNote,
+              ),
+              FormDropdown<ServiceTypeEntity>(
+                label: 'Jenis Pelayanan',
+                items: state.serviceTypes,
+                selectedValue: _formValues.serviceType,
+                getValue: (serviceType) => serviceType.id,
+                getLabel: (serviceType) => serviceType.name,
+                onChanged: (value) =>
+                    setState(() => _formValues.serviceType = value),
+              ),
+              FormDropdown<RouteEntity>(
+                label: 'Rute Pengiriman',
+                items: state.routes,
+                selectedValue: _formValues.route,
+                getValue: (route) => route.id,
+                getLabel: (route) => route.routeName,
+                onChanged: (value) => setState(() => _formValues.route = value),
+              ),
+              FormTextField(
+                label: 'Total Colli',
+                controller: _formControllers.colli,
+              ),
+              const SizedBox(height: 20),
+              FormActionButtons(
+                onClear: _clearFields,
+                onCancel: () async => context.router.maybePop(),
+                onSubmit: _submitForm,
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
+enum DateType { send, receive }
+
+class ReceiptFormControllers {
+  final colli = TextEditingController();
+  final sender = TextEditingController();
+  final receiver = TextEditingController();
+  final receiptNumber = TextEditingController();
+  final deliveryNote = TextEditingController();
+  final senderAddress = TextEditingController();
+  final receiverAddress = TextEditingController();
+  final senderHp = TextEditingController();
+  final receiverHp = TextEditingController();
+
+  void setValues({
+    required String receiptNumber,
+    required String passDocument,
+    required String totalCollies,
+    required String shipperName,
+    required String consigneeName,
+    required String shipperAddress,
+    required String consigneeAddress,
+    required String shipperPhone,
+    required String consigneePhone,
+  }) {
+    this.receiptNumber.text = receiptNumber;
+    deliveryNote.text = passDocument;
+    colli.text = totalCollies;
+    sender.text = shipperName;
+    receiver.text = consigneeName;
+    senderAddress.text = shipperAddress;
+    receiverAddress.text = consigneeAddress;
+    senderHp.text = shipperPhone;
+    receiverHp.text = consigneePhone;
+  }
+
+  void clear() {
+    colli.clear();
+    sender.clear();
+    receiver.clear();
+    receiptNumber.clear();
+    deliveryNote.clear();
+    senderAddress.clear();
+    receiverAddress.clear();
+    senderHp.clear();
+    receiverHp.clear();
+  }
+
+  void dispose() {
+    colli.dispose();
+    sender.dispose();
+    receiver.dispose();
+    receiptNumber.dispose();
+    deliveryNote.dispose();
+    senderAddress.dispose();
+    receiverAddress.dispose();
+    senderHp.dispose();
+    receiverHp.dispose();
+  }
+}
+
+class ReceiptFormValues {
+  String? branchOffice;
+  DateTime? dateSend;
+  DateTime? dateReceive;
+  String? relationAs;
+  String? city;
+  String? route;
+  String? relation;
+  String? serviceType;
+
+  void clearSelections() {
+    branchOffice = null;
+    dateSend = null;
+    dateReceive = null;
+    relationAs = null;
+    city = null;
+    route = null;
+    relation = null;
+    serviceType = null;
+  }
+}
+
+class ReceiptHeaderSection extends StatelessWidget {
+  const ReceiptHeaderSection({super.key});
+
+  static const Color headerColor = Color.fromRGBO(29, 79, 215, 1);
+
+  @override
+  Widget build(BuildContext context) => const DecoratedBox(
+        decoration: BoxDecoration(color: headerColor),
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Form',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    'Tanda Terima Barang',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                ],
+              ),
+              Icon(
+                Icons.article,
+                color: Colors.white,
+                size: 30,
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
+class FormDropdown<T> extends StatelessWidget {
+  const FormDropdown({
+    required this.label,
+    required this.items,
+    required this.selectedValue,
+    required this.getValue,
+    required this.getLabel,
+    required this.onChanged,
+    super.key,
+  });
+  final String label;
+  final List<T> items;
+  final String? selectedValue;
+  final String Function(T) getValue;
+  final String Function(T) getLabel;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: selectedValue,
+          items: items.map((item) {
+            String value = getValue(item);
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(getLabel(item)),
+            );
+          }).toList(),
+          onChanged: onChanged,
+        ),
+      );
+}
+
+class FormTextField extends StatelessWidget {
+  const FormTextField({
+    required this.label,
+    required this.controller,
+    super.key,
+  });
+  final String label;
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: TextFormField(
           controller: controller,
@@ -403,252 +488,135 @@ class _EditReceiptDetailPageState extends State<EditReceiptDetailPage> {
           ),
         ),
       );
+}
 
-  Widget _buildTwoColumnField(
-    String leftLabel,
-    String rightLabel,
-    TextEditingController leftController,
-    TextEditingController rightController, {
-    bool isRoute = false,
-  }) =>
-      Row(
-        children: [
-          Expanded(child: _buildTextField(leftLabel, leftController)),
-          const SizedBox(
-            width: 5,
-          ),
-          if (isRoute)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(Icons.route, color: Colors.red),
-            ),
-          const SizedBox(
-            width: 5,
-          ),
-          Expanded(child: _buildTextField(rightLabel, rightController)),
-        ],
-      );
+class FormTwoColumnField extends StatelessWidget {
+  const FormTwoColumnField({
+    required this.leftLabel,
+    required this.rightLabel,
+    required this.leftController,
+    required this.rightController,
+    super.key,
+  });
+  final String leftLabel;
+  final String rightLabel;
+  final TextEditingController leftController;
+  final TextEditingController rightController;
 
-  Widget _buildDropdown(
-    String label,
-    List<List<dynamic>> options,
-  ) =>
-      Padding(
+  @override
+  Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          items: options
-              .map(
-                (option) => DropdownMenuItem(
-                  value: option[0],
-                  child: Text(option[1].toString()),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: leftController,
+                decoration: InputDecoration(
+                  labelText: leftLabel,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              )
-              .toList(),
-          onChanged: (value) {
-            setState(() {
-              relationAs = value.toString();
-            });
-          },
-          value: relationAs,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextFormField(
+                controller: rightController,
+                decoration: InputDecoration(
+                  labelText: rightLabel,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
+}
 
-  Widget _buildTextButton(String label, VoidCallback onPressed) => TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          foregroundColor: const Color.fromRGBO(29, 79, 215, 1),
-        ),
-        child: Text(label),
-      );
+class FormDateField extends StatelessWidget {
+  const FormDateField({
+    required this.label,
+    required this.selectedDate,
+    required this.onTap,
+    super.key,
+  });
+  final String label;
+  final DateTime? selectedDate;
+  final VoidCallback onTap;
 
-  Widget _buildOutlinedButton(String label, VoidCallback onPressed) =>
-      OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          foregroundColor: const Color.fromRGBO(29, 79, 215, 1),
-          side: const BorderSide(
-            color: Color.fromRGBO(29, 79, 215, 1),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        child: Text(label),
-      );
-
-  Widget _buildElevatedButton(
-    String label,
-    Color color,
-    VoidCallback onPressed,
-  ) =>
-      ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        onPressed: onPressed,
-        child: Text(label, style: const TextStyle(color: Colors.white)),
-      );
-
-  Widget _buildDateField(
-    BuildContext context,
-    String label,
-    DateTime? selectedDate,
-    bool isSendDate,
-  ) =>
-      Padding(
+  @override
+  Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: GestureDetector(
-          onTap: () => _selectDate(context, isSendDate),
+          onTap: onTap,
           child: AbsorbPointer(
             child: TextFormField(
               decoration: InputDecoration(
                 labelText: label,
                 suffixIcon: const Icon(Icons.calendar_today),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
               controller: TextEditingController(
                 text: selectedDate == null
                     ? ''
-                    : '${selectedDate.toLocal()}'.split(' ')[0],
+                    : '${selectedDate!.toLocal()}'.split(' ')[0],
               ),
             ),
           ),
         ),
       );
+}
 
-  Widget _buildDropdownServiceType(
-    String label,
-    List<ServiceTypeEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (serviceType) => DropdownMenuItem<String>(
-                  value: serviceType.id,
-                  child: Text(serviceType.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownRute(
-    String label,
-    List<RouteEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (route) => DropdownMenuItem<String>(
-                  value: route.id,
-                  child: Text(route.routeName),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownKotaTujuan(
-    String label,
-    List<ConsigneeCityEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (city) => DropdownMenuItem<String>(
-                  value: city.id,
-                  child: Text(city.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-  Widget _buildDropdownRelasi(
-    String label,
-    List<RelationEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (relation) => DropdownMenuItem<String>(
-                  value: relation.id,
-                  child: Text(relation.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
+class FormActionButtons extends StatelessWidget {
+  const FormActionButtons({
+    required this.onClear,
+    required this.onCancel,
+    required this.onSubmit,
+    super.key,
+  });
+  final VoidCallback onClear;
+  final VoidCallback onCancel;
+  final VoidCallback onSubmit;
 
-  Widget _buildDropdownBranchOffice(
-    String label,
-    List<OrganizationEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+  static const Color primaryColor = Color.fromRGBO(29, 79, 215, 1);
+
+  @override
+  Widget build(BuildContext context) => Row(
+        children: [
+          TextButton(
+            onPressed: onClear,
+            style: TextButton.styleFrom(foregroundColor: primaryColor),
+            child: const Text('Clear'),
           ),
-          value: selectedValue,
-          items: options
-              .map(
-                (office) => DropdownMenuItem<String>(
-                  value: office.id,
-                  child: Text(office.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
+          const Spacer(),
+          OutlinedButton(
+            onPressed: onCancel,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: primaryColor,
+              side: const BorderSide(color: primaryColor),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Cancel'),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: onSubmit,
+            child: const Text('Next', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       );
 }

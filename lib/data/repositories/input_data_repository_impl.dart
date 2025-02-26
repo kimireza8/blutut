@@ -1,14 +1,14 @@
 import '../../domain/repositories/input_data_repository.dart';
 import '../models/input_data/consignee_city_model.dart';
-import '../models/input_data/service_type_model.dart';
 import '../models/input_data/organization_model.dart';
 import '../models/input_data/relation_model.dart';
 import '../models/input_data/route_model.dart';
+import '../models/input_data/service_type_model.dart';
 import '../remote/input_data/remote_city_provider.dart';
-import '../remote/input_data/remote_service_type_provider.dart';
 import '../remote/input_data/remote_oprroute_provider.dart';
 import '../remote/input_data/remote_organization_provider.dart';
 import '../remote/input_data/remote_relation_provider.dart';
+import '../remote/input_data/remote_service_type_provider.dart';
 
 class InputDataRepositoryImpl implements InputDataRepository {
   InputDataRepositoryImpl({
@@ -51,7 +51,8 @@ class InputDataRepositoryImpl implements InputDataRepository {
 
   @override
   Future<List<RouteModel>> getRouteData() async {
-    List<RouteModel> response = await _remoteRouteProvider.getOperationalRoutes();
+    List<RouteModel> response =
+        await _remoteRouteProvider.getOperationalRoutes();
     return response;
   }
 

@@ -23,70 +23,75 @@ class ReceiptDetailPage extends StatefulWidget {
 }
 
 class _ReceiptDetailPageState extends State<ReceiptDetailPage> {
-  String? source;
-  String? destination;
-  late final ReceiptDetailCubit _receiptDetailCubit;
+  late final ReceiptDetailCubit _cubit;
+  late final RouteInfo _routeInfo;
 
   @override
   void initState() {
     super.initState();
-    _receiptDetailCubit = ReceiptDetailCubit.create();
-    fetchReceiptDetail();
-    _updateRoute(widget.receipt.route);
+    _cubit = ReceiptDetailCubit.create();
+    _routeInfo = RouteInfo.fromString(widget.receipt.route);
+    _fetchReceiptDetail();
   }
 
   @override
-  Future<void> dispose() async {
-    await _receiptDetailCubit.close();
+  void dispose() {
+    _cubit.close();
     super.dispose();
   }
 
-  void fetchReceiptDetail() =>
-      _receiptDetailCubit.fetchReceiptDetail(widget.receipt.id);
-
-  void _updateRoute(String? route) {
-    if (route != null) {
-      List<String> parts = route.split(' - ');
-      source = parts.isNotEmpty ? parts[0] : '';
-      destination = parts.length > 1 ? parts[1] : '';
-    }
-  }
+  Future<void> _fetchReceiptDetail() async =>
+      _cubit.fetchReceiptDetail(widget.receipt.id);
 
   @override
   Widget build(BuildContext context) => BlocProvider.value(
-        value: _receiptDetailCubit,
+        value: _cubit,
         child: Scaffold(
           backgroundColor: Colors.white,
           body: BlocBuilder<ReceiptDetailCubit, ReceiptDetailState>(
-            builder: _buildContent,
+            builder: (context, state) => switch (state) {
+              ReceiptDetailLoading() => const LoadingView(),
+              ReceiptDetailLoaded() => ReceiptDetailView(
+                  detailEntity: state.detailReceiptEntity,
+                  routeInfo: _routeInfo,
+                  receipt: widget.receipt,
+                ),
+              ReceiptDetailError() => ErrorView(message: state.message),
+              _ => const EmptyView(),
+            },
           ),
         ),
       );
-
-  Widget _buildContent(BuildContext context, ReceiptDetailState state) =>
-      switch (state) {
-        ReceiptDetailLoading() => const _LoadingIndicator(),
-        ReceiptDetailLoaded() => _ReceiptDetailContent(
-            detailEntity: state.detailReceiptEntity,
-            source: source,
-            destination: destination,
-            receipt: widget.receipt,
-          ),
-        ReceiptDetailError() => _ErrorView(message: state.message),
-        _ => const _EmptyView(),
-      };
 }
 
-class _LoadingIndicator extends StatelessWidget {
-  const _LoadingIndicator();
+class RouteInfo {
+  const RouteInfo({this.source, this.destination});
+
+  factory RouteInfo.fromString(String? route) {
+    if (route == null) {
+      return const RouteInfo();
+    }
+
+    List<String> parts = route.split(' - ');
+    return RouteInfo(
+      source: parts.isNotEmpty ? parts[0] : null,
+      destination: parts.length > 1 ? parts[1] : null,
+    );
+  }
+  final String? source;
+  final String? destination;
+}
+
+class LoadingView extends StatelessWidget {
+  const LoadingView({super.key});
 
   @override
   Widget build(BuildContext context) =>
       const Center(child: CircularProgressIndicator());
 }
 
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message});
+class ErrorView extends StatelessWidget {
+  const ErrorView({required this.message, super.key});
 
   final String message;
 
@@ -103,8 +108,8 @@ class _ErrorView extends StatelessWidget {
       );
 }
 
-class _EmptyView extends StatelessWidget {
-  const _EmptyView();
+class EmptyView extends StatelessWidget {
+  const EmptyView({super.key});
 
   @override
   Widget build(BuildContext context) => const Center(
@@ -119,24 +124,23 @@ class _EmptyView extends StatelessWidget {
       );
 }
 
-class _ReceiptDetailContent extends StatelessWidget {
-  const _ReceiptDetailContent({
+class ReceiptDetailView extends StatelessWidget {
+  const ReceiptDetailView({
     required this.detailEntity,
-    required this.source,
-    required this.destination,
+    required this.routeInfo,
     required this.receipt,
+    super.key,
   });
 
   final ReceiptDetailEntity detailEntity;
-  final String? source;
-  final String? destination;
+  final RouteInfo routeInfo;
   final ReceiptEntity receipt;
 
   @override
   Widget build(BuildContext context) => SafeArea(
         child: Column(
           children: [
-            const _Header(),
+            const HeaderSection(),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -144,16 +148,15 @@ class _ReceiptDetailContent extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _BranchOfficeCard(),
+                      const BranchOfficeCard(),
                       const SizedBox(height: 16),
-                      _ReceiptInfoCard(
+                      ReceiptInfoCard(
                         detailEntity: detailEntity,
-                        source: source,
-                        destination: destination,
+                        routeInfo: routeInfo,
                       ),
                       const SizedBox(height: 16),
                       const Spacer(),
-                      _ActionButtons(receipt: receipt),
+                      ActionButtons(receipt: receipt),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -165,15 +168,13 @@ class _ReceiptDetailContent extends StatelessWidget {
       );
 }
 
-class _Header extends StatelessWidget {
-  const _Header();
+class HeaderSection extends StatelessWidget {
+  const HeaderSection({super.key});
 
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          color: Constant.primaryBlue,
-        ),
+        decoration: const BoxDecoration(color: Constant.primaryBlue),
         padding: Constant.defaultPadding,
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -211,8 +212,8 @@ class _Header extends StatelessWidget {
       );
 }
 
-class _BranchOfficeCard extends StatelessWidget {
-  const _BranchOfficeCard();
+class BranchOfficeCard extends StatelessWidget {
+  const BranchOfficeCard({super.key});
 
   @override
   Widget build(BuildContext context) => Container(
@@ -229,15 +230,9 @@ class _BranchOfficeCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Kantor Cabang',
-                  style: Constant.titleStyle,
-                ),
+                Text('Kantor Cabang', style: Constant.titleStyle),
                 SizedBox(height: 4),
-                Text(
-                  'Surabaya',
-                  style: Constant.valueStyle,
-                ),
+                Text('Surabaya', style: Constant.valueStyle),
               ],
             ),
           ],
@@ -245,16 +240,15 @@ class _BranchOfficeCard extends StatelessWidget {
       );
 }
 
-class _ReceiptInfoCard extends StatelessWidget {
-  const _ReceiptInfoCard({
+class ReceiptInfoCard extends StatelessWidget {
+  const ReceiptInfoCard({
     required this.detailEntity,
-    required this.source,
-    required this.destination,
+    required this.routeInfo,
+    super.key,
   });
 
   final ReceiptDetailEntity detailEntity;
-  final String? source;
-  final String? destination;
+  final RouteInfo routeInfo;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -288,21 +282,13 @@ class _ReceiptInfoCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Nama Relasi',
-                style: Constant.titleStyle,
-              ),
-              Text(
-                detailEntity.consigneeName,
-                style: Constant.valueStyle,
-              ),
+              const Text('Nama Relasi', style: Constant.titleStyle),
+              Text(detailEntity.consigneeName,
+                  style: Constant.valueStyle,),
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.blue.shade100,
               borderRadius: BorderRadius.circular(Constant.cardBorderRadius),
@@ -318,30 +304,21 @@ class _ReceiptInfoCard extends StatelessWidget {
   Widget _buildDateSection() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Tanggal',
-            style: Constant.titleStyle,
-          ),
-          Text(
-            detailEntity.date,
-            style: Constant.valueStyle,
-          ),
+          const Text('Tanggal', style: Constant.titleStyle),
+          Text(detailEntity.date, style: Constant.valueStyle),
         ],
       );
 
   Widget _buildShipmentDetails() => Row(
         children: [
           Expanded(
-            child: _ShipperConsigneeInfo(
+            child: ShipperConsigneeInfo(
               shipperName: detailEntity.shipperName,
               consigneeName: detailEntity.consigneeName,
             ),
           ),
           Expanded(
-            child: _RouteInfo(
-              source: source,
-              destination: destination,
-            ),
+            child: RouteInfoView(routeInfo: routeInfo),
           ),
         ],
       );
@@ -349,31 +326,20 @@ class _ReceiptInfoCard extends StatelessWidget {
   Widget _buildDocumentNumbers() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'No. Resi',
-            style: Constant.titleStyle,
-          ),
-          Text(
-            detailEntity.receiptNumber,
-            style: Constant.valueStyle,
-          ),
+          const Text('No. Resi', style: Constant.titleStyle),
+          Text(detailEntity.receiptNumber, style: Constant.valueStyle),
           const SizedBox(height: 8),
-          const Text(
-            'No. Surat Jalan',
-            style: Constant.titleStyle,
-          ),
-          Text(
-            detailEntity.passDocument,
-            style: Constant.valueStyle,
-          ),
+          const Text('No. Surat Jalan', style: Constant.titleStyle),
+          Text(detailEntity.passDocument, style: Constant.valueStyle),
         ],
       );
 }
 
-class _ShipperConsigneeInfo extends StatelessWidget {
-  const _ShipperConsigneeInfo({
+class ShipperConsigneeInfo extends StatelessWidget {
+  const ShipperConsigneeInfo({
     required this.shipperName,
     required this.consigneeName,
+    super.key,
   });
 
   final String shipperName;
@@ -383,44 +349,25 @@ class _ShipperConsigneeInfo extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Pengirim',
-            style: Constant.titleStyle,
-          ),
-          Text(
-            shipperName,
-            style: Constant.valueStyle,
-          ),
+          const Text('Pengirim', style: Constant.titleStyle),
+          Text(shipperName, style: Constant.valueStyle),
           const SizedBox(height: 8),
-          const Text(
-            'Penerima',
-            style: Constant.titleStyle,
-          ),
-          Text(
-            consigneeName,
-            style: Constant.valueStyle,
-          ),
+          const Text('Penerima', style: Constant.titleStyle),
+          Text(consigneeName, style: Constant.valueStyle),
         ],
       );
 }
 
-class _RouteInfo extends StatelessWidget {
-  const _RouteInfo({
-    required this.source,
-    required this.destination,
-  });
+class RouteInfoView extends StatelessWidget {
+  const RouteInfoView({required this.routeInfo, super.key});
 
-  final String? source;
-  final String? destination;
+  final RouteInfo routeInfo;
 
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Rute Pengiriman',
-            style: Constant.titleStyle,
-          ),
+          const Text('Rute Pengiriman', style: Constant.titleStyle),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -435,36 +382,43 @@ class _RouteInfo extends StatelessWidget {
                   ),
                 ),
               ),
-              _buildRoutePoints(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RoutePoint(
+                    icon: Icons.circle,
+                    color: Colors.blue,
+                    text: routeInfo.source ?? ' ',
+                  ),
+                  const SizedBox(height: 15),
+                  RoutePoint(
+                    icon: Icons.place,
+                    color: Colors.red,
+                    text: routeInfo.destination ?? '',
+                  ),
+                ],
+              ),
             ],
           ),
         ],
       );
+}
 
-  Widget _buildRoutePoints() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildRoutePoint(
-            icon: Icons.circle,
-            color: Colors.blue,
-            text: source ?? ' ',
-          ),
-          const SizedBox(height: 15),
-          _buildRoutePoint(
-            icon: Icons.place,
-            color: Colors.red,
-            text: destination ?? '',
-          ),
-        ],
-      );
+class RoutePoint extends StatelessWidget {
+  const RoutePoint({
+    required this.icon,
+    required this.color,
+    required this.text,
+    super.key,
+  });
 
-  Widget _buildRoutePoint({
-    required IconData icon,
-    required Color color,
-    required String text,
-  }) =>
-      Row(
+  final IconData icon;
+  final Color color;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Row(
         children: [
           Icon(icon, color: color, size: 12),
           const SizedBox(width: 4),
@@ -473,8 +427,8 @@ class _RouteInfo extends StatelessWidget {
       );
 }
 
-class _ActionButtons extends StatelessWidget {
-  const _ActionButtons({required this.receipt});
+class ActionButtons extends StatelessWidget {
+  const ActionButtons({required this.receipt, super.key});
 
   final ReceiptEntity receipt;
 
@@ -485,9 +439,7 @@ class _ActionButtons extends StatelessWidget {
             child: OutlinedButton(
               onPressed: () => Navigator.pop(context),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                  color: Constant.primaryBlue,
-                ),
+                side: const BorderSide(color: Constant.primaryBlue),
               ),
               child: const Text(
                 'Back to form',
@@ -498,9 +450,8 @@ class _ActionButtons extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: ElevatedButton(
-              onPressed: () async => context.router.replace(
-                PrintRoute(receipt: receipt),
-              ),
+              onPressed: () async =>
+                  context.router.replace(PrintRoute(receipt: receipt)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Constant.primaryBlue,
                 foregroundColor: Colors.white,

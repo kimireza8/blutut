@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 
 import '../../../core/constants/constant.dart';
-import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../models/receipt/receipt_detail_model.dart';
 import '../../models/receipt/receipt_input_model.dart';
 import '../../models/receipt/receipt_model.dart';
