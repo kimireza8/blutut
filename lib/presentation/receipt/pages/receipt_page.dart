@@ -77,7 +77,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
     String cookie =
         serviceLocator<SharedPreferencesService>().getString('cookie') ?? '';
     _receiptBloc.add(
-      FetchOprIncomingReceipts(
+      FetchOperationalIncomingReceipts(
         cookie,
         searchQuery: _searchQuery,
         page: _currentPage,
@@ -439,3 +439,4 @@ class InfoField extends StatelessWidget {
         ],
       );
 }
+

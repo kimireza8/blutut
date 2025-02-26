@@ -16,7 +16,7 @@ class RemoteRelationProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<RelationModel>> getOprRelations() async =>
+  Future<List<RelationModel>> getOperationalRelations() async =>
       _executeRequest<List<RelationModel>>(
         () async {
           String? cookie =

@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import '../../../core/constants/constant.dart';
 import '../../../domain/entities/receipt/receipt_input_entity.dart';
 import '../../models/receipt/receipt_detail_model.dart';
+import '../../models/receipt/receipt_input_model.dart';
 import '../../models/receipt/receipt_model.dart';
 
 class RemoteReceiptProvider {
@@ -15,7 +16,7 @@ class RemoteReceiptProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<ReceiptModel>> getOprIncomingReceipts(
+  Future<List<ReceiptModel>> getOperationalIncomingReceipts(
     String cookie, {
     String? searchQuery,
     int? page,
@@ -55,6 +56,7 @@ class RemoteReceiptProvider {
         },
         'fetch incoming receipts',
       );
+
   Future<ReceiptDetailModel> getDetailprOutgoingReceipts(
     String cookie,
     String id,
@@ -90,6 +92,96 @@ class RemoteReceiptProvider {
         },
         'fetch receipt detail',
       );
+
+  Future<void> createReceipt(String cookie, ReceiptInputModel receipt) async {
+    await _executeReceiptRequest<void>(
+      () async {
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
+        Map<String, String> headers = {
+          'Cookie': 'siklonsession=$cookie',
+          ..._defaultHeaders,
+        };
+
+        Map<String, dynamic> requestData = {
+          '_json': jsonEncode({
+            'oprincomingreceipt_branch': receipt.branch,
+            'oprincomingreceipt_date': receipt.date,
+            'oprincomingreceipt_incomingdate': receipt.incomingDate,
+            'oprincomingreceipt_oprcustomer': receipt.customer,
+            'oprincomingreceipt_oprcustomerrole': receipt.customerRole,
+            'oprincomingreceipt_shippername': receipt.shipperName,
+            'oprincomingreceipt_shipperaddress': receipt.shipperAddress,
+            'oprincomingreceipt_shipperphone': receipt.shipperPhone,
+            'oprincomingreceipt_consigneename': receipt.consigneeName,
+            'oprincomingreceipt_consigneeaddress': receipt.consigneeAddress,
+            'oprincomingreceipt_consigneecity': receipt.consigneeCity,
+            'oprincomingreceipt_consigneephone': receipt.consigneePhone,
+            'oprincomingreceipt_receiptnumber': receipt.receiptNumber,
+            'oprincomingreceipt_passdocument': receipt.passDocument,
+            'oprincomingreceipt_oprkindofservice': receipt.serviceType,
+            'oprincomingreceipt_oprroute': receipt.route,
+            'oprincomingreceipt_totalcollies': receipt.totalCollies,
+          }),
+        };
+
+        Response response = await _dio.post(
+          'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/insert.mod?_dc=$timestamp',
+          data: requestData,
+          options: Options(headers: headers),
+        );
+
+        if (!_isSuccessResponse(response)) {
+          throw Exception('Failed to create receipt: ${response.statusCode}');
+        }
+      },
+      'create receipt',
+    );
+  }
+
+  Future<void> updateReceipt(String cookie, ReceiptDetailModel receipt) async {
+    await _executeReceiptRequest<void>(
+      () async {
+        int timestamp = DateTime.now().millisecondsSinceEpoch;
+        Map<String, String> headers = {
+          'Cookie': 'siklonsession=$cookie',
+          ..._defaultHeaders,
+        };
+
+        Map<String, dynamic> requestData = {
+          '_json': jsonEncode({
+            'oprincomingreceipt_branch': receipt.branch,
+            'oprincomingreceipt_date': receipt.date,
+            'oprincomingreceipt_incomingdate': receipt.incomingDate,
+            'oprincomingreceipt_oprcustomer': receipt.customer,
+            'oprincomingreceipt_oprcustomerrole': receipt.customerRole,
+            'oprincomingreceipt_shippername': receipt.shipperName,
+            'oprincomingreceipt_shipperaddress': receipt.shipperAddress,
+            'oprincomingreceipt_shipperphone': receipt.shipperPhone,
+            'oprincomingreceipt_consigneename': receipt.consigneeName,
+            'oprincomingreceipt_consigneeaddress': receipt.consigneeAddress,
+            'oprincomingreceipt_consigneecity': receipt.consigneeCity,
+            'oprincomingreceipt_consigneephone': receipt.consigneePhone,
+            'oprincomingreceipt_receiptnumber': receipt.receiptNumber,
+            'oprincomingreceipt_passdocument': receipt.passDocument,
+            'oprincomingreceipt_oprkindofservice': receipt.serviceType,
+            'oprincomingreceipt_oprroute': receipt.route,
+            'oprincomingreceipt_totalcollies': receipt.totalCollies,
+          }),
+        };
+
+        Response response = await _dio.post(
+          'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/insert.mod?_dc=$timestamp&primary_key=${receipt.id}',
+          data: requestData,
+          options: Options(headers: headers),
+        );
+
+        if (!_isSuccessResponse(response)) {
+          throw Exception('Failed to create receipt: ${response.statusCode}');
+        }
+      },
+      'create receipt',
+    );
+  }
 
   Future<T> _executeReceiptRequest<T>(
     Future<T> Function() request,
@@ -181,50 +273,5 @@ class RemoteReceiptProvider {
       requestData['filter'] = null;
     }
     return requestData;
-  }
-
-  Future<void> createReceipt(String cookie, ReceiptInputEntity receipt) async {
-    await _executeReceiptRequest<void>(
-      () async {
-        int timestamp = DateTime.now().millisecondsSinceEpoch;
-        Map<String, String> headers = {
-          'Cookie': 'siklonsession=$cookie',
-          ..._defaultHeaders,
-        };
-
-        Map<String, dynamic> requestData = {
-          '_json': jsonEncode({
-            'oprincomingreceipt_branch': receipt.branch,
-            'oprincomingreceipt_date': receipt.date,
-            'oprincomingreceipt_incomingdate': receipt.incomingDate,
-            'oprincomingreceipt_oprcustomer': receipt.customer,
-            'oprincomingreceipt_oprcustomerrole': receipt.customerRole,
-            'oprincomingreceipt_shippername': receipt.shipperName,
-            'oprincomingreceipt_shipperaddress': receipt.shipperAddress,
-            'oprincomingreceipt_shipperphone': receipt.shipperPhone,
-            'oprincomingreceipt_consigneename': receipt.consigneeName,
-            'oprincomingreceipt_consigneeaddress': receipt.consigneeAddress,
-            'oprincomingreceipt_consigneecity': receipt.consigneeCity,
-            'oprincomingreceipt_consigneephone': receipt.consigneePhone,
-            'oprincomingreceipt_receiptnumber': receipt.receiptNumber,
-            'oprincomingreceipt_passdocument': receipt.passDocument,
-            'oprincomingreceipt_oprkindofservice': receipt.kindOfService,
-            'oprincomingreceipt_oprroute': receipt.route,
-            'oprincomingreceipt_totalcollies': receipt.totalCollies,
-          }),
-        };
-
-        Response response = await _dio.post(
-          'https://app.ptmakassartrans.com/index.php/oprincomingreceiptmobile/insert.mod?_dc=$timestamp',
-          data: requestData,
-          options: Options(headers: headers),
-        );
-
-        if (!_isSuccessResponse(response)) {
-          throw Exception('Failed to create receipt: ${response.statusCode}');
-        }
-      },
-      'create receipt',
-    );
   }
 }

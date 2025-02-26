@@ -5,8 +5,7 @@ import 'core/router/app_router.dart';
 import 'core/services/hive_service.dart';
 import 'dependency_injections.dart';
 import 'presentation/auth/cubit/auth_cubit.dart';
-import 'presentation/input/cubit/input_cubit.dart';
-import 'presentation/print/cubit/print_cubit.dart';
+import 'presentation/receipt_detail/cubit/receipt_detail_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +32,9 @@ class MyApp extends StatelessWidget {
   List<BlocProvider> _getBlocProviders(BuildContext context) => [
         BlocProvider<AuthCubit>(
           create: (context) => AuthCubit.create(),
+        ),
+        BlocProvider<ReceiptDetailCubit>(
+          create: (context) => ReceiptDetailCubit.create(),
         ),
       ];
 }

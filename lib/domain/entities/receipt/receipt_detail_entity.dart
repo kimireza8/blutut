@@ -9,6 +9,7 @@ class ReceiptDetailEntity {
     required this.consigneePhone,
     required this.date,
     required this.incomingDate,
+    required this.month,
     required this.number,
     required this.customer,
     required this.customerRole,
@@ -24,7 +25,13 @@ class ReceiptDetailEntity {
     required this.totalCollies,
     required this.year,
     this.shipperPhone,
+    this.contents,
+    this.termsOfPayment,
+    this.notifyPartyAddress,
+    this.notifyPartyName,
+    this.notifyPartyPhone,
   });
+
   final String id;
   final String barcode;
   final String branch;
@@ -34,6 +41,7 @@ class ReceiptDetailEntity {
   final String consigneePhone;
   final String date;
   final String incomingDate;
+  final String month;
   final String number;
   final String customer;
   final String customerRole;
@@ -49,4 +57,9 @@ class ReceiptDetailEntity {
   final String? shipperPhone;
   final String totalCollies;
   final String year;
+  final String? contents;
+  final String? termsOfPayment;
+  final String? notifyPartyAddress;
+  final String? notifyPartyName;
+  final String? notifyPartyPhone;
 }

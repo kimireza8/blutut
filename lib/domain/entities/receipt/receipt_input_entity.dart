@@ -14,7 +14,7 @@ class ReceiptInputEntity {
     required this.consigneePhone,
     required this.receiptNumber,
     required this.passDocument,
-    required this.kindOfService,
+    required this.serviceType,
     required this.route,
     required this.totalCollies,
   });
@@ -32,7 +32,7 @@ class ReceiptInputEntity {
   final String consigneePhone;
   final String receiptNumber;
   final String passDocument;
-  final String kindOfService;
+  final String serviceType;
   final String route;
   final String totalCollies;
 }

@@ -1,5 +1,5 @@
-class KindOfServiceEntity {
-  KindOfServiceEntity({
+class ServiceTypeEntity {
+  ServiceTypeEntity({
     required this.id,
     required this.code,
     required this.name,

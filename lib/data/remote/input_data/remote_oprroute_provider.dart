@@ -8,14 +8,14 @@ import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
 import '../../models/input_data/route_model.dart';
 
-class RemoteOprRouteProvider {
-  const RemoteOprRouteProvider({required Dio dio}) : _dio = dio;
+class RemoteOperationalRouteProvider {
+  const RemoteOperationalRouteProvider({required Dio dio}) : _dio = dio;
   final Dio _dio;
   static final Map<String, String> _defaultHeaders = {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<RouteModel>> getOprRoutes() async =>
+  Future<List<RouteModel>> getOperationalRoutes() async =>
       _executeRequest<List<RouteModel>>(
         () async {
           int timestamp = DateTime.now().millisecondsSinceEpoch;

@@ -10,7 +10,7 @@ class ReceiptFetchUsecase {
     String? searchQuery,
     int? page,
   }) async =>
-      _receiptRepository.getOprIncomingReceipts(
+      _receiptRepository.getOperationalIncomingReceipts(
         token,
         searchQuery: searchQuery,
         page: page,

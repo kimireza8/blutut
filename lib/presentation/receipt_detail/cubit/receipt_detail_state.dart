@@ -20,6 +20,30 @@ class ReceiptDetailLoaded extends ReceiptDetailState {
   List<Object> get props => [detailReceiptEntity];
 }
 
+class ReceiptDetailDataLoaded extends ReceiptDetailState {
+  const ReceiptDetailDataLoaded(
+    this.route,
+    this.relation,
+    this.city,
+    this.organization,
+    this.serviceType,
+  );
+  final List<RouteEntity> route;
+  final List<RelationEntity> relation;
+  final List<ConsigneeCityEntity> city;
+  final List<OrganizationEntity> organization;
+  final List<ServiceTypeEntity> serviceType;
+
+  @override
+  List<Object> get props => [
+        route,
+        relation,
+        city,
+        organization,
+        serviceType,
+      ];
+}
+
 class ReceiptDetailError extends ReceiptDetailState {
   const ReceiptDetailError(this.message);
   final String message;

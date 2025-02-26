@@ -6,17 +6,17 @@ import 'package:dio/dio.dart';
 import '../../../core/constants/constant.dart';
 import '../../../core/services/shared_preferences_service.dart';
 import '../../../dependency_injections.dart';
-import '../../models/input_data/kind_of_service_model.dart';
+import '../../models/input_data/service_type_model.dart';
 
-class RemoteKindofServiceProvider {
-  const RemoteKindofServiceProvider({required Dio dio}) : _dio = dio;
+class RemoteServiceTypeProvider {
+  const RemoteServiceTypeProvider({required Dio dio}) : _dio = dio;
   final Dio _dio;
   static final Map<String, String> _defaultHeaders = {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<KindOfServiceModel>> getKindofServices() async =>
-      _executeRequest<List<KindOfServiceModel>>(
+  Future<List<ServiceTypeModel>> getServiceType() async =>
+      _executeRequest<List<ServiceTypeModel>>(
         () async {
           int timestamp = DateTime.now().millisecondsSinceEpoch;
           String? cookie =
@@ -46,11 +46,11 @@ class RemoteKindofServiceProvider {
           return rows
               .map(
                 (json) =>
-                    KindOfServiceModel.fromJson(json as Map<String, dynamic>),
+                    ServiceTypeModel.fromJson(json as Map<String, dynamic>),
               )
               .toList();
         },
-        'fetch opr kind of service',
+        'fetch operation service type',
       );
 
   Future<T> _executeRequest<T>(

@@ -21,7 +21,7 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
         _hiveService = hiveService,
         _receiptCreateUsecase = receiptCreateUsecase,
         super(ReceiptInitial()) {
-    on<FetchOprIncomingReceipts>(_onFetchOprIncomingReceipts);
+    on<FetchOperationalIncomingReceipts>(_onFetchOperationalIncomingReceipts);
     on<CreateReceipt>(_onCreateReceipt);
   }
 
@@ -35,8 +35,8 @@ class ReceiptBloc extends Bloc<ReceiptEvent, ReceiptState> {
   final HiveService _hiveService;
   final ReceiptCreateUsecase _receiptCreateUsecase;
 
-  Future<void> _onFetchOprIncomingReceipts(
-    FetchOprIncomingReceipts event,
+  Future<void> _onFetchOperationalIncomingReceipts(
+    FetchOperationalIncomingReceipts event,
     Emitter<ReceiptState> emit,
   ) async {
     emit(ReceiptLoading());

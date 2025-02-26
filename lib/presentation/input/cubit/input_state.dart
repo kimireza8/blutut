@@ -17,13 +17,13 @@ final class InputLoaded extends InputState {
     this.relation,
     this.city,
     this.organization,
-    this.kindOfService,
+    this.serviceType,
   );
   final List<RouteEntity> route;
   final List<RelationEntity> relation;
   final List<ConsigneeCityEntity> city;
   final List<OrganizationEntity> organization;
-  final List<KindOfServiceEntity> kindOfService;
+  final List<ServiceTypeEntity> serviceType;
 
   @override
   List<Object> get props => [
@@ -31,7 +31,7 @@ final class InputLoaded extends InputState {
         relation,
         city,
         organization,
-        kindOfService,
+        serviceType,
       ];
 }
 

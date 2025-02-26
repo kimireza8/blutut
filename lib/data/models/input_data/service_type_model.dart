@@ -1,7 +1,7 @@
-import '../../../domain/entities/input_data/kind_of_service_entity.dart';
+import '../../../domain/entities/input_data/service_type_entity.dart';
 
-class KindOfServiceModel extends KindOfServiceEntity {
-  KindOfServiceModel({
+class ServiceTypeModel extends ServiceTypeEntity {
+  ServiceTypeModel({
     required super.id,
     required super.code,
     required super.name,
@@ -9,8 +9,8 @@ class KindOfServiceModel extends KindOfServiceEntity {
     required super.isActive,
   });
 
-  factory KindOfServiceModel.fromJson(Map<String, dynamic> json) =>
-      KindOfServiceModel(
+  factory ServiceTypeModel.fromJson(Map<String, dynamic> json) =>
+      ServiceTypeModel(
         id: json['oprkindofservice_id'] as String? ?? '',
         code: json['oprkindofservice_code'] as String? ?? '',
         name: json['oprkindofservice_name'] as String? ?? '',

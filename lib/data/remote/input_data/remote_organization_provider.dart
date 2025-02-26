@@ -16,7 +16,7 @@ class RemoteOrganizationProvider {
     'Content-Type': 'application/x-www-form-urlencoded',
   };
 
-  Future<List<OrganizationModel>> getOprOrganizations() async =>
+  Future<List<OrganizationModel>> getOperationalOrganizations() async =>
       _executeRequest<List<OrganizationModel>>(
         () async {
           int timestamp = DateTime.now().millisecondsSinceEpoch;

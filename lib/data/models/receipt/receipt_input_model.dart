@@ -16,7 +16,7 @@ class ReceiptInputModel extends ReceiptInputEntity {
     required super.consigneePhone,
     required super.receiptNumber,
     required super.passDocument,
-    required super.kindOfService,
+    required super.serviceType,
     required super.route,
     required super.totalCollies,
   });
@@ -43,7 +43,7 @@ class ReceiptInputModel extends ReceiptInputEntity {
         receiptNumber:
             json['oprincomingreceipt_receiptnumber'] as String? ?? '',
         passDocument: json['oprincomingreceipt_passdocument'] as String? ?? '',
-        kindOfService:
+        serviceType:
             json['oprincomingreceipt_oprkindofservice'] as String? ?? '',
         route: json['oprincomingreceipt_oprroute'] as String? ?? '',
         totalCollies: json['oprincomingreceipt_totalcollies'] as String? ?? '',

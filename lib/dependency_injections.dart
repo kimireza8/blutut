@@ -7,7 +7,7 @@ import 'core/services/hive_service.dart';
 import 'core/services/shared_preferences_service.dart';
 import 'data/remote/auth/remote_auth_provider.dart';
 import 'data/remote/input_data/remote_city_provider.dart';
-import 'data/remote/input_data/remote_kind_of_service_provider.dart';
+import 'data/remote/input_data/remote_service_type_provider.dart';
 import 'data/remote/input_data/remote_oprroute_provider.dart';
 import 'data/remote/input_data/remote_organization_provider.dart';
 import 'data/remote/input_data/remote_relation_provider.dart';
@@ -24,7 +24,7 @@ import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/auth/login_usecase.dart';
 import 'domain/usecases/auth/logout_usecase.dart';
 import 'domain/usecases/input_data/city_fetch_usecase.dart';
-import 'domain/usecases/input_data/kind_of_service_fetch_usecase.dart';
+import 'domain/usecases/input_data/service_type_fetch_usecase.dart';
 import 'domain/usecases/input_data/organization_fetch_usecase.dart';
 import 'domain/usecases/input_data/relation_fetch_usecase.dart';
 import 'domain/usecases/input_data/route_fetch_usecase.dart';
@@ -99,8 +99,8 @@ void _initializeProviders() {
     ..registerFactory<RemoteRelationProvider>(
       () => RemoteRelationProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerFactory<RemoteOprRouteProvider>(
-      () => RemoteOprRouteProvider(dio: serviceLocator<Dio>()),
+    ..registerFactory<RemoteOperationalRouteProvider>(
+      () => RemoteOperationalRouteProvider(dio: serviceLocator<Dio>()),
     )
     ..registerFactory<RemoteCityProvider>(
       () => RemoteCityProvider(dio: serviceLocator<Dio>()),
@@ -108,8 +108,8 @@ void _initializeProviders() {
     ..registerFactory<RemoteOrganizationProvider>(
       () => RemoteOrganizationProvider(dio: serviceLocator<Dio>()),
     )
-    ..registerFactory<RemoteKindofServiceProvider>(
-      () => RemoteKindofServiceProvider(dio: serviceLocator<Dio>()),
+    ..registerFactory<RemoteServiceTypeProvider>(
+      () => RemoteServiceTypeProvider(dio: serviceLocator<Dio>()),
     );
 }
 
@@ -132,13 +132,13 @@ void _initializeRepositories() {
     )
     ..registerLazySingleton<InputDataRepository>(
       () => InputDataRepositoryImpl(
-        remoteRelationProvide: serviceLocator<RemoteRelationProvider>(),
-        remoteRouteProvider: serviceLocator<RemoteOprRouteProvider>(),
+        remoteRelationProvider: serviceLocator<RemoteRelationProvider>(),
+        remoteRouteProvider: serviceLocator<RemoteOperationalRouteProvider>(),
         remoteOrganizationProvider:
             serviceLocator<RemoteOrganizationProvider>(),
         remoteCityProvider: serviceLocator<RemoteCityProvider>(),
-        remoteKindofServiceProvider:
-            serviceLocator<RemoteKindofServiceProvider>(),
+        remoteServiceTypeProvider:
+            serviceLocator<RemoteServiceTypeProvider>(),
       ),
     );
 }
@@ -196,7 +196,7 @@ void _initializeUsecases() {
       ),
     )
     ..registerLazySingleton(
-      () => KindofServiceFetchUsecase(
+      () => ServiceTypeFetchUsecase(
         serviceLocator<InputDataRepository>(),
       ),
     );
