@@ -20,7 +20,8 @@
 - [x] Membuat provider, repo, model, entity, untuk data pelayanan (Done)
 - [x] Refactor cubit & halaman receipt detail. (Done)
 - [x] Refactor cubit & widget profile. (Done)
-- [ ] Membuat halaman edit. (Ongoing)
+- [x] Membuat halaman edit. (Done)
+- [ ] Consume Update API di halaman edit. (Ongoing)
 - [ ] Memperbaiki bug di halaman print, di mana setelah print langsung terputus dengan printer. (Ongoing)
 
 ### **Kimi**
