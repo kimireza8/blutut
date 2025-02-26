@@ -9,25 +9,29 @@ import '../../../domain/entities/input_data/organization_entity.dart';
 import '../../../domain/entities/input_data/relation_entity.dart';
 import '../../../domain/entities/input_data/route_entity.dart';
 import '../../../domain/entities/input_data/service_type_entity.dart';
-import '../../../domain/entities/receipt/receipt_input_entity.dart';
-import '../../receipt/bloc/receipt_bloc.dart';
-import '../cubit/input_cubit.dart';
-import 'custom_dialog_dropdown.dart';
+import '../../../domain/entities/receipt/receipt_detail_entity.dart';
+import '../../input/pages/custom_dialog_dropdown.dart';
+import '../cubit/receipt_edit_cubit.dart';
 
 @RoutePage()
-class InputPage extends StatefulWidget {
-  const InputPage({super.key});
+class ReceiptEditPage extends StatefulWidget {
+  const ReceiptEditPage({
+    required this.receipt,
+    super.key,
+  });
+
+  final ReceiptDetailEntity receipt;
 
   @override
-  State<InputPage> createState() => _InputPageState();
+  State<ReceiptEditPage> createState() => _ReceiptEditPageState();
 }
 
-class _InputPageState extends State<InputPage> {
+class _ReceiptEditPageState extends State<ReceiptEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _formControllers = ReceiptFormControllers();
   final _formValues = ReceiptFormValues();
 
-  late final InputCubit _inputCubit;
+  late final ReceiptEditCubit _receiptEditCubit;
 
   @override
   void initState() {
@@ -36,16 +40,86 @@ class _InputPageState extends State<InputPage> {
   }
 
   void _fetchData() {
-    _inputCubit = InputCubit.create();
-    _inputCubit.fetchData();
+    _receiptEditCubit = ReceiptEditCubit.create();
+    _receiptEditCubit.fetchReferenceData();
   }
 
   @override
   void dispose() {
     _formControllers.dispose();
-    _inputCubit.close();
+    _receiptEditCubit.close();
     super.dispose();
   }
+
+  void _initializeFormValues() {
+    ReceiptDetailEntity receipt = widget.receipt;
+
+    _formControllers.setValues(
+      receiptNumber: receipt.receiptNumber,
+      passDocument: receipt.passDocument,
+      totalCollies: receipt.totalCollies,
+      shipperName: receipt.shipperName,
+      consigneeName: receipt.consigneeName,
+      shipperAddress: receipt.shipperAddress,
+      consigneeAddress: receipt.consigneeAddress,
+      shipperPhone: receipt.shipperPhone ?? '',
+      consigneePhone: receipt.consigneePhone,
+    );
+
+    ReceiptEditState state = _receiptEditCubit.state;
+    if (state is ReceiptReferenceDataLoaded) {
+      String? serviceTypeName;
+      if (receipt.serviceType.isNotEmpty) {
+        ServiceTypeEntity serviceType = state.serviceTypes.firstWhere(
+          (s) => s.id == receipt.serviceType,
+        );
+        serviceTypeName = serviceType.name.isNotEmpty ? serviceType.name : null;
+      }
+
+      List<RouteEntity> filteredRoutes = state.routes
+          .where(
+            (route) =>
+                serviceTypeName == null || route.serviceType == serviceTypeName,
+          )
+          .toList();
+
+      String? validRoute = receipt.route;
+      if (receipt.route.isNotEmpty && filteredRoutes.isNotEmpty) {
+        bool routeExists = filteredRoutes.any((r) => r.id == receipt.route);
+        if (!routeExists) {
+          validRoute = null;
+        }
+      }
+
+      setState(() {
+        _formValues
+          ..branchOffice = receipt.branch
+          ..relation = receipt.customer
+          ..relationAs = receipt.customerRole
+          ..city = receipt.consigneeCity
+          ..serviceType = receipt.serviceType
+          ..serviceTypeName = serviceTypeName
+          ..route = validRoute
+          ..dateSend = _parseDate(receipt.date)
+          ..dateReceive = _parseDate(receipt.incomingDate);
+      });
+    } else {
+      setState(() {
+        _formValues
+          ..branchOffice = receipt.branch
+          ..relation = receipt.customer
+          ..relationAs = receipt.customerRole
+          ..city = receipt.consigneeCity
+          ..serviceType = receipt.serviceType
+          ..route = receipt.route
+          ..dateSend = _parseDate(receipt.date)
+          ..dateReceive = _parseDate(receipt.incomingDate);
+      });
+    }
+  }
+
+  DateTime? _parseDate(String dateString) =>
+      dateString.isNotEmpty ? DateTime.parse(dateString) : null;
 
   Future<void> _selectDate(BuildContext context, DateType dateType) async {
     DateTime? picked = await showDatePicker(
@@ -77,29 +151,29 @@ class _InputPageState extends State<InputPage> {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
-      var receiptInput = ReceiptInputEntity(
-        branch: _formValues.branchOffice ?? '',
-        date: _formatDate(_formValues.dateSend),
-        incomingDate: _formatDate(_formValues.dateReceive),
-        customer: _formValues.relation ?? '',
-        customerRole: _formValues.relationAs ?? '',
-        shipperName: _formControllers.sender.text,
-        shipperAddress: _formControllers.senderAddress.text,
-        shipperPhone: _formControllers.senderHp.text,
-        consigneeName: _formControllers.receiver.text,
-        consigneeAddress: _formControllers.receiverAddress.text,
-        consigneeCity: _formValues.city ?? '',
-        consigneePhone: _formControllers.receiverHp.text,
-        receiptNumber: _formControllers.receiptNumber.text,
-        passDocument: _formControllers.deliveryNote.text,
-        serviceType: _formValues.serviceType ?? '',
-        route: _formValues.route ?? '',
-        totalCollies: _formControllers.colli.text,
-      );
+      // var receiptEdit = ReceiptDetailEntity(
+      //   branch: _formValues.branchOffice ?? '',
+      //   date: _formatDate(_formValues.dateSend),
+      //   incomingDate: _formatDate(_formValues.dateReceive),
+      //   customer: _formValues.relation ?? '',
+      //   customerRole: _formValues.relationAs ?? '',
+      //   shipperName: _formControllers.sender.text,
+      //   shipperAddress: _formControllers.senderAddress.text,
+      //   shipperPhone: _formControllers.senderHp.text,
+      //   consigneeName: _formControllers.receiver.text,
+      //   consigneeAddress: _formControllers.receiverAddress.text,
+      //   consigneeCity: _formValues.city ?? '',
+      //   consigneePhone: _formControllers.receiverHp.text,
+      //   receiptNumber: _formControllers.receiptNumber.text,
+      //   passDocument: _formControllers.deliveryNote.text,
+      //   serviceType: _formValues.serviceType ?? '',
+      //   route: _formValues.route ?? '',
+      //   totalCollies: _formControllers.colli.text,
+      // );
 
-      String cookie =
-          serviceLocator<SharedPreferencesService>().getCookie() ?? '';
-      context.read<ReceiptBloc>().add(CreateReceipt(cookie, receiptInput));
+      // String cookie =
+      //     serviceLocator<SharedPreferencesService>().getCookie() ?? '';
+      
       await context.router.maybePop();
     }
   }
@@ -109,37 +183,47 @@ class _InputPageState extends State<InputPage> {
 
   @override
   Widget build(BuildContext context) => BlocProvider.value(
-        value: _inputCubit,
-        child: Scaffold(
-          body: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        const ReceiptHeaderSection(),
-                        Expanded(
-                          child: BlocBuilder<InputCubit, InputState>(
-                            builder: (context, state) {
-                              if (state is InputLoading) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else if (state is InputLoaded) {
-                                return _buildForm(state);
-                              } else {
-                                return const Center(
-                                  child: Text('Gagal memuat data'),
-                                );
-                              }
-                            },
+        value: _receiptEditCubit,
+        child: BlocListener<ReceiptEditCubit, ReceiptEditState>(
+          listener: (context, state) {
+            if (state is ReceiptReferenceDataLoaded) {
+              _initializeFormValues();
+            }
+          },
+          child: Scaffold(
+            body: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        children: [
+                          const ReceiptHeaderSection(),
+                          Expanded(
+                            child:
+                                BlocBuilder<ReceiptEditCubit, ReceiptEditState>(
+                              builder: (context, state) {
+                                if (state is ReceiptEditLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (state
+                                    is ReceiptReferenceDataLoaded) {
+                                  return _buildForm(state);
+                                } else {
+                                  return const Center(
+                                    child: Text('Gagal memuat data'),
+                                  );
+                                }
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -149,7 +233,7 @@ class _InputPageState extends State<InputPage> {
         ),
       );
 
-  Widget _buildForm(InputLoaded state) => Padding(
+  Widget _buildForm(ReceiptReferenceDataLoaded state) => Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
@@ -158,7 +242,7 @@ class _InputPageState extends State<InputPage> {
             children: [
               _buildDropdownBranchOffice(
                 'Kantor Cabang',
-                state.organization,
+                state.organizations,
                 _formValues.branchOffice,
                 (value) => setState(() => _formValues.branchOffice = value),
               ),
@@ -176,7 +260,7 @@ class _InputPageState extends State<InputPage> {
               ),
               _buildDropdownCustom<RelationEntity>(
                 'Nama Relasi',
-                state.relation,
+                state.relations,
                 _formValues.relation,
                 (value) => setState(() => _formValues.relation = value),
                 (relation) => relation.name,
@@ -213,7 +297,7 @@ class _InputPageState extends State<InputPage> {
               ),
               _buildDropdownCustom<ConsigneeCityEntity>(
                 'Kota Tujuan',
-                state.city,
+                state.cities,
                 _formValues.city,
                 (value) => setState(() => _formValues.city = value),
                 (city) => city.name,
@@ -231,14 +315,14 @@ class _InputPageState extends State<InputPage> {
               ),
               _buildDropdownCustom<ServiceTypeEntity>(
                 'Jenis Pelayanan',
-                state.serviceType,
+                state.serviceTypes,
                 _formValues.serviceType,
                 (value) {
                   setState(() {
                     _formValues
                       ..serviceType = value
                       ..serviceTypeName = value != null
-                          ? state.serviceType
+                          ? state.serviceTypes
                               .firstWhere(
                                 (s) => s.id == value,
                               )
@@ -254,7 +338,7 @@ class _InputPageState extends State<InputPage> {
               ),
               _buildDropdownCustom<RouteEntity>(
                 'Rute Pengiriman',
-                state.route
+                state.routes
                     .where(
                       (route) =>
                           _formValues.serviceTypeName == null ||
@@ -286,7 +370,7 @@ class _InputPageState extends State<InputPage> {
                   ),
                   const SizedBox(width: 8),
                   _buildElevatedButton(
-                    'Next',
+                    'Update',
                     const Color.fromRGBO(29, 79, 215, 1),
                     _submitForm,
                   ),
@@ -465,7 +549,7 @@ class _InputPageState extends State<InputPage> {
               children: [
                 Text(
                   _getDisplayTextForDropdown(
-                      selectedValue, options, getLabel, getValue, label),
+                      selectedValue, options, getLabel, getValue, label,),
                 ),
                 const Icon(Icons.arrow_drop_down),
               ],
@@ -547,6 +631,28 @@ class ReceiptFormControllers {
   final senderHp = TextEditingController();
   final receiverHp = TextEditingController();
 
+  void setValues({
+    required String receiptNumber,
+    required String passDocument,
+    required String totalCollies,
+    required String shipperName,
+    required String consigneeName,
+    required String shipperAddress,
+    required String consigneeAddress,
+    required String shipperPhone,
+    required String consigneePhone,
+  }) {
+    this.receiptNumber.text = receiptNumber;
+    deliveryNote.text = passDocument;
+    colli.text = totalCollies;
+    sender.text = shipperName;
+    receiver.text = consigneeName;
+    senderAddress.text = shipperAddress;
+    receiverAddress.text = consigneeAddress;
+    senderHp.text = shipperPhone;
+    receiverHp.text = consigneePhone;
+  }
+
   void clear() {
     colli.clear();
     sender.clear();
@@ -613,7 +719,7 @@ class ReceiptHeaderSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Form',
+                    'Edit Form',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -628,11 +734,6 @@ class ReceiptHeaderSection extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              Icon(
-                Icons.article,
-                color: Colors.white,
-                size: 30,
               ),
             ],
           ),

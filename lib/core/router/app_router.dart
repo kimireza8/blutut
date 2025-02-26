@@ -30,7 +30,7 @@ class AppRouter extends $AppRouter {
           guards: [AuthenticatedGuard()],
         ),
         AutoRoute(
-          page: EditReceiptDetailRoute.page,
+          page: ReceiptEditRoute.page,
           guards: [AuthenticatedGuard()],
           path: '/edit/:receipt',
         ),

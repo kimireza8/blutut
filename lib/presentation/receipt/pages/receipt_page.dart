@@ -43,8 +43,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   @override
-  Future<void> dispose() async {
-    await _receiptBloc.close();
+  void dispose() {
+    _receiptBloc.close();
     _scrollController.dispose();
     _debounce?.cancel();
     super.dispose();

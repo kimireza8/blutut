@@ -23,29 +23,29 @@ class ReceiptDetailPage extends StatefulWidget {
 }
 
 class _ReceiptDetailPageState extends State<ReceiptDetailPage> {
-  late final ReceiptDetailCubit _cubit;
+  late final ReceiptDetailCubit _receiptDetailCubit;
   late final RouteInfo _routeInfo;
 
   @override
   void initState() {
     super.initState();
-    _cubit = ReceiptDetailCubit.create();
+    _receiptDetailCubit = ReceiptDetailCubit.create();
     _routeInfo = RouteInfo.fromString(widget.receipt.route);
     _fetchReceiptDetail();
   }
 
   @override
   void dispose() {
-    _cubit.close();
+    _receiptDetailCubit.close();
     super.dispose();
   }
 
   Future<void> _fetchReceiptDetail() async =>
-      _cubit.fetchReceiptDetail(widget.receipt.id);
+      _receiptDetailCubit.fetchReceiptDetail(widget.receipt.id);
 
   @override
   Widget build(BuildContext context) => BlocProvider.value(
-        value: _cubit,
+        value: _receiptDetailCubit,
         child: Scaffold(
           backgroundColor: Colors.white,
           body: BlocBuilder<ReceiptDetailCubit, ReceiptDetailState>(
@@ -140,7 +140,9 @@ class ReceiptDetailView extends StatelessWidget {
   Widget build(BuildContext context) => SafeArea(
         child: Column(
           children: [
-            const HeaderSection(),
+            HeaderSection(
+              detailEntity: detailEntity,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -169,17 +171,22 @@ class ReceiptDetailView extends StatelessWidget {
 }
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  const HeaderSection({
+    required this.detailEntity,
+    super.key,
+  });
+
+  final ReceiptDetailEntity detailEntity;
 
   @override
   Widget build(BuildContext context) => Container(
         width: double.infinity,
         decoration: const BoxDecoration(color: Constant.primaryBlue),
         padding: Constant.defaultPadding,
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
+            const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -202,10 +209,14 @@ class HeaderSection extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.article,
-              color: Colors.white,
-              size: 30,
+            IconButton(
+              onPressed: () =>
+                  context.router.push(ReceiptEditRoute(receipt: detailEntity)),
+              icon: const Icon(
+                Icons.edit_note,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
           ],
         ),
@@ -283,8 +294,10 @@ class ReceiptInfoCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Nama Relasi', style: Constant.titleStyle),
-              Text(detailEntity.consigneeName,
-                  style: Constant.valueStyle,),
+              Text(
+                detailEntity.consigneeName,
+                style: Constant.valueStyle,
+              ),
             ],
           ),
           Container(
