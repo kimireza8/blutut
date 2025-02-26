@@ -19,48 +19,100 @@ class InputPage extends StatefulWidget {
   const InputPage({super.key});
 
   @override
-  State<InputPage> createState() => _InputPageState();
+  _InputPageState createState() => _InputPageState();
 }
 
-class _InputPageState extends State<InputPage> {
+class _InputPageState extends State<InputPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _formControllers = ReceiptFormControllers();
-  final _formValues = ReceiptFormValues();
-
-  late final InputCubit _inputCubit;
+  String? selectedBranchOffice;
+  DateTime? selectedDateSend;
+  DateTime? selectedDateReceive;
+  String? relationAs;
+  String? selectedCity;
+  String? selectedRoute;
+  String? selectedRelation;
+  String? selectedKindofService;
+  String? selectedServiceType;
+  final TextEditingController colliController = TextEditingController();
+  final TextEditingController senderController = TextEditingController();
+  final TextEditingController receiverController = TextEditingController();
+  final TextEditingController receiptNumberController = TextEditingController();
+  final TextEditingController deliveryNoteController = TextEditingController();
+  final TextEditingController senderAddressController = TextEditingController();
+  final TextEditingController receiverAddressController =
+      TextEditingController();
+  final TextEditingController senderHpController = TextEditingController();
+  final TextEditingController receiverHpController = TextEditingController();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
-  }
-
-  void _fetchData() {
-    _inputCubit = InputCubit.create();
-    _inputCubit.fetchData();
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
-    _formControllers.dispose();
-    _inputCubit.close();
+    colliController.dispose();
+    senderController.dispose();
+    receiverController.dispose();
+    receiptNumberController.dispose();
+    deliveryNoteController.dispose();
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, DateType dateType) async {
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      var receipt = ReceiptInputEntity(
+        branch: selectedBranchOffice ?? '',
+        date: selectedDateSend != null
+            ? "${selectedDateSend!.toIso8601String().split('T')[0]}T00:00:00"
+            : '',
+        incomingDate: selectedDateReceive != null
+            ? "${selectedDateReceive!.toIso8601String().split('T')[0]}T00:00:00"
+            : '',
+        customer: selectedRelation ?? '',
+        customerRole: relationAs ?? '',
+        shipperName: senderController.text,
+        shipperAddress: senderAddressController.text,
+        shipperPhone: senderHpController.text,
+        consigneeName: receiverController.text,
+        consigneeAddress: receiverAddressController.text,
+        consigneeCity: selectedCity ?? '',
+        consigneePhone: receiverHpController.text,
+        receiptNumber: receiptNumberController.text,
+        passDocument: deliveryNoteController.text,
+        serviceType: selectedServiceType ?? '',
+        route: selectedRoute ?? '',
+        totalCollies: colliController.text,
+      );
+
+      context.read<ReceiptBloc>().add(
+            CreateReceipt(
+              serviceLocator<SharedPreferencesService>().getCookie() ?? '',
+              receipt,
+            ),
+          );
+      context.router.pop();
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isSendDate) async {
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-
     if (picked != null) {
       setState(() {
-        if (dateType == DateType.send) {
-          _formValues.dateSend = picked;
+        if (isSendDate) {
+          selectedDateSend = picked;
         } else {
-          _formValues.dateReceive = picked;
+          selectedDateReceive = picked;
         }
       });
     }
@@ -68,365 +120,243 @@ class _InputPageState extends State<InputPage> {
 
   void _clearFields() {
     setState(() {
-      _formControllers.clear();
-      _formValues.clearSelections();
+      colliController.clear();
+      senderController.clear();
+      receiverController.clear();
+      receiptNumberController.clear();
+      deliveryNoteController.clear();
+
+      selectedCity = null;
+      selectedRoute = null;
+      selectedRelation = null;
+      selectedServiceType = null;
     });
   }
 
-  Future<void> _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState?.save();
-
-      var receiptInput = ReceiptInputEntity(
-        branch: _formValues.branchOffice ?? '',
-        date: _formatDate(_formValues.dateSend),
-        incomingDate: _formatDate(_formValues.dateReceive),
-        customer: _formValues.relation ?? '',
-        customerRole: _formValues.relationAs ?? '',
-        shipperName: _formControllers.sender.text,
-        shipperAddress: _formControllers.senderAddress.text,
-        shipperPhone: _formControllers.senderHp.text,
-        consigneeName: _formControllers.receiver.text,
-        consigneeAddress: _formControllers.receiverAddress.text,
-        consigneeCity: _formValues.city ?? '',
-        consigneePhone: _formControllers.receiverHp.text,
-        receiptNumber: _formControllers.receiptNumber.text,
-        passDocument: _formControllers.deliveryNote.text,
-        serviceType: _formValues.serviceType ?? '',
-        route: _formValues.route ?? '',
-        totalCollies: _formControllers.colli.text,
-      );
-
-      String cookie =
-          serviceLocator<SharedPreferencesService>().getCookie() ?? '';
-      context.read<ReceiptBloc>().add(CreateReceipt(cookie, receiptInput));
-      await context.router.maybePop();
-    }
-  }
-
-  String _formatDate(DateTime? date) =>
-      date != null ? "${date.toIso8601String().split('T')[0]}T00:00:00" : '';
-
   @override
-  Widget build(BuildContext context) => BlocProvider.value(
-        value: _inputCubit,
+  Widget build(BuildContext context) => BlocProvider(
+        create: (context) => InputCubit.create()..fetchData(),
         child: Scaffold(
-          body: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) => SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      children: [
-                        const ReceiptHeaderSection(),
-                        Expanded(
-                          child: BlocBuilder<InputCubit, InputState>(
-                            builder: (context, state) {
-                              if (state is InputLoading) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              } else if (state is InputLoaded) {
-                                return _buildForm(state);
-                              } else {
-                                return const Center(
-                                  child: Text('Gagal memuat data'),
-                                );
-                              }
-                            },
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(148),
+            child: Column(
+              children: [
+                Container(
+                  color: const Color.fromRGBO(29, 79, 215, 1),
+                  padding: const EdgeInsets.all(20),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Form',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                          Text(
+                            'Tanda Terima Barang',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        Icons.article,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ],
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicatorColor: Colors.blue,
+                    labelColor: Colors.blue,
+                    tabs: const [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.calendar_today),
+                            SizedBox(width: 4),
+                            Text('Tanggal &\n Relasi'),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.person),
+                            SizedBox(width: 4),
+                            Text('Pengirim &\n Penerima'),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.receipt),
+                            SizedBox(width: 4),
+                            Text('Detail\n Transaksi'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-      );
-
-  Widget _buildForm(InputLoaded state) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          body: TabBarView(
+            controller: _tabController,
             children: [
-              _buildDropdownBranchOffice(
-                'Kantor Cabang',
-                state.organization,
-                _formValues.branchOffice,
-                (value) => setState(() => _formValues.branchOffice = value),
-              ),
-              _buildDateField(
-                context,
-                'Tanggal Kirim',
-                _formValues.dateSend,
-                DateType.send,
-              ),
-              _buildDateField(
-                context,
-                'Tanggal Diterima',
-                _formValues.dateReceive,
-                DateType.receive,
-              ),
-              _buildDropdownCustom<RelationEntity>(
-                'Nama Relasi',
-                state.relation,
-                _formValues.relation,
-                (value) => setState(() => _formValues.relation = value),
-                (relation) => relation.name,
-                (relation) => relation.id,
-                Icons.people,
-                context,
-              ),
-              _buildDropdown(
-                'Relasi Sebagai',
-                [
-                  ['1', 'Pengirim'],
-                  ['2', 'Penerima'],
-                ],
-                _formValues.relationAs,
-                (value) => setState(() => _formValues.relationAs = value),
-              ),
-              _buildTwoColumnField(
-                'Pengirim',
-                'Penerima',
-                _formControllers.sender,
-                _formControllers.receiver,
-              ),
-              _buildTwoColumnField(
-                'Alamat Pengirim',
-                'Alamat Penerima',
-                _formControllers.senderAddress,
-                _formControllers.receiverAddress,
-              ),
-              _buildTwoColumnField(
-                'No Hp Pengirim',
-                'No Hp Penerima',
-                _formControllers.senderHp,
-                _formControllers.receiverHp,
-              ),
-              _buildDropdownCustom<ConsigneeCityEntity>(
-                'Kota Tujuan',
-                state.city,
-                _formValues.city,
-                (value) => setState(() => _formValues.city = value),
-                (city) => city.name,
-                (city) => city.id,
-                Icons.location_on,
-                context,
-              ),
-              _buildTextField(
-                'Nomor Resi',
-                _formControllers.receiptNumber,
-              ),
-              _buildTextField(
-                'Nomor Surat Jalan',
-                _formControllers.deliveryNote,
-              ),
-              _buildDropdownCustom<ServiceTypeEntity>(
-                'Jenis Pelayanan',
-                state.serviceType,
-                _formValues.serviceType,
-                (value) {
-                  setState(() {
-                    _formValues
-                      ..serviceType = value
-                      ..serviceTypeName = value != null
-                          ? state.serviceType
-                              .firstWhere(
-                                (s) => s.id == value,
-                              )
-                              .name
-                          : null
-                      ..route = null;
-                  });
-                },
-                (serviceType) => serviceType.name,
-                (serviceType) => serviceType.id,
-                Icons.room_service,
-                context,
-              ),
-              _buildDropdownCustom<RouteEntity>(
-                'Rute Pengiriman',
-                state.route
-                    .where(
-                      (route) =>
-                          _formValues.serviceTypeName == null ||
-                          route.serviceType == _formValues.serviceTypeName,
-                    )
-                    .toList(),
-                _formValues.route,
-                (value) => setState(() => _formValues.route = value),
-                (route) => route.routeName,
-                (route) => route.id,
-                Icons.route,
-                context,
-              ),
-              _buildTextField(
-                'Total Colli',
-                _formControllers.colli,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  _buildTextButton(
-                    'Clear',
-                    _clearFields,
-                  ),
-                  const Spacer(),
-                  _buildOutlinedButton(
-                    'Cancel',
-                    () async => context.router.maybePop(),
-                  ),
-                  const SizedBox(width: 8),
-                  _buildElevatedButton(
-                    'Next',
-                    const Color.fromRGBO(29, 79, 215, 1),
-                    _submitForm,
-                  ),
-                ],
-              ),
+              _buildTabTanggalRelasi(),
+              _buildTabPengirimPenerima(),
+              _buildTabDetailTransaksi(),
             ],
           ),
         ),
       );
 
-  Widget _buildTextField(String label, TextEditingController controller) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-        ),
+  Widget _buildTabTanggalRelasi() => BlocBuilder<InputCubit, InputState>(
+        builder: (context, state) {
+          if (state is InputLoaded) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle('Waktu & Tanggal'),
+                  _buildDateField(context, 'Tanggal', selectedDateSend, true),
+                  _buildDateField(
+                      context, 'Tanggal diterima', selectedDateReceive, false),
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Pihak Terkait'),
+                  _buildDropdownCustom<RelationEntity>(
+                    'Nama Relasi',
+                    state.relation,
+                    selectedRelation,
+                    (value) => setState(() => selectedRelation = value),
+                    (relation) => relation.name,
+                    (relation) => relation.id,
+                    Icons.people,
+                    context,
+                  ),
+                  _buildDropdown('Relasi Sebagai', [
+                    ['1', 'Pengirim'],
+                    ['2', 'Penerima'],
+                  ]),
+                ],
+              ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
       );
 
-  Widget _buildTwoColumnField(
-    String leftLabel,
-    String rightLabel,
-    TextEditingController leftController,
-    TextEditingController rightController,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Row(
+  Widget _buildTabPengirimPenerima() => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: TextFormField(
-                controller: leftController,
-                decoration: InputDecoration(
-                  labelText: leftLabel,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextFormField(
-                controller: rightController,
-                decoration: InputDecoration(
-                  labelText: rightLabel,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
+            _buildSectionTitle('Pengirim'),
+            _buildTextField('Nama', senderController),
+            _buildTextField('Alamat', senderController),
+            _buildTextField('No. Handphone', senderController),
+            const SizedBox(height: 24),
+            _buildSectionTitle('Penerima'),
+            _buildTextField('Nama', receiverController),
+            _buildTextField('Alamat', receiverController),
+            _buildTextField('No. Handphone', receiverController),
           ],
         ),
       );
 
-  Widget _buildDateField(
-    BuildContext context,
-    String label,
-    DateTime? selectedDate,
-    DateType dateType,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: GestureDetector(
-          onTap: () => _selectDate(context, dateType),
-          child: AbsorbPointer(
-            child: TextFormField(
-              decoration: InputDecoration(
-                labelText: label,
-                suffixIcon: const Icon(Icons.calendar_today),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+  Widget _buildTabDetailTransaksi() => BlocBuilder<InputCubit, InputState>(
+        builder: (context, state) {
+          if (state is InputLoaded) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSectionTitle('Detail Transaksi'),
+                  _buildDropdownCustom<ConsigneeCityEntity>(
+                    'Kota Tujuan',
+                    state.city,
+                    selectedCity,
+                    (value) => setState(() => selectedCity = value),
+                    (city) => city.name,
+                    (city) => city.id,
+                    Icons.location_on,
+                    context,
+                  ),
+                  _buildTextField('Nomor Resi', receiptNumberController),
+                  _buildTextField('Nomor Surat Jalan', deliveryNoteController),
+                  _buildDropdownCustom<ServiceTypeEntity>(
+                    'Jenis Pelayanan',
+                    state.serviceType,
+                    selectedKindofService,
+                    (value) {
+                      setState(() {
+                        selectedKindofService = value;
+                        selectedServiceType =
+                            state.serviceType[int.parse(value!)].name;
+                        selectedRoute = null;
+                      });
+                    },
+                    (kindOfService) => kindOfService.name,
+                    (kindOfService) => kindOfService.id,
+                    Icons.room_service,
+                    context,
+                  ),
+                  _buildDropdownCustom<RouteEntity>(
+                    'Rute Pengiriman',
+                    state.route
+                        .where((route) =>
+                            selectedServiceType == null ||
+                            route.serviceType == selectedServiceType)
+                        .toList(),
+                    selectedRoute,
+                    (value) => setState(() => selectedRoute = value),
+                    (route) => route.routeName,
+                    (route) => route.id,
+                    Icons.route,
+                    context,
+                  ),
+                  _buildTextField('Total Colli', colliController),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      _buildTextButton('Clear', _clearFields),
+                      const Spacer(),
+                      _buildOutlinedButton('Cancel', () async {
+                        await context.router.maybePop();
+                      }),
+                      const SizedBox(width: 8),
+                      _buildElevatedButton('Next',
+                          const Color.fromRGBO(29, 79, 215, 1), _submitForm),
+                    ],
+                  ),
+                ],
               ),
-              controller: TextEditingController(
-                text: selectedDate == null
-                    ? ''
-                    : '${selectedDate.toLocal()}'.split(' ')[0],
-              ),
-            ),
-          ),
-        ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
       );
-
-  Widget _buildDropdown(
-    String label,
-    List<List<dynamic>> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (option) => DropdownMenuItem<String>(
-                  value: option[0].toString(),
-                  child: Text(option[1].toString()),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-
-  Widget _buildDropdownBranchOffice(
-    String label,
-    List<OrganizationEntity> options,
-    String? selectedValue,
-    Function(String?) onChanged,
-  ) =>
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: selectedValue,
-          items: options
-              .map(
-                (office) => DropdownMenuItem<String>(
-                  value: office.id,
-                  child: Text(office.name),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      );
-
   Widget _buildDropdownCustom<T>(
     String label,
     List<T> options,
@@ -464,35 +394,71 @@ class _InputPageState extends State<InputPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  _getDisplayTextForDropdown(
-                      selectedValue, options, getLabel, getValue, label),
+                  selectedValue != null && options.isNotEmpty
+                      ? getLabel(
+                          options
+                              .firstWhere((e) => getValue(e) == selectedValue),
+                        )
+                      : 'Pilih $label',
                 ),
-                const Icon(Icons.arrow_drop_down),
+                Icon(Icons.add_circle, color: Colors.blue),
               ],
             ),
           ),
         ),
       );
 
-  String _getDisplayTextForDropdown<T>(
-    String? selectedValue,
-    List<T> options,
-    String Function(T) getLabel,
-    String Function(T) getValue,
+  Widget _buildTextField(String label, TextEditingController controller) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+        ),
+      );
+
+  Widget _buildSectionTitle(String title) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+
+  Widget _buildDropdown(
     String label,
-  ) {
-    if (selectedValue == null || options.isEmpty) {
-      return 'Pilih $label';
-    }
-
-    for (final option in options) {
-      if (getValue(option) == selectedValue) {
-        return getLabel(option);
-      }
-    }
-
-    return 'Pilih $label';
-  }
+    List<List<dynamic>> options,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: DropdownButtonFormField(
+          icon: Icon(Icons.add_circle, color: Colors.blue),
+          decoration: InputDecoration(
+            labelText: label,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          items: options
+              .map(
+                (option) => DropdownMenuItem(
+                  value: option[0],
+                  child: Text(option[1].toString()),
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              relationAs = value.toString();
+            });
+          },
+          value: relationAs,
+        ),
+      );
 
   Widget _buildTextButton(String label, VoidCallback onPressed) => TextButton(
         onPressed: onPressed,
@@ -532,109 +498,33 @@ class _InputPageState extends State<InputPage> {
         onPressed: onPressed,
         child: Text(label, style: const TextStyle(color: Colors.white)),
       );
-}
 
-enum DateType { send, receive }
-
-class ReceiptFormControllers {
-  final colli = TextEditingController();
-  final sender = TextEditingController();
-  final receiver = TextEditingController();
-  final receiptNumber = TextEditingController();
-  final deliveryNote = TextEditingController();
-  final senderAddress = TextEditingController();
-  final receiverAddress = TextEditingController();
-  final senderHp = TextEditingController();
-  final receiverHp = TextEditingController();
-
-  void clear() {
-    colli.clear();
-    sender.clear();
-    receiver.clear();
-    receiptNumber.clear();
-    deliveryNote.clear();
-    senderAddress.clear();
-    receiverAddress.clear();
-    senderHp.clear();
-    receiverHp.clear();
-  }
-
-  void dispose() {
-    colli.dispose();
-    sender.dispose();
-    receiver.dispose();
-    receiptNumber.dispose();
-    deliveryNote.dispose();
-    senderAddress.dispose();
-    receiverAddress.dispose();
-    senderHp.dispose();
-    receiverHp.dispose();
-  }
-}
-
-class ReceiptFormValues {
-  String? branchOffice;
-  DateTime? dateSend;
-  DateTime? dateReceive;
-  String? relationAs;
-  String? city;
-  String? route;
-  String? relation;
-  String? serviceType;
-  String? serviceTypeName;
-
-  void clearSelections() {
-    branchOffice = null;
-    dateSend = null;
-    dateReceive = null;
-    relationAs = null;
-    city = null;
-    route = null;
-    relation = null;
-    serviceType = null;
-    serviceTypeName = null;
-  }
-}
-
-class ReceiptHeaderSection extends StatelessWidget {
-  const ReceiptHeaderSection({super.key});
-
-  static const Color headerColor = Color.fromRGBO(29, 79, 215, 1);
-
-  @override
-  Widget build(BuildContext context) => const DecoratedBox(
-        decoration: BoxDecoration(color: headerColor),
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Form',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
-                  ),
-                  Text(
-                    'Tanda Terima Barang',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                ],
+  Widget _buildDateField(
+    BuildContext context,
+    String label,
+    DateTime? selectedDate,
+    bool isSendDate,
+  ) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: GestureDetector(
+          onTap: () => _selectDate(context, isSendDate),
+          child: AbsorbPointer(
+            child: TextFormField(
+              decoration: InputDecoration(
+                labelText: label,
+                suffixIcon:
+                    const Icon(Icons.calendar_today, color: Colors.blue),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              Icon(
-                Icons.article,
-                color: Colors.white,
-                size: 30,
+              controller: TextEditingController(
+                text: selectedDate == null
+                    ? ''
+                    : '${selectedDate.toLocal()}'.split(' ')[0],
               ),
-            ],
+            ),
           ),
         ),
       );
